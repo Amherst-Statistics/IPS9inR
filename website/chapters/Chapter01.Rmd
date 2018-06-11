@@ -44,6 +44,7 @@ he *R Journal*: https://journal.r-project.org/archive/2017/RJ-2017-024.
 
 ```{r}
 library(mosaic)
+library(readr)
 ds <- read_csv("https://nhorton.people.amherst.edu/ips9/data/chapter01/EG01-01COUPONS.csv")
 glimpse(ds)
 ```
