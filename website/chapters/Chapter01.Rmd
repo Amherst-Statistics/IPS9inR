@@ -43,7 +43,9 @@ he *R Journal*: https://journal.r-project.org/archive/2017/RJ-2017-024.
 
 
 ```{r}
-ds <- readRDS(url("https://nhorton.people.amherst.edu/ips9/data/chap01/EG01-01COUPONS.rda"))
+load(url("https://nhorton.people.amherst.edu/ips9/data/chap01/EG01-01COUPONS.rda"))
+glimpse(EG01-COUPONS)
+```
   
 ## Chapter 1: XX
 
