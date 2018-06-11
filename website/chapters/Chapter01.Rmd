@@ -43,8 +43,9 @@ he *R Journal*: https://journal.r-project.org/archive/2017/RJ-2017-024.
 
 
 ```{r}
-load(url("https://nhorton.people.amherst.edu/ips9/data/chap01/EG01-01COUPONS.rda"))
-glimpse(EG01-COUPONS)
+library(mosaic)
+ds <- read_csv("https://nhorton.people.amherst.edu/ips9/data/chapter01/EG01-01COUPONS.csv")
+glimpse(ds)
 ```
   
 ## Chapter 1: XX
