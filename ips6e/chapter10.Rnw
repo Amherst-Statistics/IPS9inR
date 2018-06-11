@@ -1,0 +1,242 @@
+\documentclass[11pt]{article}
+
+\usepackage[margin=1in,bottom=.5in,includehead,includefoot]{geometry}
+\usepackage{hyperref}
+\usepackage{language}
+\usepackage{alltt}
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+
+%% Now begin customising things. See the fancyhdr docs for more info.
+
+\chead{}
+\lhead[\sf \thepage]{\sf \leftmark}
+\rhead[\sf \leftmark]{\sf \thepage}
+\lfoot{}
+\cfoot{Introduction to the Practice of Statistics using R: Chapter 10}
+\rfoot{}
+
+\newcounter{myenumi}
+\newcommand{\saveenumi}{\setcounter{myenumi}{\value{enumi}}}
+\newcommand{\reuseenumi}{\setcounter{enumi}{\value{myenumi}}}
+
+\pagestyle{fancy}
+
+\def\R{{\sf R}}
+\def\Rstudio{{\sf RStudio}}
+\def\RStudio{{\sf RStudio}}
+\def\term#1{\textbf{#1}}
+\def\tab#1{{\sf #1}}
+
+
+\usepackage{relsize}
+
+\newlength{\tempfmlength}
+\newsavebox{\fmbox}
+\newenvironment{fmpage}[1]
+     {
+   \medskip
+   \setlength{\tempfmlength}{#1}
+	 \begin{lrbox}{\fmbox}
+	   \begin{minipage}{#1}
+		 \vspace*{.02\tempfmlength}
+		 \hfill
+	   \begin{minipage}{.95 \tempfmlength}}
+		 {\end{minipage}\hfill
+		 \vspace*{.015\tempfmlength}
+		 \end{minipage}\end{lrbox}\fbox{\usebox{\fmbox}}
+	 \medskip
+	 }
+
+
+\newenvironment{boxedText}[1][.98\textwidth]%
+{%
+\begin{center}
+\begin{fmpage}{#1}
+}%
+{%
+\end{fmpage}
+\end{center}
+}
+
+\newenvironment{boxedTable}[2][tbp]%
+{%
+\begin{table}[#1]
+  \refstepcounter{table}
+  \begin{center}
+\begin{fmpage}{.98\textwidth}
+  \begin{center}
+	\sf \large Box~\expandafter\thetable. #2
+\end{center}
+\medskip
+}%
+{%
+\end{fmpage}
+\end{center}
+\end{table}		% need to do something about exercises that follow boxedTable
+}
+
+
+\newcommand{\cran}{\href{http://www.R-project.org/}{CRAN}}
+
+\title{Introduction to the Practice of Statistics using R: \\
+Chapter 16}
+
+\author{
+Ben Baumer \and Nicholas J. Horton\thanks{Department of Mathematics, Amherst College, nhorton@amherst.edu} 
+} 
+\date{\today}
+
+\begin{document}
+
+
+\maketitle
+\tableofcontents
+
+%\parindent=0pt
+
+
+<<setup, include=FALSE, cache=FALSE>>=
+opts_chunk$set(
+  dev="pdf",
+  tidy=FALSE,
+  fig.path="figures/",
+	fig.height=4,
+	fig.width=5,
+	out.width=".57\\textwidth",
+	fig.keep="high",
+	fig.show="hold",
+	fig.align="center",
+	prompt=TRUE,  # show the prompts; but perhaps we should not do this 
+	comment=NA    
+  )
+options(continue=" ")
+@
+
+<<pvalues, echo=FALSE, message=FALSE>>=
+print.pval = function(pval) {
+  threshold = 0.0001
+    return(ifelse(pval < threshold, paste("p<", sprintf("%.4f", threshold), sep=""),
+                ifelse(pval > 0.1, paste("p=",round(pval, 2), sep=""),
+                       paste("p=", round(pval, 3), sep=""))))
+}
+@
+
+<<setup2,echo=FALSE,message=FALSE>>=
+require(mosaic)
+trellis.par.set(theme=col.mosaic())  # get a better color scheme for lattice
+set.seed(123)
+# this allows for code formatting inline.  Use \Sexpr{'function(x,y)'}, for exmaple.
+knit_hooks$set(inline = function(x) {
+if (is.numeric(x)) return(knitr:::format_sci(x, 'latex'))
+x = as.character(x)
+h = knitr:::hilight_source(x, 'latex', list(prompt=FALSE, size='normalsize'))
+h = gsub("([_#$%&])", "\\\\\\1", h)
+h = gsub('(["\'])', '\\1{}', h)
+gsub('^\\\\begin\\{alltt\\}\\s*|\\\\end\\{alltt\\}\\s*$', '', h)
+})
+showOriginal=FALSE
+showNew=TRUE
+@ 
+
+\section*{Introduction}
+
+This document is intended to help describe how to undertake analyses introduced as examples in the Sixth Edition of \emph{Introduction to the 
+Practice of Statistics} (2002) by David Moore, George McCabe and Bruce
+Craig.
+More information about the book can be found at \url{http://bcs.whfreeman.com/ips6e/}.  This
+file as well as the associated \pkg{knitr} reproducible analysis source file can be found at
+\url{http://www.math.smith.edu/~nhorton/ips6e}.
+
+This work leverages initiatives undertaken by Project MOSAIC (\url{http://www.mosaic-web.org}), an NSF-funded effort to improve the teaching of statistics, calculus, science and computing in the undergraduate curriculum. In particular, we utilize the 
+\pkg{mosaic} package, which was written to simplify the use of R for introductory statistics courses. A short summary of the R needed to teach introductory statistics can be found in the mosaic package vignette (\url{http://cran.r-project.org/web/packages/mosaic/vignettes/MinimalR.pdf}).
+
+To use a package within R, it must be installed (one time), and loaded (each session). The package can be installed using the following command:
+<<install_mosaic,eval=FALSE>>=
+install.packages('mosaic')               # note the quotation marks
+@
+The {\tt \#} character is a comment in R, and all text after that on the 
+current line is ignored.
+
+Once the package is installed (one time only), it can be loaded by running the command:
+<<load_mosaic,eval=FALSE>>=
+require(mosaic)
+@
+This
+needs to be done once per session.
+
+We also set some options to improve legibility of graphs and output.
+<<eval=TRUE>>=
+trellis.par.set(theme=col.mosaic())  # get a better color scheme for lattice
+options(digits=3)
+@
+
+The specific goal of this document is to demonstrate how to replicate the
+analysis described in Chapter 10: Inference for Regression.
+
+\section{Simple Linear Regression}
+
+The first example from Chapter 10 is 10.4 (page 566), which assesses fuel economy for 60 cars. 
+
+<<>>=
+fuel = read.csv("http://math.smith.edu/ips6eR/ch10/eg10_001.csv")
+head(fuel)
+@
+
+In this case we are building a model for $MPG$ as a function of $LOGMPG$, which is a precomputed variable. Output similar to that shown in Figure 10.5 can be produced by applying the {\tt summary()} command to an {\tt lm} object.
+
+<<>>=
+fm1 = lm(MPG ~ LOGMPH, data=fuel)
+summary(fm1)
+@
+
+Note that R can compute the same model without using the precomputed variables, by applying the {\tt log()} function to the $MPH$ variables on-the-fly.
+
+<<>>=
+fm1a = lm(MPG ~ log(MPH), data=fuel)
+summary(fm1a)
+@
+
+Like other statistical software packages, R performs a $t$-test for the null hypothesis that $\beta_i = 0$ for all coefficients $\beta_i$ present in the model. The third column of the {\tt summary()} output (labeled {\tt t value}) gives the $t$-statistic, and the fourth column gives the corresponding $p$-value. Confidence intervals can be retrieved using the {\tt confint()} command, which by default returns a 95\% confidence interval.
+
+<<>>=
+confint(fm1)
+@
+
+Confidence intervals for the mean response, as well as prediction intervals for future observations, can be plotted using the {\tt panel.lmbands} argument to {\tt xyplot()}. The following plot is a mashup of Figure 10.9 (page 573) and Figure 10.10 (page 575). 
+
+<<>>=
+xyplot(MPG ~ log(MPH), panel=panel.lmbands, data=fuel)
+@
+
+To retrieve the actual values, we can apply the {\tt predict()} command to our regression model object, and specify whether we want confindence intervals or prediction intervals.
+
+<<>>=
+# only show the first six rows for clarity
+head(predict(fm1, interval="confidence"))
+# only show the first six rows for clarity
+head(predict(fm1, interval="predict"))
+@
+
+
+\section{More Detail about Simple Linear Regression}
+
+\subsection{The ANOVA $F$-test}
+
+An ANOVA table similar to the one shown in Figure 10.12 (page 583) can be produced by applying the {\tt anova()} command to a regression model object.
+
+<<>>=
+anova(fm1)
+@
+
+\subsection{Inference for Correlation}
+
+We can test for zero correlation using the {\tt cor.test()} command. In Example 10.22, a $t$-test for non-zero correlation is conducted between the $MPG$ and $LOGMPH$ of 60 cars
+
+<<>>=
+with(fuel, cor.test(MPG, LOGMPH))
+@
+
+
+\end{document}

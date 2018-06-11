@@ -1,0 +1,369 @@
+\documentclass[11pt]{article}
+
+\usepackage[margin=1in,bottom=.5in,includehead,includefoot]{geometry}
+\usepackage{hyperref}
+\usepackage{language}
+\usepackage{alltt}
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+
+%% Now begin customising things. See the fancyhdr docs for more info.
+
+\chead{}
+\lhead[\sf \thepage]{\sf \leftmark}
+\rhead[\sf \leftmark]{\sf \thepage}
+\lfoot{}
+\cfoot{Introduction to the Practice of Statistics using R: Chapter 7}
+\rfoot{}
+
+\newcounter{myenumi}
+\newcommand{\saveenumi}{\setcounter{myenumi}{\value{enumi}}}
+\newcommand{\reuseenumi}{\setcounter{enumi}{\value{myenumi}}}
+
+\pagestyle{fancy}
+
+\def\R{{\sf R}}
+\def\Rstudio{{\sf RStudio}}
+\def\RStudio{{\sf RStudio}}
+\def\term#1{\textbf{#1}}
+\def\tab#1{{\sf #1}}
+
+
+\usepackage{relsize}
+
+\newlength{\tempfmlength}
+\newsavebox{\fmbox}
+\newenvironment{fmpage}[1]
+     {
+   \medskip
+   \setlength{\tempfmlength}{#1}
+	 \begin{lrbox}{\fmbox}
+	   \begin{minipage}{#1}
+		 \vspace*{.02\tempfmlength}
+		 \hfill
+	   \begin{minipage}{.95 \tempfmlength}}
+		 {\end{minipage}\hfill
+		 \vspace*{.015\tempfmlength}
+		 \end{minipage}\end{lrbox}\fbox{\usebox{\fmbox}}
+	 \medskip
+	 }
+
+
+\newenvironment{boxedText}[1][.98\textwidth]%
+{%
+\begin{center}
+\begin{fmpage}{#1}
+}%
+{%
+\end{fmpage}
+\end{center}
+}
+
+\newenvironment{boxedTable}[2][tbp]%
+{%
+\begin{table}[#1]
+  \refstepcounter{table}
+  \begin{center}
+\begin{fmpage}{.98\textwidth}
+  \begin{center}
+	\sf \large Box~\expandafter\thetable. #2
+\end{center}
+\medskip
+}%
+{%
+\end{fmpage}
+\end{center}
+\end{table}		% need to do something about exercises that follow boxedTable
+}
+
+
+\newcommand{\cran}{\href{http://www.R-project.org/}{CRAN}}
+
+\title{Introduction to the Practice of Statistics using R: \\
+Chapter 7}
+
+\author{
+Nicholas J. Horton\thanks{Department of Mathematics, Amherst College, nhorton@amherst.edu} \and Ben Baumer
+} 
+
+\date{\today}
+
+\begin{document}
+
+
+\maketitle
+\tableofcontents
+
+%\parindent=0pt
+
+
+<<setup, include=FALSE, cache=FALSE>>=
+opts_chunk$set(
+  dev="pdf",
+  tidy=FALSE,
+  fig.path="figures/",
+	fig.height=4,
+	fig.width=5,
+	out.width=".57\\textwidth",
+	fig.keep="high",
+	fig.show="hold",
+	fig.align="center",
+	prompt=TRUE,  # show the prompts; but perhaps we should not do this 
+	comment=NA    
+  )
+options(continue=" ")
+@
+
+<<pvalues, echo=FALSE, message=FALSE>>=
+print.pval = function(pval) {
+  threshold = 0.0001
+    return(ifelse(pval < threshold, paste("p<", sprintf("%.4f", threshold), sep=""),
+                ifelse(pval > 0.1, paste("p=",round(pval, 2), sep=""),
+                       paste("p=", round(pval, 3), sep=""))))
+}
+@
+
+<<setup2,echo=FALSE,message=FALSE>>=
+require(mosaic)
+trellis.par.set(theme=col.mosaic())  # get a better color scheme for lattice
+set.seed(123)
+# this allows for code formatting inline.  Use \Sexpr{'function(x,y)'}, for exmaple.
+knit_hooks$set(inline = function(x) {
+if (is.numeric(x)) return(knitr:::format_sci(x, 'latex'))
+x = as.character(x)
+h = knitr:::hilight_source(x, 'latex', list(prompt=FALSE, size='normalsize'))
+h = gsub("([_#$%&])", "\\\\\\1", h)
+h = gsub('(["\'])', '\\1{}', h)
+gsub('^\\\\begin\\{alltt\\}\\s*|\\\\end\\{alltt\\}\\s*$', '', h)
+})
+showOriginal=FALSE
+showNew=TRUE
+@ 
+
+\section*{Introduction}
+
+This document is intended to help describe how to undertake analyses introduced as examples in the Sixth Edition of \emph{Introduction to the 
+Practice of Statistics} (2002) by David Moore, George McCabe and Bruce
+Craig.
+More information about the book can be found at \url{http://bcs.whfreeman.com/ips6e/}.  This
+file as well as the associated \pkg{knitr} reproducible analysis source file can be found at
+\url{http://www.math.smith.edu/~nhorton/ips6e}.
+
+This work leverages initiatives undertaken by Project MOSAIC (\url{http://www.mosaic-web.org}), an NSF-funded effort to improve the teaching of statistics, calculus, science and computing in the undergraduate curriculum. In particular, we utilize the 
+\pkg{mosaic} package, which was written to simplify the use of R for introductory statistics courses. A short summary of the R needed to teach introductory statistics can be found in the mosaic package vignette (\url{http://cran.r-project.org/web/packages/mosaic/vignettes/MinimalR.pdf}).
+
+To use a package within R, it must be installed (one time), and loaded (each session). The package can be installed using the following command:
+<<install_mosaic,eval=FALSE>>=
+install.packages('mosaic')               # note the quotation marks
+@
+The {\tt \#} character is a comment in R, and all text after that on the 
+current line is ignored.
+
+Once the package is installed (one time only), it can be loaded by running the command:
+<<load_mosaic,eval=FALSE>>=
+require(mosaic)
+@
+This
+needs to be done once per session.
+
+We also set some options to improve legibility of graphs and output.
+<<eval=TRUE>>=
+trellis.par.set(theme=col.mosaic())  # get a better color scheme for lattice
+options(digits=3)
+@
+
+The specific goal of this document is to demonstrate how to replicate the
+analysis described in Chapter 7: Inference for Distributions.
+
+\section{Inference for the mean of a population}
+
+It is straightforward to undertake inference for a single population using R.  
+For example, the results from Example 7.1 (page 421)
+can be reproduced using the following commands
+<<>>=
+x = c(5,6, 0, 4, 11, 9, 2, 3)
+favstats(x)
+length(x)
+tstar = qt(.975, df=length(x) - 1)
+tstar
+moe = sd(x) / sqrt(length(x))
+moe
+mean(x) + c(-tstar, tstar) * moe
+@
+
+As the authors note (page 421), 
+we are 95\% confident that the US population's average time spent listening to full-track music on a cell phone
+is between 2.0 and 8.0 hours per month.  Since this interval does not contain the null value of 8.3 hours, 
+these data suggest that on average, a US subscriber listens to less full-track music.
+
+Example 7.2 (pages 422--423) continues this example using a one-sample t-test, specifically assessing whether the mean in the US is different than 8.3 hours.
+<<>>=
+t = (mean(x) - 8.3) / (sd(x)/sqrt(length(x)))
+t
+pt(t, df=length(x) - 1)   # one tail
+1 - pt(abs(t), df=length(x) - 1)   # right tail
+2* pt(t, df=length(x) - 1)   # two sided test (since our statistic was negative)
+2*(1 - pt(abs(t), df=length(x) - 1))   # two sided test (this always works)
+@
+
+Example 7.4 (pages 424--425) considers a one-sample test of stock portfolio diversification.  
+<<>>=
+ds = read.csv("http://www.math.smith.edu/ips6eR/ch07/ta07_001.csv")
+favstats(~ return, data=ds)
+with(ds, qqnorm(return))
+with(ds, t.test(return-0.95))
+@
+
+Example 7.7 (pages 428--429) considers whether there is a statistically significant difference in the aggressive behaviors of dementia patients on moon days vs. other days.  
+
+<<>>=
+ds = read.csv("http://www.math.smith.edu/ips6eR/ch07/ta07_002.csv")
+favstats(~ aggdiff, data=ds)
+with(ds, stem(aggdiff))
+with(ds, t.test(aggdiff))
+@
+These results are consistent with those from the text.
+
+\subsection{Transformations}
+
+Example 7.11 (pages 436--437) considers the length of audio files on an iPod (which are dramatically right skewed).  A log transformation is indicated (as seen below).
+
+<<>>=
+ds = read.csv("http://www.math.smith.edu/ips6eR/ch07/ta07_003.csv")
+names(ds)
+ds = transform(ds, logtotal = log(total_secs))
+with(ds, qqnorm(total_secs))
+with(ds, qqnorm(logtotal))
+@
+
+<<>>=
+with(ds, t.test(logtotal))
+@
+
+\subsection{Sign test}
+
+The sign test can be undertaken using the {\tt pbinom()} command (as described in Example 7.12 on pages 438--439). 
+
+
+<<>>=
+1 - pbinom(13, size=15, prob=0.5)
+@
+
+\section{Comparing two means}
+
+Example 7.14 (pages 450--453) compares the DRP scores from two samples of third-graders
+randomly assigned to a treatment group and control group.  We can replicate the parts
+and pieces of this comparison as well as undertake a two sample (equal variance) t-test.
+<<>>=
+ds = read.csv("http://www.math.smith.edu/ips6eR/ch07/ta07_004.csv")
+mean(drp ~ group, data=ds)
+diff(mean(drp ~ group, data=ds))
+sd(drp ~ group, data=ds)
+@
+We wouldn't undertake a one-sided test, but that's the approach suggested by the authors (page 453):
+<<>>=
+t.test(drp ~ group, alternative="less", data=ds)   
+@
+
+\subsection{Confidence interval}
+
+
+Example 7.15 (page 454) calculates a 95\% confidence interval for the mean improvement in the entire population of third-graders.
+<<>>=
+t.test(drp ~ group, data=ds)   # to match bottom of page 452
+@
+This interval matches the results at the top of page 455.
+
+\subsection{Pooled two-sample t procedure}
+
+While not generally recommended, the pooled two sample procedures can be fit within R.
+ By default the \emph{unequal} variance test is calculated. The {\tt var.equal=} option can be
+set to change this.  (But first note the error in the dataset, where the eighth placebo subject 
+is miscoded (should be 114, 112, decrease=2, not -2).
+<<>>=
+ds = read.csv("http://www.math.smith.edu/ips6eR/ch07/ta07_005.csv")
+ds[18,]
+ds[18,"dec"] = 2    # note error from table 7.5 page 463
+ds[18,]
+t.test(dec ~ group, alternative="greater", var.equal=TRUE, data=ds)
+@
+Again: the one-sided test is used (though we might question this).  
+
+To get a two-sided confidence interval, we fit the t.test without the {\tt alternative=} option:
+<<>>=
+t.test(dec ~ group, var.equal=TRUE, data=ds)
+@
+We would probably still suggest reporting the unequal variance (unpooled) results:
+<<>>=
+t.test(dec ~ group, var.equal=FALSE, data=ds)
+@
+These are slighter wide (but require less unverifiable assumptions).  
+
+\section{Optional topics}
+
+\subsection{F test for equality of spread}
+
+While we don't recommend using the test for equality for spread, this is straightforward to undertake
+in R.  The values displayed on page 475 can be generated with the command:
+<<>>=
+qf(c(0.90, 0.95, 0.0975, 0.99, 0.999), df1=9, df2=10)
+@
+
+We can carry out the test of equal variances using {\tt var.test()}:
+<<>>=
+var.test(dec ~ group, data=ds)
+@
+
+
+\subsection{Power}
+
+Power calculations, such as the one described in Example 7.23 (page 478) can be undertaken using the
+{\tt power.t.test()} function.  Suppose that we wanted to plan a new study to provide convincing evidence 
+at the $\alpha=0.01$ level, with 45 subjects in each of our two groups.  We believe that the true different
+in means is 5 points, and we assume that the population standard deviation is 7.4 for both groups (this
+corresponds to an effect size of $5/7.4 = 0.676$).
+<<>>=
+power.t.test(delta=5, n=45, sd=7.4, alternative="one.sided", sig.level=0.01)
+@
+
+We'd still do the two-sided test (which will have slightly less power):
+<<>>=
+power.t.test(delta=5, n=45, sd=7.4, sig.level=0.01)
+@
+
+An even more flexible approach would be to simulate data to calculate the power.  This can be extended to other settings for which the existing power functions do not handle. 
+
+
+We first need to write a function which samples the two groups under the assumptions of the 
+power calculation.
+
+<<>>=
+gendata = function() {
+  n = 45
+  sd = 7.4
+  diff = 5
+  y1 = rnorm(n, mean=0, sd=sd)
+  y2 = rnorm(n, mean=diff, sd=sd)
+  y = c(y1, y2)
+  x = c(rep("Control", n), rep("Treatment", n))
+  return(data.frame(y, x))
+}
+@
+
+We can repeatedly call this function, carry out our $t$-test, and save the $p$-value (using the 
+{\tt pval()} function in the {\tt mosaic} package.  Using 5000 simulations is sufficient 
+to estimate the proportion of times with fair accuracy (if the power was 0.50, 
+then the standard error of the proportion would be $\sqrt{0.5^2/5000}$ = \Sexpr{sqrt(0.5^2/5000)}).
+
+Finally, we tally how many of these were less than our desired alpha level (0.01).
+<<>>=
+powersim = do(5000) * pval(t.test(y ~ x, data=gendata()))
+head(powersim)
+options(digits=5)
+tally(~ p.value <= 0.01, format="percent", data=powersim)
+@
+The results are quite consistent with the analytic power calculation.
+
+
+\end{document}

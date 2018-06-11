@@ -1,0 +1,328 @@
+\documentclass[11pt]{article}
+
+\usepackage[margin=1in,bottom=.5in,includehead,includefoot]{geometry}
+\usepackage{hyperref}
+\usepackage{language}
+\usepackage{alltt}
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+
+%% Now begin customising things. See the fancyhdr docs for more info.
+
+\chead{}
+\lhead[\sf \thepage]{\sf \leftmark}
+\rhead[\sf \leftmark]{\sf \thepage}
+\lfoot{}
+\cfoot{Introduction to the Practice of Statistics using R: Chapter 6}
+\rfoot{}
+
+\newcounter{myenumi}
+\newcommand{\saveenumi}{\setcounter{myenumi}{\value{enumi}}}
+\newcommand{\reuseenumi}{\setcounter{enumi}{\value{myenumi}}}
+
+\pagestyle{fancy}
+
+\def\R{{\sf R}}
+\def\Rstudio{{\sf RStudio}}
+\def\RStudio{{\sf RStudio}}
+\def\term#1{\textbf{#1}}
+\def\tab#1{{\sf #1}}
+
+
+\usepackage{relsize}
+
+\newlength{\tempfmlength}
+\newsavebox{\fmbox}
+\newenvironment{fmpage}[1]
+     {
+   \medskip
+   \setlength{\tempfmlength}{#1}
+	 \begin{lrbox}{\fmbox}
+	   \begin{minipage}{#1}
+		 \vspace*{.02\tempfmlength}
+		 \hfill
+	   \begin{minipage}{.95 \tempfmlength}}
+		 {\end{minipage}\hfill
+		 \vspace*{.015\tempfmlength}
+		 \end{minipage}\end{lrbox}\fbox{\usebox{\fmbox}}
+	 \medskip
+	 }
+
+
+\newenvironment{boxedText}[1][.98\textwidth]%
+{%
+\begin{center}
+\begin{fmpage}{#1}
+}%
+{%
+\end{fmpage}
+\end{center}
+}
+
+\newenvironment{boxedTable}[2][tbp]%
+{%
+\begin{table}[#1]
+  \refstepcounter{table}
+  \begin{center}
+\begin{fmpage}{.98\textwidth}
+  \begin{center}
+	\sf \large Box~\expandafter\thetable. #2
+\end{center}
+\medskip
+}%
+{%
+\end{fmpage}
+\end{center}
+\end{table}		% need to do something about exercises that follow boxedTable
+}
+
+
+\newcommand{\cran}{\href{http://www.R-project.org/}{CRAN}}
+
+\title{Introduction to the Practice of Statistics using R: \\
+Chapter 6}
+
+\author{
+Ben Baumer \and Nicholas J. Horton\thanks{Department of Mathematics, Amherst College, nhorton@amherst.edu}
+} 
+
+\date{\today}
+
+\begin{document}
+
+
+\maketitle
+\tableofcontents
+
+%\parindent=0pt
+
+
+<<setup, include=FALSE, cache=FALSE>>=
+opts_chunk$set(
+  dev="pdf",
+  tidy=FALSE,
+  fig.path="figures/",
+	fig.height=4,
+	fig.width=5,
+	out.width=".57\\textwidth",
+	fig.keep="high",
+	fig.show="hold",
+	fig.align="center",
+	prompt=TRUE,  # show the prompts; but perhaps we should not do this 
+	comment=NA    
+  )
+options(continue=" ")
+@
+
+<<pvalues, echo=FALSE, message=FALSE>>=
+print.pval = function(pval) {
+  threshold = 0.0001
+    return(ifelse(pval < threshold, paste("p<", sprintf("%.4f", threshold), sep=""),
+                ifelse(pval > 0.1, paste("p=",round(pval, 2), sep=""),
+                       paste("p=", round(pval, 3), sep=""))))
+}
+@
+
+<<setup2,echo=FALSE,message=FALSE>>=
+require(mosaic)
+trellis.par.set(theme=col.mosaic())  # get a better color scheme for lattice
+set.seed(43)
+# this allows for code formatting inline.  Use \Sexpr{'function(x,y)'}, for exmaple.
+knit_hooks$set(inline = function(x) {
+if (is.numeric(x)) return(knitr:::format_sci(x, 'latex'))
+x = as.character(x)
+h = knitr:::hilight_source(x, 'latex', list(prompt=FALSE, size='normalsize'))
+h = gsub("([_#$%&])", "\\\\\\1", h)
+h = gsub('(["\'])', '\\1{}', h)
+gsub('^\\\\begin\\{alltt\\}\\s*|\\\\end\\{alltt\\}\\s*$', '', h)
+})
+showOriginal=FALSE
+showNew=TRUE
+@ 
+
+\section*{Introduction}
+
+This document is intended to help describe how to undertake analyses introduced as examples in the Sixth Edition of \emph{Introduction to the 
+Practice of Statistics} (2009) by David Moore, George McCabe and Bruce
+Craig.
+More information about the book can be found at \url{http://bcs.whfreeman.com/ips6e/}.  This
+file as well as the associated \pkg{knitr} reproducible analysis source file can be found at
+\url{http://www.math.smith.edu/~nhorton/ips6e}.
+
+This work leverages initiatives undertaken by Project MOSAIC (\url{http://www.mosaic-web.org}), an NSF-funded effort to improve the teaching of statistics, calculus, science and computing in the undergraduate curriculum. In particular, we utilize the 
+\pkg{mosaic} package, which was written to simplify the use of R for introductory statistics courses. A short summary of the R needed to teach introductory statistics can be found in the mosaic package vignette (\url{http://cran.r-project.org/web/packages/mosaic/vignettes/MinimalR.pdf}).
+
+To use a package within R, it must be installed (one time), and loaded (each session). The package can be installed using the following command:
+<<install_mosaic,eval=FALSE>>=
+install.packages('mosaic')               # note the quotation marks
+@
+The {\tt \#} character is a comment in R, and all text after that on the 
+current line is ignored.
+
+Once the package is installed (one time only), it can be loaded by running the command:
+<<load_mosaic,eval=FALSE>>=
+require(mosaic)
+@
+This
+needs to be done once per session.
+
+We also set some options to improve legibility of graphs and output.
+<<eval=TRUE>>=
+trellis.par.set(theme=col.mosaic())  # get a better color scheme for lattice
+options(digits=3)
+@
+
+The specific goal of this document is to demonstrate how to replicate the
+analysis described in Chapter 6: Introduction to Inference.
+
+\section{Estimating with Confidence}
+
+First, let's generate a random sample of 500 SAT scores drawn from a normal distribution with mean 500 and standard deviation 100. To do this we use the {\tt rnorm()} function, which draws from a normal distribution. 
+
+<<>>=
+mu = 500
+sigma = 100
+x = rnorm(500, mean=mu, sd=sigma)
+favstats(x)
+@
+
+To compute a confidence interval for the mean, we'll use a simple function that finds a confidence interval for the mean of any vector of data $x$, given a specified significance level and the true (assumed known) population standard deviation. Note that 95\% is the default level of confidence. 
+
+<<>>=
+meanconfint = function (x, sigma, level = 0.95, ...) {
+  se = sigma / sqrt(length(x))
+  mu = mean(x)
+  z = qnorm(1 - (1 - level)/2)
+  out = c(mu, mu - z * se, mu + z * se)
+  names(out) = c("mean", "lower", "upper")
+  return(out)
+}
+meanconfint(x, sigma = sigma)
+@
+
+At the bottom of page 358, many such confidence intervals are calculated. We can simulate this using our function. The {\tt do()} function will repeat any operation a specified number of times, and return a data frame of the results.
+The {\tt apply()} family of functions provide  a powerful way to apply an operation to the rows or columns of a data frame.  Here it lets us repeat an operation for each of the 50 sets of 500 random numbers.
+
+<<>>=
+randomx = do(50) * rnorm(500, mean=mu, sd=sigma)
+ci = data.frame(t(apply(randomx, 1, meanconfint, sigma=sigma)))
+head(ci, 3)
+@
+
+Let's try to visualize these intervals in a manner analogous to the plot on the bottom of page 358. 
+
+<<fig.height=7>>=
+xyplot(1:nrow(ci) ~ mean, data=ci, xlim=range(ci), xlab="SAT score", ylab="Index")
+ladd(panel.abline(v=500, col="lightgray", lty=2))
+ladd(with(ci, panel.arrows(x0 = lower, y0=1:nrow(ci), y1=1:nrow(ci), cex=0.5, 
+  x1=upper, code=3)))
+@
+
+We see that sometimes (e.g. simulation 41) the confidence interval does \emph{not} cover the true population
+mean (500 points).  
+
+Note that we can consider confidence levels other than $0.95$ by specifying the {\tt level} argument. Here's how we compute a 90\% confidence interval. 
+
+<<>>=
+head(t(apply(randomx, 1, meanconfint, sigma=sigma, level=0.9)), 3)
+@
+
+The 90\% confidence intervals are narrower than the 95\% confidence intervals, since we sacrifice some accuracy in exchange for increased confidence that the interval will contain the true mean. 
+
+In Example 6.4 (page 361), we are asked to compute a 95\% confidence interval for a sample mean of \$18,900 in undergraduate debt, computed from a sample of 1280 borrowers. The standard deviation of the population is known to be \$49,000. Since we want a 95\% confidence interval, we need to find the $z$-score that corresponds to $0.025$ (or equivalently $0.0975$), since 95\% of the standard normal distribution lies between these two values. 
+
+<<>>=
+z.star = qnorm(0.975)
+z.star
+@
+
+Then we compute the margin or error and the confidence interval by:
+
+<<>>=
+se = z.star * (49000) / sqrt(1280)
+se
+18900 + c(-se, se)
+@
+
+In Example 6.6 (page 364), we change the confidence level to 99\%. Thus, we need to compute a different value of $z^*$. 
+
+<<>>=
+z.star2 = qnorm(0.995)
+z.star2
+se2 = z.star2 * (49000) / sqrt(1280)
+se2
+18900 + c(-se2, se2)
+@
+
+
+
+\subsection{Beyond the Basics}
+
+We'll discuss the bootstrap in much greater detail in Chapter 16. Here, we can use the {\tt resample()} function from {\tt mosaic} to quickly compute a bootstrap sample. 
+
+<<>>=
+time = c(190.5, 109, 95.5, 137)
+resample(time)
+bootstrap = do(1000) * mean(resample(time))
+densityplot(~result, data=bootstrap)
+@
+
+
+\section{Tests of Significance}
+
+In Example 6.12 (page 378), we compute a $p$-value for the observed difference of \$4,100. Note that we need to multiply the cumulative probability in the right-hand tail by 2 for a two-sided test.
+<<6.12>>=
+z = (4100 - 0) / 3000
+z
+2 * (1 - pnorm(z))
+@
+
+The $z$-test for a population mean on page 383 can be computed using the {\tt pbinom()}. 
+
+<<>>=
+# one-sided test for right tail probability
+pnorm(2, lower.tail=FALSE)
+# one-sided test for left tail probability
+pnorm(-2)
+# two-sided test
+2 * pnorm(2, lower.tail=FALSE)
+@
+
+In Example 6.16 (page 385), we find the right-hand tail probability. 
+
+<<>>=
+pnorm(461, mean=450, sd=100 / sqrt(500), lower.tail=FALSE)
+xpnorm(2.46)
+@
+
+\section{Use and Abuse of Tests}
+
+In Example 6.84 (page 396), we test for significance. Note the use of a one-sided test. 
+
+<<>>=
+z1 = (541.4 - 525) / (100 / sqrt(100))
+pnorm(z1, lower.tail=FALSE)
+z2 = (541.5 - 525) / (100 / sqrt(100))
+pnorm(z2, lower.tail=FALSE)
+@
+
+\section{Power and Inference as a Decision}
+
+Example 6.29 (page 402) considers the power for a study with n=25 subjects, where a one-sided 
+alternative is tested at an $\alpha$ level of 0.05 and the population standard deviation is assumed 
+known and equals $\sigma=2$.  
+
+<<>>=
+xqnorm(.95, mean=0, sd=2/sqrt(25))
+@
+
+We can now compare this to the distribution when the alternative is true ($\mu=1$).  
+<<>>=
+xpnorm(0.658, mean=1, sd=2/sqrt(25))
+@
+
+We see that the power is 0.80.  
+
+
+\end{document}

@@ -1,0 +1,340 @@
+\documentclass[11pt]{article}
+
+\usepackage[margin=1in,bottom=.5in,includehead,includefoot]{geometry}
+\usepackage{hyperref}
+\usepackage{language}
+\usepackage{alltt}
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+
+%% Now begin customising things. See the fancyhdr docs for more info.
+
+\chead{}
+\lhead[\sf \thepage]{\sf \leftmark}
+\rhead[\sf \leftmark]{\sf \thepage}
+\lfoot{}
+\cfoot{Introduction to the Practice of Statistics using R: Chapter 16}
+\rfoot{}
+
+\newcounter{myenumi}
+\newcommand{\saveenumi}{\setcounter{myenumi}{\value{enumi}}}
+\newcommand{\reuseenumi}{\setcounter{enumi}{\value{myenumi}}}
+
+\pagestyle{fancy}
+
+\def\R{{\sf R}}
+\def\Rstudio{{\sf RStudio}}
+\def\RStudio{{\sf RStudio}}
+\def\term#1{\textbf{#1}}
+\def\tab#1{{\sf #1}}
+
+
+\usepackage{relsize}
+
+\newlength{\tempfmlength}
+\newsavebox{\fmbox}
+\newenvironment{fmpage}[1]
+     {
+   \medskip
+   \setlength{\tempfmlength}{#1}
+	 \begin{lrbox}{\fmbox}
+	   \begin{minipage}{#1}
+		 \vspace*{.02\tempfmlength}
+		 \hfill
+	   \begin{minipage}{.95 \tempfmlength}}
+		 {\end{minipage}\hfill
+		 \vspace*{.015\tempfmlength}
+		 \end{minipage}\end{lrbox}\fbox{\usebox{\fmbox}}
+	 \medskip
+	 }
+
+
+\newenvironment{boxedText}[1][.98\textwidth]%
+{%
+\begin{center}
+\begin{fmpage}{#1}
+}%
+{%
+\end{fmpage}
+\end{center}
+}
+
+\newenvironment{boxedTable}[2][tbp]%
+{%
+\begin{table}[#1]
+  \refstepcounter{table}
+  \begin{center}
+\begin{fmpage}{.98\textwidth}
+  \begin{center}
+	\sf \large Box~\expandafter\thetable. #2
+\end{center}
+\medskip
+}%
+{%
+\end{fmpage}
+\end{center}
+\end{table}		% need to do something about exercises that follow boxedTable
+}
+
+
+\newcommand{\cran}{\href{http://www.R-project.org/}{CRAN}}
+
+\title{Introduction to the Practice of Statistics using R: \\
+Chapter 16}
+
+\author{
+Ben Baumer \and Nicholas J. Horton\thanks{Department of Mathematics, Amherst College, nhorton@amherst.edu} 
+} 
+\date{\today}
+
+\begin{document}
+
+
+\maketitle
+\tableofcontents
+
+%\parindent=0pt
+
+
+<<setup, include=FALSE, cache=FALSE>>=
+opts_chunk$set(
+  dev="pdf",
+  tidy=FALSE,
+  fig.path="figures/",
+	fig.height=4,
+	fig.width=5,
+	out.width=".57\\textwidth",
+	fig.keep="high",
+	fig.show="hold",
+	fig.align="center",
+	prompt=TRUE,  # show the prompts; but perhaps we should not do this 
+	comment=NA    
+  )
+options(continue=" ")
+@
+
+<<pvalues, echo=FALSE, message=FALSE>>=
+print.pval = function(pval) {
+  threshold = 0.0001
+    return(ifelse(pval < threshold, paste("p<", sprintf("%.4f", threshold), sep=""),
+                ifelse(pval > 0.1, paste("p=",round(pval, 2), sep=""),
+                       paste("p=", round(pval, 3), sep=""))))
+}
+@
+
+<<setup2,echo=FALSE,message=FALSE>>=
+require(mosaic)
+trellis.par.set(theme=col.mosaic())  # get a better color scheme for lattice
+set.seed(123)
+# this allows for code formatting inline.  Use \Sexpr{'function(x,y)'}, for exmaple.
+knit_hooks$set(inline = function(x) {
+if (is.numeric(x)) return(knitr:::format_sci(x, 'latex'))
+x = as.character(x)
+h = knitr:::hilight_source(x, 'latex', list(prompt=FALSE, size='normalsize'))
+h = gsub("([_#$%&])", "\\\\\\1", h)
+h = gsub('(["\'])', '\\1{}', h)
+gsub('^\\\\begin\\{alltt\\}\\s*|\\\\end\\{alltt\\}\\s*$', '', h)
+})
+showOriginal=FALSE
+showNew=TRUE
+@ 
+
+\section*{Introduction}
+
+This document is intended to help describe how to undertake analyses introduced as examples in the Sixth Edition of \emph{Introduction to the 
+Practice of Statistics} (2002) by David Moore, George McCabe and Bruce
+Craig.
+More information about the book can be found at \url{http://bcs.whfreeman.com/ips6e/}.  This
+file as well as the associated \pkg{knitr} reproducible analysis source file can be found at
+\url{http://www.math.smith.edu/~nhorton/ips6e}.
+
+This work leverages initiatives undertaken by Project MOSAIC (\url{http://www.mosaic-web.org}), an NSF-funded effort to improve the teaching of statistics, calculus, science and computing in the undergraduate curriculum. In particular, we utilize the 
+\pkg{mosaic} package, which was written to simplify the use of R for introductory statistics courses. A short summary of the R needed to teach introductory statistics can be found in the mosaic package vignette (\url{http://cran.r-project.org/web/packages/mosaic/vignettes/MinimalR.pdf}).
+
+To use a package within R, it must be installed (one time), and loaded (each session). The package can be installed using the following command:
+<<install_mosaic,eval=FALSE>>=
+install.packages('mosaic')               # note the quotation marks
+@
+The {\tt \#} character is a comment in R, and all text after that on the 
+current line is ignored.
+
+Once the package is installed (one time only), it can be loaded by running the command:
+<<load_mosaic,eval=FALSE>>=
+require(mosaic)
+@
+This
+needs to be done once per session.
+
+We also set some options to improve legibility of graphs and output.
+<<eval=TRUE>>=
+trellis.par.set(theme=col.mosaic())  # get a better color scheme for lattice
+options(digits=3)
+@
+
+The specific goal of this document is to demonstrate how to replicate the
+analysis described in Chapter 16: Bootstrap Methods and Permutation Tests.
+
+\section{The Bootstrap Idea}
+
+The bootstrap is a fundamental concept in statistical computing, and the requisite calculations are very easy to perform in {\tt R}. 
+
+The repair time data from Verizon shown in Figure 16.1 (page 16-4) can be plotted thusly:
+
+<<verizon>>=
+verizon = read.csv("http://www.math.smith.edu/ips6eR/ch16/eg16_001.csv")
+histogram(~time, data=verizon, nint=100)
+with(verizon, qqnorm(time, ylab="Repair times (in hours)"))
+@
+
+A command to facilitate resampling within the {\tt mosaic} package is {\tt resample()}. We get our first example on page 16-5, which considers a subset of size $n=6$ from the Verizon dataset. 
+
+<<>>=
+data = c(3.12, 0, 1.57, 19.67, 0.22, 2.2)
+mean(data)
+s1 = resample(data)
+s1
+mean(s1)
+s2 = resample(data)
+s2
+mean(s2)
+s3 = resample(data)
+s3
+mean(s3)
+@
+
+Note that the results shown here do not match the book, due to the random nature of resampling. 
+
+In Figure 16.3 (page 16-6) we visualize a bootstrap distribution. To construct such a thing, we use the {\tt do()} command, which simply repeats some operation many times, and collects the results in a data frame. 
+
+<<message=FALSE,warning=FALSE>>=
+mean(~time, data=verizon)
+mean(~time, data=resample(verizon))
+mean(~time, data=resample(verizon))
+mean(~time, data=resample(verizon))
+bootstrap = do(1000) * mean(time, data=resample(verizon))
+favstats(~result, data=bootstrap)
+# Theoretical standard error
+14.69 / sqrt(1664)
+@
+
+Note how the theoretical standard error (i.e. standard deviation of the sampling distribution of the mean) compares to the standard deviation from the bootstrap sample. 
+
+<<message=FALSE>>=
+histogram(~result, data=bootstrap, fit="normal")
+with(bootstrap, qqnorm(result, ylab="Mean repair times of resamples (in hours)"))
+@
+
+
+\section{First Steps in Using the Bootstrap}
+
+Table 16.1 and Figure 16.6 (page 16-14) display residential and commercial real estate prices in Seattle. 
+
+<<seattle>>=
+seattle = read.csv("http://www.math.smith.edu/ips6eR/ch16/ta16_001.csv")
+names(seattle) = c("price")
+histogram(~price, data=seattle)
+with(seattle, qqnorm(price, ylab="Selling Price (in $1000)"))
+@
+
+In this example we are working with the 25\% trimmed mean. To find the 25\% trimmed mean, we grab only the middle 50\% of the data, and compute the mean on this subset. This can be achieved using the {\tt trim} argument to {\tt mean()}.
+
+<<>>=
+mean(~price, trim=0.25, data=seattle)
+bootstrap = do(1000) * mean(~price, trim=0.25, data=resample(seattle))
+favstats(~result, data=bootstrap)
+histogram(~result, data=bootstrap, fit="normal")
+with(bootstrap, qqnorm(result, ylab="Means of resamples (in $1000)"))
+@
+
+We compute the bias as the difference between the average of the bootstrapped means and the trimmed mean from the original sample. 
+
+<<>>=
+# bias
+mean(~result, data=bootstrap) - mean(~price, trim=0.25, data=seattle)
+@
+
+The computation of the confidence interval in Example 16.5 (page 16-16) makes use of the $t$-distribution. 
+
+<<>>=
+se.boot = sd(~result, bootstrap)
+t.star = qt(0.975, df=49)
+t.star
+moe = t.star * se.boot
+mean(~price, trim=0.25, data=seattle) + c(-moe, moe)
+@
+
+In Example 16.6, we compare the means of two groups of service providers. 
+
+<<>>=
+CLEC = read.csv("http://www.math.smith.edu/ips6eR/ch16/eg16_006.csv")
+mean(Time ~ Group, data=CLEC)
+densityplot(~Time, groups=Group, data=CLEC)
+@
+
+We then construct a bootstrap distribution for the difference in means among the two groups. 
+
+<<>>=
+bstrap = do(1000) * diff(mean(Time ~ Group, data=resample(CLEC)))
+favstats(~ILEC, data=bstrap)
+@ 
+
+Note that the resulting distribution is not quite so normal. Thus, we can use the quantile method to produce a bootstrap percentile confidence interval for the mean. 
+
+<<>>=
+histogram(~ILEC, fit="normal", data=bstrap)
+qdata(c(0.025, 0.975), vals=ILEC, data=bstrap)
+@
+
+\section{How Accurate is a Bootstrap Distribution?}
+
+\section{Bootstrap Confidence Intervals}
+
+We return to the construction of a confidence interval for the mean price of real estate in Seattle explored in Example 16-5. To the $t$-based confidence interval we constructed previously, we can add the percentile-based confidence interval
+
+<<>>=
+mean(~price, trim=0.25, data=seattle) + c(-moe, moe)
+qdata(c(0.025, 0.975), vals=result, data=bootstrap)
+@
+
+Note that the bootstrapped confidence interval is not quite symmetric with respect to the sample mean of 244. 
+
+\subsection{Confidence intervals for the correlation}
+
+In Example 16.10 (page 16-35), we explore the correlation between batting average and player salary in Major League Baseball. The value of the correlation coefficient among the 50 players in Table 16.2 (page 16-36) is relatively small. 
+
+<<>>=
+MLB = read.csv("http://www.math.smith.edu/ips6eR/ch16/ta16_002.csv")
+names(MLB)[2] = "Salary"
+xyplot(Salary ~ Average, data=MLB, xlab="Batting Average"
+       , ylab="Salary (in millions of dollars)")
+with(MLB, cor(Salary, Average))
+@
+
+To construct a bootstrap distribution for the correlation between batting average and salary, we resample the players and compute the correlation coefficient.
+
+<<>>=
+cor.boot = do(1000) * with(resample(MLB), cor(Salary, Average))
+histogram(~result, data=cor.boot, fit="normal")
+with(cor.boot, qqnorm(result, ylab="Correlation Coefficient"))
+@
+
+In this case, the $t$-based confidence interval for the correlation coefficient
+
+<<>>==
+se.boot = sd(~result, cor.boot)
+t.star = qt(0.975, df=(nrow(MLB) - 1))
+t.star
+moe = t.star * se.boot
+with(MLB, cor(Salary, Average)) + c(-moe, moe)
+@
+
+is in reasonable agreement with the percentile-based method.
+
+<<>>=
+qdata(c(0.025, 0.975), vals=result, data=cor.boot)
+@
+
+
+
+\end{document}

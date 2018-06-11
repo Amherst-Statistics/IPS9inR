@@ -1,0 +1,273 @@
+\documentclass[11pt]{article}
+
+\usepackage[margin=1in,bottom=.5in,includehead,includefoot]{geometry}
+\usepackage{hyperref}
+\usepackage{language}
+\usepackage{alltt}
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+
+%% Now begin customising things. See the fancyhdr docs for more info.
+
+\chead{}
+\lhead[\sf \thepage]{\sf \leftmark}
+\rhead[\sf \leftmark]{\sf \thepage}
+\lfoot{}
+\cfoot{Introduction to the Practice of Statistics using R: Chapter 3}
+\rfoot{}
+
+\newcounter{myenumi}
+\newcommand{\saveenumi}{\setcounter{myenumi}{\value{enumi}}}
+\newcommand{\reuseenumi}{\setcounter{enumi}{\value{myenumi}}}
+
+\pagestyle{fancy}
+
+\def\R{{\sf R}}
+\def\Rstudio{{\sf RStudio}}
+\def\RStudio{{\sf RStudio}}
+\def\term#1{\textbf{#1}}
+\def\tab#1{{\sf #1}}
+
+
+\usepackage{relsize}
+
+\newlength{\tempfmlength}
+\newsavebox{\fmbox}
+\newenvironment{fmpage}[1]
+     {
+   \medskip
+   \setlength{\tempfmlength}{#1}
+	 \begin{lrbox}{\fmbox}
+	   \begin{minipage}{#1}
+		 \vspace*{.02\tempfmlength}
+		 \hfill
+	   \begin{minipage}{.95 \tempfmlength}}
+		 {\end{minipage}\hfill
+		 \vspace*{.015\tempfmlength}
+		 \end{minipage}\end{lrbox}\fbox{\usebox{\fmbox}}
+	 \medskip
+	 }
+
+
+\newenvironment{boxedText}[1][.98\textwidth]%
+{%
+\begin{center}
+\begin{fmpage}{#1}
+}%
+{%
+\end{fmpage}
+\end{center}
+}
+
+\newenvironment{boxedTable}[2][tbp]%
+{%
+\begin{table}[#1]
+  \refstepcounter{table}
+  \begin{center}
+\begin{fmpage}{.98\textwidth}
+  \begin{center}
+	\sf \large Box~\expandafter\thetable. #2
+\end{center}
+\medskip
+}%
+{%
+\end{fmpage}
+\end{center}
+\end{table}		% need to do something about exercises that follow boxedTable
+}
+
+
+\newcommand{\cran}{\href{http://www.R-project.org/}{CRAN}}
+
+\title{Introduction to the Practice of Statistics using R: \\
+Chapter 3}
+
+\author{
+Nicholas J. Horton\thanks{Department of Mathematics, Amherst College, nhorton@amherst.edu} \and Ben Baumer
+} 
+
+\date{\today}
+
+\begin{document}
+
+
+\maketitle
+\tableofcontents
+
+%\parindent=0pt
+
+
+<<setup, include=FALSE, cache=FALSE>>=
+opts_chunk$set(
+  dev="pdf",
+  tidy=FALSE,
+  fig.path="figures/",
+	fig.height=4,
+	fig.width=5,
+	out.width=".57\\textwidth",
+	fig.keep="high",
+	fig.show="hold",
+	fig.align="center",
+	prompt=TRUE,  # show the prompts; but perhaps we should not do this 
+	comment=NA    
+  )
+options(continue=" ")
+@
+
+<<pvalues, echo=FALSE, message=FALSE>>=
+print.pval = function(pval) {
+  threshold = 0.0001
+    return(ifelse(pval < threshold, paste("p<", sprintf("%.4f", threshold), sep=""),
+                ifelse(pval > 0.1, paste("p=",round(pval, 2), sep=""),
+                       paste("p=", round(pval, 3), sep=""))))
+}
+@
+
+<<setup2,echo=FALSE,message=FALSE>>=
+require(mosaic)
+trellis.par.set(theme=col.mosaic())  # get a better color scheme for lattice
+set.seed(123)
+# this allows for code formatting inline.  Use \Sexpr{'function(x,y)'}, for exmaple.
+knit_hooks$set(inline = function(x) {
+if (is.numeric(x)) return(knitr:::format_sci(x, 'latex'))
+x = as.character(x)
+h = knitr:::hilight_source(x, 'latex', list(prompt=FALSE, size='normalsize'))
+h = gsub("([_#$%&])", "\\\\\\1", h)
+h = gsub('(["\'])', '\\1{}', h)
+gsub('^\\\\begin\\{alltt\\}\\s*|\\\\end\\{alltt\\}\\s*$', '', h)
+})
+showOriginal=FALSE
+showNew=TRUE
+@ 
+
+\section*{Introduction}
+
+This document is intended to help describe how to undertake analyses introduced as examples in the Sixth Edition of \emph{Introduction to the 
+Practice of Statistics} (2009) by David Moore, George McCabe and Bruce
+Craig.
+More information about the book can be found at \url{http://bcs.whfreeman.com/ips6e/}.  This
+file as well as the associated \pkg{knitr} reproducible analysis source file can be found at
+\url{http://www.math.smith.edu/~nhorton/ips6e}.
+
+This work leverages initiatives undertaken by Project MOSAIC (\url{http://www.mosaic-web.org}), an NSF-funded effort to improve the teaching of statistics, calculus, science and computing in the undergraduate curriculum. In particular, we utilize the 
+\pkg{mosaic} package, which was written to simplify the use of R for introductory statistics courses. A short summary of the R needed to teach introductory statistics can be found in the mosaic package vignette (\url{http://cran.r-project.org/web/packages/mosaic/vignettes/MinimalR.pdf}).
+
+To use a package within R, it must be installed (one time), and loaded (each session). The package can be installed using the following command:
+<<install_mosaic,eval=FALSE>>=
+install.packages('mosaic')               # note the quotation marks
+@
+The {\tt \#} character is a comment in R, and all text after that on the 
+current line is ignored.
+
+Once the package is installed (one time only), it can be loaded by running the command:
+<<load_mosaic,eval=FALSE>>=
+require(mosaic)
+@
+This
+needs to be done once per session.
+
+We also set some options to improve legibility of graphs and output.
+<<eval=TRUE>>=
+trellis.par.set(theme=col.mosaic())  # get a better color scheme for lattice
+options(digits=3)
+@
+
+The specific goal of this document is to demonstrate how to replicate the
+analysis described in Chapter 3: Producing Data.
+
+\section{Design of experiments}
+
+\subsection{Randomizing subjects}
+
+It's straightforward to randomly divide 40 students into two groups of 20 students
+each (as described in Example 3.11 on page 185).  
+
+<<>>=
+students = 1:40    # equivalent to seq(from=1, to=40, by=1)
+group1 = sample(students, size=20)
+sort(group1)
+group2 = students[-group1]    # all but those values are included
+sort(group2)
+@
+
+\section{Sampling design}
+
+\subsection{Simple random samples}
+
+We reproduce a random sampling of resorts (from Figure 3.8, page 202).
+<<>>=
+resorts = c("Aloha Kai", "Captiva", "Palm Tree", "Sea Shell", "Anchor Down",
+  "Casa del Mar", "Radisson", "Silver Beach")
+# generate a SRS of size 3
+sampled = sample(resorts, size=3)
+sampled
+@
+
+\section{Toward statistical inference}
+
+\subsection{Simulate a random sample}
+
+It's straightforward to use R to generate simple random samples.  
+Example 3.32 (page 214) describes how this is done by using a table 
+of random digits.  It's more generalizable to do this with a set of possible
+options each with specified probabilities (probability frustrated=0.6, probability
+not-frustrated=0.4):
+<<>>=
+srs1 = sample(c("Frustrating", "Not-frustrating"), size=100, prob=c(0.6, 0.4), 
+  replace=TRUE)
+tally(srs1)
+@
+We can repeat the process, which will (generally) give different answers.
+<<>>=
+n = 100
+n
+tally(sample(c("Frustrating", "Not-frustrating"), size=n, prob=c(0.6, 0.4), 
+  replace=TRUE))
+tally(sample(c("Frustrating", "Not-frustrating"), size=n, prob=c(0.6, 0.4), 
+  replace=TRUE))
+tally(sample(c("Frustrating", "Not-frustrating"), size=n, prob=c(0.6, 0.4), 
+  replace=TRUE))
+@
+
+We can repeat the process many times using the {\tt do()} function, which 
+saves the results.
+<<>>=
+res = do(1000) * tally(sample(c("Frustrating", "Not-frustrating"), size=n, 
+  prob=c(0.6, 0.4), replace=TRUE))
+histogram(~ Frustrating, xlab="Number reporting shopping frustrating", data=res)
+@
+We see that the sampling distribution for the number reporting \emph{Frustrating} 
+in m=1000 simple random samples each of size n=100 is centered at the value of around 60, which we
+would expect since the true probability of being Frustrating is in fact $p=0.60$.
+
+The results are equivalent if rescaled as a proportion (by dividing by the sample size).
+<<>>=
+sd(~ Frustrating/n, data=res)
+histogram(~ Frustrating/n, xlab="Proportion reporting shopping frustrating", data=res)
+@
+
+
+What happens if we take samples of size n=2500 (as displayed in Example 3.33, on 
+pages 214--215).   
+
+<<>>=
+n=2500
+n
+res = do(1000) * tally(sample(c("Frustrating", "Not-frustrating"), size=n, 
+  prob=c(0.6, 0.4), replace=TRUE))
+sd(~ Frustrating/n, data=res)
+histogram(~ Frustrating/n, xlab="Proportion reporting shopping frustrating", 
+  data=res)
+@
+The sampling distribution is much narrower, given the much larger sample size.
+
+
+\subsection{Capture-recapture sampling}
+
+R can be used as a calculator, as for the calculations in Example 3.34 (page 220).  
+<<>>=
+200*120/12
+@
+
+\end{document}

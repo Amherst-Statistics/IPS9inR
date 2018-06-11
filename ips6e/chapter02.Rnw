@@ -1,0 +1,523 @@
+\documentclass[11pt]{article}
+
+\usepackage[margin=1in,bottom=.5in,includehead,includefoot]{geometry}
+\usepackage{hyperref}
+\usepackage{language}
+\usepackage{alltt}
+\usepackage{fancyhdr}
+\usepackage{color,soul}
+\pagestyle{fancy}
+\fancyhf{}
+
+%% Now begin customising things. See the fancyhdr docs for more info.
+
+\chead{}
+\lhead[\sf \thepage]{\sf \leftmark}
+\rhead[\sf \leftmark]{\sf \thepage}
+\lfoot{}
+\cfoot{Introduction to the Practice of Statistics using R: Chapter 2}
+\rfoot{}
+
+\newcounter{myenumi}
+\newcommand{\saveenumi}{\setcounter{myenumi}{\value{enumi}}}
+\newcommand{\reuseenumi}{\setcounter{enumi}{\value{myenumi}}}
+
+\newcommand{\nick}[1]{\sethlcolor{yellow}\hl{Nick: #1}}
+\newcommand{\ben}[1]{\sethlcolor{green}\hl{Ben: #1}}
+
+\pagestyle{fancy}
+
+\def\R{{\sf R}}
+\def\Rstudio{{\sf RStudio}}
+\def\term#1{\textbf{#1}}
+\def\tab#1{{\sf #1}}
+
+
+\usepackage{relsize}
+
+\newlength{\tempfmlength}
+\newsavebox{\fmbox}
+\newenvironment{fmpage}[1]
+     {
+   \medskip
+   \setlength{\tempfmlength}{#1}
+	 \begin{lrbox}{\fmbox}
+	   \begin{minipage}{#1}
+		 \vspace*{.02\tempfmlength}
+		 \hfill
+	   \begin{minipage}{.95 \tempfmlength}}
+		 {\end{minipage}\hfill
+		 \vspace*{.015\tempfmlength}
+		 \end{minipage}\end{lrbox}\fbox{\usebox{\fmbox}}
+	 \medskip
+	 }
+
+
+\newenvironment{boxedText}[1][.98\textwidth]%
+{%
+\begin{center}
+\begin{fmpage}{#1}
+}%
+{%
+\end{fmpage}
+\end{center}
+}
+
+\newenvironment{boxedTable}[2][tbp]%
+{%
+\begin{table}[#1]
+  \refstepcounter{table}
+  \begin{center}
+\begin{fmpage}{.98\textwidth}
+  \begin{center}
+	\sf \large Box~\expandafter\thetable. #2
+\end{center}
+\medskip
+}%
+{%
+\end{fmpage}
+\end{center}
+\end{table}		% need to do something about exercises that follow boxedTable
+}
+
+
+\newcommand{\cran}{\href{http://www.R-project.org/}{CRAN}}
+
+\title{Introduction to the Practice of Statistics using R: \\
+Chapter 2}
+
+\author{
+Ben Baumer \and Nicholas J. Horton\thanks{Department of Mathematics, Amherst College, nhorton@amherst.edu} 
+} 
+
+\date{\today}
+
+\begin{document}
+%\SweaveOpts{concordance=TRUE}
+ 
+ 
+\maketitle
+\tableofcontents
+
+%\parindent=0pt
+
+
+<<setup, include=FALSE, cache=FALSE>>=
+opts_chunk$set(
+  dev="pdf",
+  tidy=FALSE,
+  fig.path="figures/",
+	fig.height=4,
+	fig.width=5,
+	out.width=".57\\textwidth",
+	fig.keep="high",
+	fig.show="hold",
+	fig.align="center",
+	prompt=TRUE,  # show the prompts; but perhaps we should not do this 
+	comment=NA    
+  )
+options(continue=" ")
+@
+
+<<pvalues, echo=FALSE, message=FALSE>>=
+print.pval = function(pval) {
+  threshold = 0.0001
+    return(ifelse(pval < threshold, paste("p<", sprintf("%.4f", threshold), sep=""),
+                ifelse(pval > 0.1, paste("p=",round(pval, 2), sep=""),
+                       paste("p=", round(pval, 3), sep=""))))
+}
+@
+
+<<setup2,echo=FALSE,message=FALSE>>=
+require(mosaic); require(Sleuth2)
+trellis.par.set(theme=col.mosaic())  # get a better color scheme for lattice
+set.seed(123)
+# this allows for code formatting inline.  Use \Sexpr{'function(x,y)'}, for exmaple.
+knit_hooks$set(inline = function(x) {
+if (is.numeric(x)) return(knitr:::format_sci(x, 'latex'))
+x = as.character(x)
+h = knitr:::hilight_source(x, 'latex', list(prompt=FALSE, size='normalsize'))
+h = gsub("([_#$%&])", "\\\\\\1", h)
+h = gsub('(["\'])', '\\1{}', h)
+gsub('^\\\\begin\\{alltt\\}\\s*|\\\\end\\{alltt\\}\\s*$', '', h)
+})
+showOriginal=FALSE
+showNew=TRUE
+@ 
+
+\section*{Introduction}
+
+This document is intended to help describe how to undertake analyses introduced as examples in the Sixth Edition of \emph{Introduction to the 
+Practice of Statistics} (2009) by David Moore, George McCabe and Bruce
+Craig.
+More information about the book can be found at \url{http://bcs.whfreeman.com/ips6e/}.  This
+file as well as the associated \pkg{knitr} reproducible analysis source file can be found at
+\url{http://www.math.smith.edu/~nhorton/ips6e}.
+
+This work leverages initiatives undertaken by Project MOSAIC (\url{http://www.mosaic-web.org}), an NSF-funded effort to improve the teaching of statistics, calculus, science and computing in the undergraduate curriculum. In particular, we utilize the 
+\pkg{mosaic} package, which was written to simplify the use of R for introductory statistics courses. A short summary of the R needed to teach introductory statistics can be found in the mosaic package vignette (\url{http://cran.r-project.org/web/packages/mosaic/vignettes/MinimalR.pdf}).
+
+To use a package within R, it must be installed (one time), and loaded (each session). The package can be installed using the following command:
+<<install_mosaic,eval=FALSE>>=
+install.packages('mosaic')               # note the quotation marks
+@
+The {\tt \#} character is a comment in R, and all text after that on the 
+current line is ignored.
+
+This chapter also references a dataset from the second edition of \emph{The Statistical Sleuth}, so this must be installed as well.
+
+<<install_sleuth,eval=FALSE>>=
+install.packages('Sleuth2')               # note the quotation marks
+@
+
+Once the package is installed (one time only), they can be loaded by running the command:
+<<load_mosaic,eval=FALSE>>=
+require(mosaic)
+require(Sleuth2)
+@
+This needs to be done once per session.
+
+We also set some options to improve legibility of graphs and output.
+<<eval=TRUE>>=
+trellis.par.set(theme=col.mosaic())  # get a better color scheme for lattice
+options(digits=3)
+@
+
+The specific goal of this document is to demonstrate how to replicate the
+analysis described in Chapter 2: Looking at Data (Relationships).
+
+\section{Scatterplots}
+
+Example 2.6 (page 87) shows a scatterplot of the average SAT scores for all 50 states and the District of Columbia. 
+<<>>=
+SAT = read.csv("http://www.math.smith.edu/ips6eR/ch02/eg02_006.csv")
+head(SAT)
+plotPoints(total ~ percent, data=SAT, xlab="Percent taking SAT", 
+  ylab="Mean SAT total score", pch=19)
+@
+
+This can also be generated using the {\tt xyplot()} function.  
+
+\subsection{Adding categorical variables to scatterplots}
+
+Figure 2.2 (page 89) illustrates the use of different plotting symbols as a means of distinguishing levels of a categorical variable in a scatterplot. This can be achieved just as easily using color and the {\tt groups} attribute. First, we assign a region to each state. This can be done using the {\tt transform} and {\tt ifelse} commands. 
+
+<<fig2.2setup>>=
+midwest = c("Ohio", "Michigan", "Wisconsin", "Indiana", "Illinois", "Minnesota"
+            , "Iowa", "NorthDakota", "SouthDakota", "Nebraska"
+            , "Kansas", "Missouri")
+northeast = c("Maine", "NewHampshire", "Vermont", "Massachusetts", "Connecticut"
+              , "RhodeIsland", "NewYork", "NewJersey", "Pennsylvania")
+SAT = transform(SAT, region = ifelse(state %in% midwest, "midwest", 
+  ifelse(state %in% northeast, "northeast", NA)))
+@
+
+Now that the {\tt region} variable is set, we can use the {\tt groups} argument to separate the states by color. Adding specific labels can be achieved by using {\tt ladd} and {\tt panel.text} to add things to an existing plot. Note the use of the {\tt subset()} function to restrict the states which are being plotted and labelled. 
+
+<<fig2.2>>=
+plotPoints(total ~ percent, groups=region, data=subset(SAT, !is.na(region)), 
+  xlab="Percent taking SAT", ylab="Mean SAT total score", pch=c("m", "e"), 
+  cex=1.5)
+SAT.labels = subset(SAT, state %in% c("Ohio", "Indiana"))
+with(SAT.labels, ladd(panel.text(percent, total, state, pos=1)))
+@
+
+\subsection{More examples of scatterplots}
+
+Example 2.7 (page 90) concerns the Trans-Alaska Pipeline. The dataset is in the following format:
+
+<<Ex2.7>>=
+Oil = read.csv("http://www.math.smith.edu/ips6eR/ch02/eg02_007.csv")
+head(Oil)
+@
+
+We can add a straight line to a plot using the {\tt panel.abline} function. In this we specify the line $y=x$ by giving the first argument (the intercept) as 0 and the second argument (the slope) as 1. Thus, the {\tt abline} is $y=a + bx$. 
+
+<<fig2.3>>=
+plotPoints(field ~ lab, data=Oil, xlab="Laboratory Measurement", 
+  ylab="Field measurement", pch=19)
+ladd(panel.abline(a=0, b=1, col="red"))
+@
+
+Example 2.8 (page 91) relates the density of perch to the proportion that are killed by predators. 
+
+<<Ex2.8>>=
+Perch = read.csv("http://www.math.smith.edu/ips6eR/ch02/eg02_008.csv")
+head(Perch)
+@
+
+Figure 2.4 (pagee 92) shows the relationship between perch density and the proportion killed. Note that some data points occur multiple times. Although the textbook uses different plot marks to distinguish single instances from those with multiplicity, we can use transparency to achieve the same effect. 
+
+<<fig2.4>>=
+plotPoints(killed ~ perch, data=Perch, xlab="Perch per pen", 
+  ylab="Proportion Eaten", pch=19, cex=1.5, alpha=0.5)
+perch.means = mean(~killed | perch, data=Perch)
+perch.means
+ladd(panel.lines(names(perch.means), perch.means, col="red"))
+@
+
+Note the use of the bar notation for computing the groupwise means. 
+
+\subsection{Smoothing}
+
+Because the data for Figure 2.5 (page 93), we display how to add a scatterplot smoother to a figure using data from the HELP (Health Evaluation and Linkage to Primary Care) study.
+
+<<>>=
+xyplot(cesd ~ pcs, type=c("p", "smooth"), lwd=3, data=HELPrct)
+@
+
+\section{Correlation}
+
+Correlation can be computed using the {\tt cor()} function. For example, we can create two random vector and compute their correlation:
+
+<<cor>>=
+x = runif(100)
+y = runif(100)
+cor(x,y)
+@
+
+Of course, because the random variables are generated independently of each 
+other, the sample correlation should be close to zero. Moreover, you can compute the pairwise correlation coefficients for more than two vectors at one time. 
+
+<<cormat>>=
+z = runif(100)
+cor(data.frame(x,y,z))
+@
+
+The 1's along the diagonal indicate the correlation of a vector with itself. 
+
+\section{Least-Squares Regression}
+
+Figure 2.11 (page 109) shows the relationship between non-exercise activity ($nea$) and fat gain after 8 weeks of overeating. 
+
+<<fig2.11>>=
+Fat = read.csv("http://www.math.smith.edu/ips6eR/ch02/eg02_012.csv")
+head(Fat)
+xyplot(fat ~ nea, data=Fat, xlab="Nonexercise activity (calories)", 
+  ylab="Fat gain (kilograms)", pch=19)
+@
+
+\subsection{Fitting a line to data}
+
+If we just want to add the least squares regression line to the plot, we can specificy the "r" value for the {\tt type} argument to the plotting function. 
+
+<<fig2.12>>=
+plotPoints(fat ~ nea, xlab="Nonexercise activity (calories)", 
+  ylab="Fat gain (kilograms)", pch=19, type=c("p", "r"), data=Fat)
+@
+
+However, in addition to plotting the line, we often will want to extract further information about the regression model that we built. To build the model, we use the {\tt lm} command, and to see the coefficients from the model, we use {\tt coef}. 
+
+<<ex2.13>>=
+fm = lm(fat ~ nea, data=Fat)
+coef(fm)
+@
+
+\subsection{Prediction}
+
+There are a few different ways of using our model, now that we've built it. A nice way is to run {\tt makeFun()} on the model to convert it into a function. Then, we can simply ask the resulting function to compute estimate based on our model. 
+
+<<ex2.14a>>=
+fit.fat = makeFun(fm)
+@
+
+Note that the arguments to this function are named. 
+
+In Example 2.14 (page 111), we use the model for fat gain to estimate the fat gain for an individual whose NEA increases by 400 calories. 
+
+<<ex2.14>>=
+fit.fat(nea = 400)
+@
+
+This is certainly easier than calculating it manually using R as a calculator:
+<<>>=
+3.50512 - 0.00344*400
+@
+
+In Example 2.15 (page 112), we use the model for fat gain to esimate the fat gain for an individual whose NEA increases by 1500 calories. 
+
+<<ex2.15>>=
+fit.fat(nea = 1500)
+@
+
+This information can also be extracted using the {\tt predict} function. In this case, we can ask the model to return values for many different inputs at once. 
+
+<<predict>>=
+nea.new = data.frame(nea = c(400, 1500))
+predict(fm, newdata = nea.new)
+@
+
+\subsection{Least-squares regression}
+
+In Example 2.16, we verify that the coefficients returned by the regression model can be computed directly from the correlation coefficient, along with the means and standard deviations of the two variables. The correlation coefficient is:
+
+<<ex2.16>>=
+cor(fat, nea, data=Fat)
+@
+
+The means and standard deviation are given below.
+
+<<ex2.16a>>=
+favstats(~fat, data=Fat)
+favstats(~nea, data=Fat)
+@
+
+The slope of the regression line is the product of the correlation coefficient and the ratio of the standard deviations. We can verify this:
+
+<<ex2.16c>>=
+coef(fm)["nea"]
+slope = with(Fat, cor(fat, nea) * (sd(fat) / sd(nea)))
+slope
+@
+
+With the slope in hand, we can then compute the intercept, since we know that the point $(\bar{x}, \bar{y})$ is on the regression line.
+
+<<ex2.16d>>=
+coef(fm)["(Intercept)"]
+intercept = with(Fat, mean(fat) - slope * mean(nea))
+intercept
+@
+
+\subsection{Correlation and Regression}
+
+The {\tt summary} command will show a table containing information about a regression model that is similar to the information shown in Figure 2.14 (page 116). 
+
+<<fig2.14>>=
+summary(fm)
+@
+
+For the purposes of Chapter 2 of IPS, regression is being used to describe relationships, so the primary focus is the regression parameter estimates in the first numeric column.
+
+For least squares regression of one variable, the square of the correlation coefficient is equal to the coefficient of determination (or R-squared aka $R^2$). 
+
+<<ex2.17>>=
+cor(fat, nea, data=Fat)^2
+r.squared(fm)
+@
+
+\subsection{Transforming Relationships}
+
+The dataset from Example 2.17 (page 119), Example 2.18 and Figure 2.18 resemble data from 
+Chapter 9 of the Statistical Sleuth.
+
+<<>>=
+xyplot(Brain ~ Body, data=case0902)
+@
+We can remove outliers, which yields a plot similar to that in Figure 2.18 (page 120).
+
+<<>>=
+smaller = subset(case0902, Brain < 700 & Body < 1000)
+xyplot(Brain ~ Body, xlab="Body weight (kg)", ylab="Brain weight (gm)",
+  main="Subset without outliers", data=smaller)
+@
+
+
+We can also transform the two variables, as seen in Figure 2.19 (page 121).
+
+<<>>=
+case0902 = transform(case0902, logbrain = log10(Brain))
+case0902 = transform(case0902, logbody = log10(Body))
+xyplot(logbrain ~ logbody, xlab="log body weight", ylab="log brain weight",
+  main="transformed variables", type=c("p", "r"), data=case0902)
+@
+
+\section{Cautions about Correlation and Regression}
+
+The residuals can be extracted easily from a linear regression model, as 
+displayed in Example 2.19 (page 126).
+
+<<ex2.19>>=
+resid(fm)
+@
+
+Note that the mean of the residuals is always (by mathematical construction) equal to zero.
+
+<<ex2.19a>>=
+mean(resid(fm))
+@
+
+It's straightforward to display the univariate distribution of the residuals, to help assess
+the normality assumption.
+
+<<>>=
+histogram(~ resid(fm), fit="normal")
+@
+
+
+{\tt R} has a built-in function for showing residual plots. You can simply {\tt plot} the model object, and ask for only the first (of four) diagnostic plots. 
+
+<<fig2.20c>>=
+plot(fm, which=1)
+@
+
+Alternatively this can be created in parts, using {\tt plotPoints()}.
+<<>>=
+Fat = transform(Fat, pred = fitted(fm))
+Fat = transform(Fat, resid = residuals(fm))
+plotPoints(resid ~ pred, type=c("p", "r", "smooth"), data=Fat)
+@
+
+
+For both of these {\tt R} plots the residuals against the fitted values. However, in Figure 2.20 (page 127), the residuals are plotted against the values of the explanatory variable.
+
+<<fig2.20b>>=
+plotPoints(resid(fm) ~ nea, ylab="Residual", 
+  xlab="Nonexercise activity (calories)", type=c("p", "r", "smooth"), data=Fat)
+@
+
+
+A similar plot is shown in Figure 2.21 (page 128).
+
+<<fig2.21>>=
+fm.oil = lm(field ~ lab, data=Oil)
+plotPoints(resid(fm.oil) ~ lab, xlab="Laboratory Measurement", 
+  ylab="Field measurement", pch=19, type=c("p", "r", "smooth"), 
+  data=Oil)
+@
+
+\subsection{Outliers and influential observations}
+
+The analyses displayed in Example 2.21 (page 129) and Figures 2.22 and 2.23 (page 130) can be generated in a straightforward manner.
+
+<<>>=
+diabetes = read.csv("http://www.math.smith.edu/ips6eR/ch02/ta02_005.csv")
+xyplot(fpg ~ hba, xlab="HbA (%)", ylab="Fasting plasma glucose (mg/dl)",
+       type=c("p", "r"), data=diabetes)
+@
+
+<<>>=
+outliermodel = lm(fpg ~ hba, data=diabetes)
+coef(outliermodel)
+plot(outliermodel, which=1)
+@
+
+To replicate the display in 
+ Figure 2.24 (page 131), we need to fit the model twice more dropping either subject 15 or subject 18, and generating predicted lines for each of these models.
+
+<<>>=
+no18 = lm(fpg ~ hba, data=subset(diabetes, obs != 18))
+no15 = lm(fpg ~ hba, data=subset(diabetes, obs != 15))
+plotPoints(fpg ~ hba, type=c("p", "r"), data=diabetes)
+ladd(panel.abline(no18, col="red", lty=2))
+ladd(panel.abline(no15, col="green", lty=2))
+
+@
+
+
+
+\subsection{Beware the lurking variable}
+
+In Example 2.24 (page 133), the association between private health care spending and goods imported to the United States is examined each year between 1990 and 2001. 
+
+<<ex2.24>>=
+Imports = read.csv("http://www.math.smith.edu/ips6eR/ch02/eg02_024.csv")
+head(Imports)
+@
+
+Figure 2.25 (page 133) illustrates the relationship.
+
+<<fig2.25>>=
+plotPoints(health ~ imports, data=Imports, pch=19)
+@
+
+\end{document}

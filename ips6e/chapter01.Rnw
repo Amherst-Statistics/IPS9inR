@@ -1,0 +1,572 @@
+\documentclass[11pt]{article}
+
+\usepackage[margin=1in,bottom=.5in,includehead,includefoot]{geometry}
+\usepackage{hyperref}
+\usepackage{language}
+\usepackage{alltt}
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+
+%% Now begin customising things. See the fancyhdr docs for more info.
+
+\chead{}
+\lhead[\sf \thepage]{\sf \leftmark}
+\rhead[\sf \leftmark]{\sf \thepage}
+\lfoot{}
+\cfoot{Introduction to the Practice of Statistics using R: Chapter 1}
+\rfoot{}
+
+\newcounter{myenumi}
+\newcommand{\saveenumi}{\setcounter{myenumi}{\value{enumi}}}
+\newcommand{\reuseenumi}{\setcounter{enumi}{\value{myenumi}}}
+
+\pagestyle{fancy}
+
+\def\R{{\sf R}}
+\def\Rstudio{{\sf RStudio}}
+\def\RStudio{{\sf RStudio}}
+\def\term#1{\textbf{#1}}
+\def\tab#1{{\sf #1}}
+
+
+\usepackage{relsize}
+
+\newlength{\tempfmlength}
+\newsavebox{\fmbox}
+\newenvironment{fmpage}[1]
+     {
+   \medskip
+   \setlength{\tempfmlength}{#1}
+	 \begin{lrbox}{\fmbox}
+	   \begin{minipage}{#1}
+		 \vspace*{.02\tempfmlength}
+		 \hfill
+	   \begin{minipage}{.95 \tempfmlength}}
+		 {\end{minipage}\hfill
+		 \vspace*{.015\tempfmlength}
+		 \end{minipage}\end{lrbox}\fbox{\usebox{\fmbox}}
+	 \medskip
+	 }
+
+
+\newenvironment{boxedText}[1][.98\textwidth]%
+{%
+\begin{center}
+\begin{fmpage}{#1}
+}%
+{%
+\end{fmpage}
+\end{center}
+}
+
+\newenvironment{boxedTable}[2][tbp]%
+{%
+\begin{table}[#1]
+  \refstepcounter{table}
+  \begin{center}
+\begin{fmpage}{.98\textwidth}
+  \begin{center}
+	\sf \large Box~\expandafter\thetable. #2
+\end{center}
+\medskip
+}%
+{%
+\end{fmpage}
+\end{center}
+\end{table}		% need to do something about exercises that follow boxedTable
+}
+
+
+\newcommand{\cran}{\href{http://www.R-project.org/}{CRAN}}
+
+\title{Introduction to the Practice of Statistics using R: \\
+Chapter 1}
+
+\author{
+Nicholas J. Horton\thanks{Department of Mathematics, Amherst College, nhorton@amherst.edu} \and Ben Baumer
+} 
+
+\date{\today}
+
+\begin{document}
+
+
+\maketitle
+\tableofcontents
+
+%\parindent=0pt
+
+
+<<setup, include=FALSE, cache=FALSE>>=
+opts_chunk$set(
+  dev="pdf",
+  tidy=FALSE,
+  fig.path="figures/",
+	fig.height=4,
+	fig.width=5,
+	out.width=".57\\textwidth",
+	fig.keep="high",
+	fig.show="hold",
+	fig.align="center",
+	prompt=TRUE,  # show the prompts; but perhaps we should not do this 
+	comment=NA    
+  )
+options(continue=" ")
+@
+
+<<pvalues, echo=FALSE, message=FALSE>>=
+print.pval = function(pval) {
+  threshold = 0.0001
+    return(ifelse(pval < threshold, paste("p<", sprintf("%.4f", threshold), sep=""),
+                ifelse(pval > 0.1, paste("p=",round(pval, 2), sep=""),
+                       paste("p=", round(pval, 3), sep=""))))
+}
+@
+
+<<setup2,echo=FALSE,message=FALSE>>=
+require(mosaic)
+trellis.par.set(theme=col.mosaic())  # get a better color scheme for lattice
+set.seed(123)
+# this allows for code formatting inline.  Use \Sexpr{'function(x,y)'}, for exmaple.
+knit_hooks$set(inline = function(x) {
+if (is.numeric(x)) return(knitr:::format_sci(x, 'latex'))
+x = as.character(x)
+h = knitr:::hilight_source(x, 'latex', list(prompt=FALSE, size='normalsize'))
+h = gsub("([_#$%&])", "\\\\\\1", h)
+h = gsub('(["\'])', '\\1{}', h)
+gsub('^\\\\begin\\{alltt\\}\\s*|\\\\end\\{alltt\\}\\s*$', '', h)
+})
+showOriginal=FALSE
+showNew=TRUE
+@ 
+
+\section*{Introduction}
+
+This document is intended to help describe how to undertake analyses introduced as examples in the Sixth Edition of \emph{Introduction to the 
+Practice of Statistics} (2009) by David Moore, George McCabe and Bruce
+Craig.
+More information about the book can be found at \url{http://bcs.whfreeman.com/ips6e/}.  This
+file as well as the associated \pkg{knitr} reproducible analysis source file can be found at
+\url{http://www.math.smith.edu/~nhorton/ips6e}.
+
+This work leverages initiatives undertaken by Project MOSAIC (\url{http://www.mosaic-web.org}), an NSF-funded effort to improve the teaching of statistics, calculus, science and computing in the undergraduate curriculum. In particular, we utilize the 
+\pkg{mosaic} package, which was written to simplify the use of R for introductory statistics courses. A short summary of the R needed to teach introductory statistics can be found in the mosaic package vignette (\url{http://cran.r-project.org/web/packages/mosaic/vignettes/MinimalR.pdf}).
+
+To use a package within R, it must be installed (one time), and loaded (each session). The package can be installed using the following command:
+<<install_mosaic,eval=FALSE>>=
+install.packages('mosaic')               # note the quotation marks
+@
+The {\tt \#} character is a comment in R, and all text after that on the 
+current line is ignored.
+
+Once the package is installed (one time only), it can be loaded by running the command:
+<<load_mosaic,eval=FALSE>>=
+require(mosaic)
+@
+This
+needs to be done once per session.
+
+We also set some options to improve legibility of graphs and output.
+<<eval=TRUE>>=
+trellis.par.set(theme=col.mosaic())  # get a better color scheme for lattice
+options(digits=3)
+@
+
+The specific goal of this document is to demonstrate how to replicate the
+analysis described in Chapter 1: Looking at Data (Distributions).
+
+\section{Displaying distributions with graphs}
+
+\subsection{Histograms}
+
+Table 1.1 (page 8) displays service times (in seconds) for calls to a customer
+service center.  
+
+We begin by reading the data and summarizing the variable.
+<<>>=
+calltimes = read.csv("http://www.math.smith.edu/ips6eR/ch01/eg01_004.csv")
+summary(calltimes)
+head(calltimes)
+nrow(calltimes)
+favstats(~ length, data=calltimes)
+@
+The {\tt =} sign is one of the assignment operators in R (the other 
+common one is {\tt <-}).  We use this to create a dataframe read 
+from the internet using the {\tt read.csv()} function to read a Comma-Separated
+Value file.
+
+A total of \Sexpr{nrow(calltimes)} service times are reported in the
+dataframe (or dataset) called {\tt calltimes}.  The {\tt head()} function displays 
+the first rows of the dataframe, which has a single variable called {\tt length}
+(length of the service times, in seconds).
+
+Creating a histogram using the defaults is straightforward, and requires
+specification of the variable and the dataset:
+<<>>=
+histogram(~ length, data=calltimes)
+@
+
+To match the output in Figure 1.4 (page 8), we can add some additional 
+options that display counts rather than density, add more bins, restrict the x-axis
+limits, and improve the axis labels.
+We begin by creating a new dataframe called {\tt shortercalls} which matches 
+the condition within the {\tt subset()} function.
+
+<<warning=FALSE>>=
+shortercalls = subset(calltimes, length <= 1200)
+histogram(~ length, type="count", breaks=121, 
+  xlab="Service time (seconds)", shortercalls)
+@
+
+We can calculate the proportion less than or equal to ten seconds 
+(to replicate the text in Figure 1.4, on page 8).
+<<>>=
+tally(~ length <= 10, format="percent", data=calltimes)
+@
+
+
+\subsection{Stem (and leaf) plots}
+Figure 1.6 (page 12) displays the stem and leaf plot in Minitab for a sample 
+of n=80 observations from the call lengths dataset.
+<<>>=
+eightytimes = read.csv("http://www.math.smith.edu/ips6eR/ch01/ta01_001.csv")
+favstats(~ length, data=eightytimes)
+with(eightytimes, stem(length))
+@
+
+Many common functions (e.g. {\tt mean()}, {\tt median()}, {\tt favstats()})
+support a {\tt data=} option to specify the dataframe on which to operate.  
+For functions (such as {\tt stem()} which do not, the {\tt with()} function
+can achieve the same result, and avoids the use of the \$ operator to 
+reference a variable within a dataframe.
+
+We can approximate the Minitab output by adding the {\tt scale=} option:
+<<>>=
+with(eightytimes, stem(length, scale=2))
+@
+
+As always, it is critical to include a legend along with a stem and leaf
+plot.  For the latter figure, this would be of the form:
+
+\begin{verbatim}
+Legend:  26 | 3  corresponds to a call of 2,630 seconds.
+\end{verbatim}
+
+
+\subsection{Creating classes from quantitative variables}
+
+<<>>=
+iqscores = read.csv("http://www.math.smith.edu/ips6eR/ch01/ta01_003.csv")
+head(iqscores)
+names(iqscores)
+favstats(~ iq, data=iqscores)
+@
+
+We can create classes using the rules defined on page 13 using the {\tt cut()} command:
+
+<<>>=
+iqscores = transform(iqscores, iqcat=cut(iq, right=FALSE, 
+  breaks=c(75, 85, 95, 105, 115, 125, 135, 145, 155)))
+tally(~ iqcat, data=iqscores)
+@
+Here we demonstrate use of the {\tt c()} function to glue together a vector
+(a one-dimensional array) with the breakpoints).
+
+\subsection{Time plots}
+
+<<>>=
+mississippi = read.csv("http://www.math.smith.edu/ips6eR/ch01/ta01_004.csv")
+head(mississippi)
+summary(mississippi)
+@
+
+We can replicate Figure 1.10 (a) on page 19 using the {\tt histogram()} 
+command with specification of the breaks.
+<<>>=
+histogram(~ discharge, breaks=seq(200, 900, by=100), 
+  xlab="Mississippi River discharge (cubic km)", data=mississippi)
+@
+
+We can replicated Figure 1.10 (b) on page 19 using the {\tt xyplot()} 
+command with specification of the Line and Regression type.
+<<>>=
+xyplot(discharge ~ year, type=c("l", "r"), 
+  ylab="Mississippi River discharge (cubic km)", data=mississippi)
+@
+Other options for {\tt type=} include Points and Smooth:
+<<>>=
+xyplot(discharge ~ year, type=c("p", "smooth"), 
+  ylab="Mississippi River discharge (cubic km)", data=mississippi)
+@
+
+\section{Displaying distributions with numbers}
+
+\subsection{Mean}
+
+We begin by reading in the dataset, and calculating the mean highway 
+mileage of the
+two seaters:
+<<>>=
+origmileage = read.csv("http://www.math.smith.edu/ips6eR/ch01/ta01_010.csv",
+  stringsAsFactor=FALSE)
+mean(~ Hwy, data=subset(origmileage, Type=="T"))
+favstats(~ Hwy, data=subset(origmileage, Type=="T"))
+@
+The use of {\tt stringsAsFactors} ensures that the {\tt Type} variable 
+can be referenced as a character string.
+
+As described on page 30, we drop the outlier as the authors
+suggest, with the justification that it appears to be completely different from
+the other cars.
+
+<<>>=
+mileage = subset(origmileage, Hwy < 60)
+twoseat = subset(mileage, Type=="T")
+mean(~ Hwy, data=twoseat)
+favstats(~ Hwy, data=twoseat)
+@
+
+The dataset with the outlier dropped will be used for all further analyses.
+
+\subsection{Median and quantiles}
+The {\tt favstats()} function displays a variety of useful quantities, 
+though other functions are also available to calculate specific 
+statistics.
+<<>>=
+favstats(~ Hwy, data=twoseat)
+median(~ Hwy, data=twoseat)
+with(twoseat, quantile(Hwy, probs=c(0.5)))
+@
+This is an example of the use of {\tt with()} to make a variable
+within a dataframe accessible to the {\tt quantile()} function.
+
+The output matches the description in Example 1.16 (page 35).  
+
+The default behavior in R for the calculation of quantiles does not match 
+that of SPSS and Minitab.  For those with a fetish for accuracy, the
+results displayed in part (b) of Figure 1.18 (page 36) can be replicated using the {\tt type=6} option to {\tt quantile()}:
+<<>>=
+with(twoseat, quantile(Hwy, probs=c(0.25, 0.75), type=6))
+@
+
+
+\subsection{Five number summary}
+
+<<>>=
+favstats(~ Hwy, data=twoseat)
+min(~ Hwy, data=twoseat)
+max(~ Hwy, data=twoseat)
+with(twoseat, fivenum(Hwy))
+@
+Note that the five number summary is calculating the lower and upper hinges, rather
+than Q1 and Q3.
+
+For pedagogical purposes, we often find it simpler to just introduce {\tt favstats()} for calculations of this sort.
+
+\subsection{Interquartile range and outliers}
+
+We can calculate the IQR, as well as display boxplots.
+<<>>=
+with(twoseat, IQR(Hwy))
+bwplot(~ Hwy, data=twoseat)
+@
+This matches the display for two seater cars on page 37.
+
+We generally encourage students to use boxplots when comparing two of more
+groups, as it's not a particularly compelling display for a single population.
+
+<<>>=
+bwplot(Hwy ~ Type, data=mileage)
+@
+
+To generate all four groups from Figure 1.19 (page 37), we need to transform
+the dataset into \emph{tall} format.  This is a somewhat pesky 
+data management task that is best done by instructors (rather than 
+students) early on in a course.
+<<>>=
+head(mileage)
+# create a vector of locations
+Location = c(rep("Hwy", nrow(mileage)), rep("City", nrow(mileage)))
+# create a vector of car types
+CarType = with(mileage, c(Type, Type))
+# create a vector of miles per gallon
+MPG = with(mileage, c(Hwy, City))
+# glue them all together
+figure1.19 = with(mileage, data.frame(CarType, MPG, Location))
+head(figure1.19)
+# cleanup
+rm(Location, CarType, MPG)
+bwplot(MPG ~ Location | CarType, data=figure1.19)
+@
+
+
+\subsection{IQR rule and outliers}
+
+We can flag outliers using the 1.5 IQR rule, for the call times dataset
+(as displayed in Figure 1.20):
+
+<<>>=
+bwplot(~ length, data=eightytimes)
+@
+
+We can also display information regarding the outliers:
+<<>>=
+threshold = 1.5 * with(eightytimes, IQR(length))
+threshold
+q1 = with(eightytimes, quantile(length, probs=0.25))
+q1
+q3 = with(eightytimes, quantile(length, probs=0.75))
+q3
+# outlier if either condition matches 
+eightytimes = transform(eightytimes, 
+  outliers = (length < q1 - threshold) | (length > q3 + threshold))
+@
+
+<<>>=
+tally(~ outliers, data=eightytimes)
+favstats(~ length, data=subset(eightytimes, outliers==TRUE))
+subset(eightytimes, outliers==TRUE)
+@
+
+
+\subsection{Standard deviation and variance}
+
+It's straightforward to calculate the variance and standard deviation
+directly within R.
+
+<<>>=
+x = c(1792, 1666, 1362, 1614, 1460, 1867, 1439)
+n = length(x)
+n
+mean(x)
+myvar = sum((x - mean(x))^2) / (n - 1)
+myvar
+sqrt(myvar)
+@
+
+But it's simpler to use the built-in commands:
+<<>>=
+var(x)
+sd(x)
+@
+These match the values calculated on page 41.
+
+Normally, we'll access variables in a dataframe, which requires use of 
+the {\tt ~} operator and the {\tt data=} statement (or use of {\tt with()}).
+
+
+\subsection{Linear transformations}
+
+We replicate the analyses from example 1.22 (page 46).  Instead of operating 
+directly on the vector, we'll create a simple dataframe.
+<<>>=
+score = c(1056, 1080, 900, 1164, 1020)
+grades = data.frame(score)
+mean(~ score, data=grades)
+sd(~ score, data=grades)
+grades = transform(grades, points = score / 4)
+grades
+mean(~ points, data=grades)
+sd(~ points, data=grades)
+@
+
+
+\section{Density curves and normal distributions}
+
+\subsection{Density curves}
+
+<<>>=
+rainwater = read.csv("http://www.math.smith.edu/ips6eR/ch01/ex01_036.csv")
+names(rainwater)
+densityplot(~ ph, data=rainwater)
+@
+
+We can adjust how ``smooth'' the curve will be.  Here we make the bandwidth
+(see page 71) narrower, which will make the curve less smooth.
+<<>>=
+densityplot(~ ph, adjust=0.5, data=rainwater)
+@
+
+Here we make the bandwidth
+wider, which will make the curve smoother.
+<<>>=
+densityplot(~ ph, adjust=2, data=rainwater)
+@
+
+The defaults are generally satisfactory.
+
+We can also overlay a normal distribution on top of a histogram.
+<<>>=
+histogram(~ ph, fit='normal', data=rainwater)
+@
+
+\subsection{Empirical (68/95/99.7) rule}
+
+While it's straightforward to use R to calculate the probabilities for 
+any distribution, many times the empirical (or 68/95/99.7) rule can be
+used to get a rough sense of probabilities.
+
+<<>>=
+xpnorm(1, mean=0, sd=1)
+@
+Because it is symmetric, 
+we observe that approximately $2*.1587=\Sexpr{2*.1587}$ (or a little
+less than 1/3) of the density for 
+a normal distribution is more than 1 standard deviation from the mean.
+
+<<>>=
+xpnorm(2, mean=0, sd=1)
+@
+
+Similarly,
+we observe that approximately $2*.0228=\Sexpr{2*.0228}$ (or a little
+less than 5\%) of the density for 
+a normal distribution is more than 2 standard deviations from the mean.
+
+<<>>=
+xpnorm(3, mean=0, sd=1)
+@
+Only a small proportion ($2*.0013=\Sexpr{2*.0013}$) 
+of the density of
+a normal distribution is more than 3 standard deviations from the mean.
+
+We also know that the probability of a value above the mean is 0.5, since the
+distribution is symmetric.
+
+\subsection{Normal distribution calculations}
+
+The {\tt xpnorm()} function can be used to calculate normal probabilities (look ma: no
+Table!).  More formally, it calculates the probability that a random variable
+X takes on probability of x or less given a distribution with mean $\mu$ and
+standard deviation $\sigma$.
+
+Example 1.27 (page 63) calculates the probability that a student had a score of
+820 on the SAT, given that SAT scores are approximately normal with mean $\mu=1026$ 
+and
+standard deviation $\sigma=209$:
+<<>>=
+xpnorm(820, mean=1026, sd=209)
+@
+This matches the value of 0.8379 at the bottom of the page.
+
+Other functions can be used to work backwards to find a quantile in terms of a probability.  Example 1.32 (page 67) asks to find the quantile of the distribution 
+which corresponds to the top 10\%:
+<<>>=
+xqnorm(.90, mean=505, sd=110)
+@
+The value of 646 matches the value from the calculations from the Table.
+
+
+\subsection{Normal quantile plots}
+
+We can replicate Figure 1.34 (normal quantile plot of the breaking 
+strengths of wires, page 69) using the {qqnorm()} command:
+<<>>=
+wires = read.csv("http://www.math.smith.edu/ips6eR/ch01/eg01_011.csv")
+names(wires)
+with(wires, qqnorm(strength))
+@
+
+
+\end{document}

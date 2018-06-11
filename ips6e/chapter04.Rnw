@@ -1,0 +1,332 @@
+\documentclass[11pt]{article}
+
+\usepackage[margin=1in,bottom=.5in,includehead,includefoot]{geometry}
+\usepackage{hyperref}
+\usepackage{language}
+\usepackage{alltt}
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+
+%% Now begin customising things. See the fancyhdr docs for more info.
+
+\chead{}
+\lhead[\sf \thepage]{\sf \leftmark}
+\rhead[\sf \leftmark]{\sf \thepage}
+\lfoot{}
+\cfoot{Introduction to the Practice of Statistics using R: Chapter 4}
+\rfoot{}
+
+\newcounter{myenumi}
+\newcommand{\saveenumi}{\setcounter{myenumi}{\value{enumi}}}
+\newcommand{\reuseenumi}{\setcounter{enumi}{\value{myenumi}}}
+
+\pagestyle{fancy}
+
+\def\R{{\sf R}}
+\def\Rstudio{{\sf RStudio}}
+\def\RStudio{{\sf RStudio}}
+\def\term#1{\textbf{#1}}
+\def\tab#1{{\sf #1}}
+
+
+\usepackage{relsize}
+
+\newlength{\tempfmlength}
+\newsavebox{\fmbox}
+\newenvironment{fmpage}[1]
+     {
+   \medskip
+   \setlength{\tempfmlength}{#1}
+	 \begin{lrbox}{\fmbox}
+	   \begin{minipage}{#1}
+		 \vspace*{.02\tempfmlength}
+		 \hfill
+	   \begin{minipage}{.95 \tempfmlength}}
+		 {\end{minipage}\hfill
+		 \vspace*{.015\tempfmlength}
+		 \end{minipage}\end{lrbox}\fbox{\usebox{\fmbox}}
+	 \medskip
+	 }
+
+
+\newenvironment{boxedText}[1][.98\textwidth]%
+{%
+\begin{center}
+\begin{fmpage}{#1}
+}%
+{%
+\end{fmpage}
+\end{center}
+}
+
+\newenvironment{boxedTable}[2][tbp]%
+{%
+\begin{table}[#1]
+  \refstepcounter{table}
+  \begin{center}
+\begin{fmpage}{.98\textwidth}
+  \begin{center}
+	\sf \large Box~\expandafter\thetable. #2
+\end{center}
+\medskip
+}%
+{%
+\end{fmpage}
+\end{center}
+\end{table}		% need to do something about exercises that follow boxedTable
+}
+
+
+\newcommand{\cran}{\href{http://www.R-project.org/}{CRAN}}
+
+\title{Introduction to the Practice of Statistics using R: \\
+Chapter 4}
+
+\author{
+Nicholas J. Horton\thanks{Department of Mathematics, Amherst College, nhorton@amherst.edu} \and Ben Baumer
+} 
+
+\date{\today}
+
+\begin{document}
+
+
+\maketitle
+\tableofcontents
+
+%\parindent=0pt
+
+
+<<setup, include=FALSE, cache=FALSE>>=
+opts_chunk$set(
+  dev="pdf",
+  tidy=FALSE,
+  fig.path="figures/",
+	fig.height=4,
+	fig.width=5,
+	out.width=".57\\textwidth",
+	fig.keep="high",
+	fig.show="hold",
+	fig.align="center",
+	prompt=TRUE,  # show the prompts; but perhaps we should not do this 
+	comment=NA    
+  )
+options(continue=" ")
+@
+
+<<pvalues, echo=FALSE, message=FALSE>>=
+print.pval = function(pval) {
+  threshold = 0.0001
+    return(ifelse(pval < threshold, paste("p<", sprintf("%.4f", threshold), sep=""),
+                ifelse(pval > 0.1, paste("p=",round(pval, 2), sep=""),
+                       paste("p=", round(pval, 3), sep=""))))
+}
+@
+
+<<setup2,echo=FALSE,message=FALSE>>=
+require(mosaic)
+trellis.par.set(theme=col.mosaic())  # get a better color scheme for lattice
+set.seed(123)
+# this allows for code formatting inline.  Use \Sexpr{'function(x,y)'}, for exmaple.
+knit_hooks$set(inline = function(x) {
+if (is.numeric(x)) return(knitr:::format_sci(x, 'latex'))
+x = as.character(x)
+h = knitr:::hilight_source(x, 'latex', list(prompt=FALSE, size='normalsize'))
+h = gsub("([_#$%&])", "\\\\\\1", h)
+h = gsub('(["\'])', '\\1{}', h)
+gsub('^\\\\begin\\{alltt\\}\\s*|\\\\end\\{alltt\\}\\s*$', '', h)
+})
+showOriginal=FALSE
+showNew=TRUE
+@ 
+
+\section*{Introduction}
+
+This document is intended to help describe how to undertake analyses introduced as examples in the Sixth Edition of \emph{Introduction to the 
+Practice of Statistics} (2009) by David Moore, George McCabe and Bruce
+Craig.
+More information about the book can be found at \url{http://bcs.whfreeman.com/ips6e/}.  This
+file as well as the associated \pkg{knitr} reproducible analysis source file can be found at
+\url{http://www.math.smith.edu/~nhorton/ips6e}.
+
+This work leverages initiatives undertaken by Project MOSAIC (\url{http://www.mosaic-web.org}), an NSF-funded effort to improve the teaching of statistics, calculus, science and computing in the undergraduate curriculum. In particular, we utilize the 
+\pkg{mosaic} package, which was written to simplify the use of R for introductory statistics courses. A short summary of the R needed to teach introductory statistics can be found in the mosaic package vignette (\url{http://cran.r-project.org/web/packages/mosaic/vignettes/MinimalR.pdf}).
+
+To use a package within R, it must be installed (one time), and loaded (each session). The package can be installed using the following command:
+<<install_mosaic,eval=FALSE>>=
+install.packages('mosaic')               # note the quotation marks
+@
+The {\tt \#} character is a comment in R, and all text after that on the 
+current line is ignored.
+
+Once the package is installed (one time only), it can be loaded by running the command:
+<<load_mosaic,eval=FALSE>>=
+require(mosaic)
+@
+This
+needs to be done once per session.
+
+We also set some options to improve legibility of graphs and output.
+<<eval=TRUE>>=
+trellis.par.set(theme=col.mosaic())  # get a better color scheme for lattice
+options(digits=3)
+@
+
+The specific goal of this document is to demonstrate how to replicate the
+analysis described in Chapter 4: Probability (The Study of Randomness).
+
+\section{Randomness}
+
+It's straightforward to replicate displays such as
+Figure 4.1 (page 240) using R.  We begin by specifying the random number seed (this is set 
+arbitrarily if {\tt set.seed()} is not run), then generating a thousand coin flips (using {\tt rbinom()}) then calculating the running average for each of the tosses.
+To match the Figure, we use a log scale for the x-axis.
+<<>>=
+set.seed(42)
+numtosses = 5000
+runave = numeric(numtosses)
+toss = rbinom(numtosses, size=1, prob=0.50)
+for (i in 1:numtosses) {
+	runave[i] = mean(toss[1:i])
+}
+xyplot(runave ~ 1:numtosses, type=c("p", "l"), scales=list(x=list(log=T)), 
+  ylab="Proportion heads", xlab="Number of tosses", lwd=2) 
+ladd(panel.abline(h=0.50, lty=2))
+@
+
+Random digits can be sampled using the {\tt sample()} command, as described using Table B at the bottom 
+of page 239 (0 through 4 called \emph{tails} or false and 5 through 9 \emph{heads} or true:
+<<>>=
+x = sample(0:9, size=10, replace=TRUE)
+x
+x > 4
+@
+
+Alternatively, heads and tails can be generated directly.
+<<>>=
+rbinom(10, size=1, prob=0.50)
+@
+
+\section{Probability models}
+
+The {\tt mosaic} package includes support for samples of cards.
+
+<<>>=
+Cards
+@
+
+Let's create a deck which is missing an ace (to verify the calculation on page 252):
+<<>>=
+noacespades = subset(Cards, Cards != "AS")
+noacespades
+@
+
+How often is the next card also an ace?  We know that the true answer is 3/51 (or \Sexpr{3/51}), and we can 
+estimate this through sampling.
+
+<<>>=
+res = do(10000) * sample(noacespades, size=1, replace=TRUE)
+head(res)
+tally(~ (result %in% c("AD", "AC", "AH")), format="percent", data=res)
+@
+
+\section{Random variables}
+
+Example 4.23 (page 261) derives the Binomial distribution when $n=4$ and $p=0.50$.
+<<>>=
+dbinom(0:4, size=4, prob=0.50)   # probability mass function
+pbinom(0:4, size=4, prob=0.50)   # cumulative probability
+@
+
+Example 4.24 (page 262) asks about the probability of at least two heads, which is equivalent to
+one minus the probability of no more than one head, or $P(X=2) + P(X=3) + P(X=4)$. 
+<<>>=
+dbinom(2:4, size=4, prob=0.50)
+sum(dbinom(2:4, size=4, prob=0.50))
+1 - pbinom(1, size=4, prob=0.50)
+@
+
+Calculations for Uniform random variables can be undertaken as easily (as seen in Example 4.25, page 263):
+
+<<>>=
+punif(0.7, min=0, max=1)
+punif(0.3, min=0, max=1)
+punif(0.7, min=0, max=1) - punif(0.3, min=0, max=1)
+@
+
+Simulation studies are also easy to carry out:
+<<>>=
+randnums = runif(10000, min=0, max=1)
+head(randnums)
+tally(~ (randnums > 0.3 & randnums < 0.7), format="percent")
+@
+
+Example 4.26 (pages 265--266) displays the same type of calculation for a normal random variable:
+
+<<>>=
+xpnorm(0.14, mean=0.12, sd=0.016)
+pnorm(0.10, mean=0.12, sd=0.016)
+pnorm(0.14, mean=0.12, sd=0.016) - pnorm(0.10, mean=0.12, sd=0.016)
+@
+
+or on the normalized scale:
+<<>>=
+xpnorm(1.25, mean=0, sd=1)
+pnorm(-1.25, mean=0, sd=1)
+pnorm(1.25, mean=0, sd=1) - pnorm(-1.25, mean=0, sd=1)
+@
+
+\section{Means and variances of random variables}
+
+Example 4.29 (page 272) calculates the mean of the first digits following Benford's law:
+<<>>=
+V = 1:9
+probV = c(0.301, 0.176, 0.125, 0.097, 0.079, 0.067, 0.058, 0.051, 0.046)
+sum(probV)
+xyplot(probV ~ V, xlab="Outcomes", ylab="Probability")
+V*probV
+benfordmean = sum(V*probV)
+benfordmean
+@
+
+Figure 4.14 (page 275) describes the law of large numbers in action.  We can display this for samples from the Benford distribution:
+<<>>=
+runave = numeric(numtosses)
+benford = sample(V, size=numtosses, prob=probV, replace=TRUE)
+for (i in 1:numtosses) {
+	runave[i] = mean(benford[1:i])
+}
+xyplot(runave ~ 1:numtosses, type=c("p", "l"), scales=list(x=list(log=T)), 
+  ylab="Mean of first n", xlab="Number of observations", lwd=2) 
+ladd(panel.abline(h=3.441, lty=2))
+@
+
+The variance (introduced on page 280) can be carried out in a similar fashion:
+<<>>=
+sum((V - benfordmean)^2 * probV)
+@
+Note that we can estimate this value from the variance of the simulated samples above:
+<<>>=
+var(benford)
+@
+
+Similar calculations can be undertaken on either the original or linearly transformed scale for the Tri-State pick 3 lottery example (4.34) on page 282:
+<<>>=
+X = c(0, 500)
+probX = c(0.999, 0.001)
+xmean = sum(X*probX)
+xmean
+sum((X - xmean)^2 * probX)
+@
+
+For Example 4.35 (page 283), since $W = X-1$ we know that $\mu_w = \mu_x - 1$:
+<<>>=
+W = X - 1
+wmean = sum(W*probX)
+wmean
+sum((W - wmean)^2 * probX)
+@
+
+
+\end{document}
