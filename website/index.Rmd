@@ -1,0 +1,8 @@
+---
+title: "Introduction"
+---
+
+These documents are intended to help describe how to undertake analyses introduced 
+as examples in the XX needs to be udpated.....Fifth Edition of Intro Stats (2018) by De Veaux, Velleman, and Bock.
+
+http://wps.aw.com/aw_deveaux_stats_series/27/6993/1790249.cw/index.html
