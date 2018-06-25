@@ -1,27 +1,21 @@
-name: "SDM4-in-R"
+name: "IPS9-in-R"
 navbar:
-  title: "Stats Data & Models (version 4) in R"
+  title: "Introduction to the Practice of Statistics (Ninth Edition) in R"
   type: inverse
   left:
 
     - text: "PDF and Rmd Files"
       icon: fa-file
       menu:
-        - text: "PDF and Rmd Files for Parts I-VII of SDM4"
-        - text: "Chapters 1-5 : Part I Exploring and Understanding Data"
+        - text: "PDF and Rmd Files for Parts I-III and Companion Chapters of IPS9"
+        - text: "Chapters 1-3 : Part I Looking at Data"
           href: partI.html
-        - text: "Chapters 6-9 : Part II Exploring Relationships Between Variables"
+        - text: "Chapters 4-8 : Part II Probability and Inference"
           href: partII.html
-        - text: "Chapters 10-12 : Part III Gathering Data"
+        - text: "Chapters 9-13 : Part III Topics in Inference"
           href: partIII.html
-        - text: "Chapters 13-16 : Part IV Randomness and Probability"
+        - text: "Chapters 14-17 : Companion Chapters"
           href: partIV.html
-        - text: "Chapters 17-21 : Part V From the Data at Hand to the World at Large"
-          href: partV.html
-        - text: "Chapters 22-25 : Part VI Accessing Associations Between Variables"
-          href: partVI.html
-        - text: "Chapters 26-29 : Part VII Inference When Variables are Related"
-          href: partVII.html
 
     - text: "Other Resources"
       icon: fa-lightbulb-o
