@@ -62,11 +62,45 @@ See table on page 10.
 Online_Percent <- 
   read_csv("https://nhorton.people.amherst.edu/ips9/data/chapter01/EG01-08ONLINE.csv")
 
-Online <- Online %>%
+Online_Percent <- Online %>%
+  mutate(Count = 100 * Count/sum(Count)) %>%
+  rename(Percent = Count) 
   
+Online_Percent %>%
   adorn_totals("row") 
 ```
-### Section 1.3: Describing Distirbutions with Numbers
+
+See bar graph on page 10.
+```{r eg 1-9}
+gf_col(Percent ~ Source, data = Online_Percent)
+```
+
+See pie chart on page 11. 
+```{r eg 1-10}
+library(ggplot2)
+Preferences <- ggplot(Online_Percent, aes(x = "", y = Percent, fill = factor(Source))) +
+geom_bar(width = 1, stat = "identity")
+Preferences + coord_polar(theta="y") + labs(fill = "Source") +  theme_void()
+# XX Still need to include the percentage labels
+```
+See histogram on page 15. 
+```{r eg 1-14}
+IQ <- read_csv("https://nhorton.people.amherst.edu/ips9/data/chapter01/EG01-14IQ.csv")
+levels <- c(75, 85, 95, 105, 115, 125, 135, 145, 155)
+labels <- c("75 <= IQ & IQ < 85", "85 <= IQ & IQ < 95", "95 <= IQ & IQ < 105", "105 <= IQ & IQ < 115", "115 <= IQ & IQ < 125", "125 <= IQ & IQ < 135", "135 <= IQ & IQ < 145", "145 <= IQ & IQ < 155")
+IQ_Count <- IQ %>% 
+  mutate(Class = cut(IQ, levels, labels = labels)) %>% 
+  pull(Class) %>%
+  tally()
+gf_histogram(IQ_Count)
+```
+The cut() function divides the IQ dataset into the defined levels and assigns the values into the appropriate categories.  
+
+### Section 1.3: Describing Distributions with Numbers
+See .
+```{r}
+
+```
 ### Section 1.4: Density Curves and Normal Distributions
 
 See table on page 7.
