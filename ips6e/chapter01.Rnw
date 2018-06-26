@@ -90,6 +90,7 @@ Nicholas J. Horton\thanks{Department of Mathematics, Amherst College, nhorton@am
 \date{\today}
 
 \begin{document}
+\SweaveOpts{concordance=TRUE}
 
 
 \maketitle

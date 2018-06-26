@@ -41,11 +41,14 @@ file as well as the associated R Markdown reproducible analysis source file used
 This work leverages initiatives undertaken by Project MOSAIC (http://www.mosaic-web.org), an NSF-funded effort to improve the teaching of statistics, calculus, science and computing in the undergraduate curriculum. In particular, we utilize the `mosaic` package, which was written to simplify the use of R for introductory statistics courses. A short summary of the R needed to teach introductory statistics can be found in the mosaic package vignettes (http://cran.r-project.org/web/packages/mosaic).  A paper describing the mosaic approach was published in the *R Journal*: https://journal.r-project.org/archive/2017/RJ-2017-024.
   
 ## Chapter 1: Looking at Data -- Distributions
+The specific goal of this document is to demonstrate how to replicate the
+analysis described in Chapter 1: Looking at Data (Distributions).
 
 ### Section 1.1: Data
 ### Section 1.2: Displaying Distributions with Graphs
 
-See table on page 9.
+The table on page 9 displays the counts of preferences for online resources
+of 552 first-year college students. We begin by reading the data: 
 ```{r eg 1-7}
 library(mosaic)
 library(readr)
@@ -57,7 +60,9 @@ Online %>%
   adorn_totals("row") 
 ```
 
-See table on page 10. 
+We can represent the data in percentages by dividing the number 
+of students who favor each online resource by the total number of participants
+and multiplying the ratio by 100. The table on page 10 shows the preference percents.
 ```{r eg 1-8}
 Online_Percent <- 
   read_csv("https://nhorton.people.amherst.edu/ips9/data/chapter01/EG01-08ONLINE.csv")
@@ -69,13 +74,27 @@ Online_Percent <- Online %>%
 Online_Percent %>%
   adorn_totals("row") 
 ```
+We use the `mutate()` function to compute the counts as percentages, while the `rename()` function 
+provides an easy way to rename the column from "Count" to "Percent".
 
-See bar graph on page 10.
+Figure 1.2 (page 10) displays the online resource preference data from the above example
+using a bar graph. We can make a bar graph by typing: 
 ```{r eg 1-9}
 gf_col(Percent ~ Source, data = Online_Percent)
+
+Online_Percent %>%
+  arrange(-Percent) %>%
+  mutate(Source = reorder(Source, - Percent)) %>%
+  gf_col(Percent ~ Source)
 ```
 
-See pie chart on page 11. 
+R automatically orders the x-axis alphabetically, placing "Other" before "Wikipedia". However, we can make
+slight modifications by nesting the `reorder()` function in the `mutate()` function, which will first reorder the
+data based on the Percent and then reassign the data. The output now matches the graph on page 10 and graphs
+the sources on a descending order of preference percentages. 
+
+Figure 1.3 (page 11) displays the online resource preference data in a pie chart. You can create one using 
+the `ggplot2` package.
 ```{r eg 1-10}
 library(ggplot2)
 Preferences <- ggplot(Online_Percent, aes(x = "", y = Percent, fill = factor(Source))) +
@@ -83,18 +102,60 @@ geom_bar(width = 1, stat = "identity")
 Preferences + coord_polar(theta="y") + labs(fill = "Source") +  theme_void()
 # XX Still need to include the percentage labels
 ```
-See histogram on page 15. 
+XX Should I make the stemplots on page 12 and 13? Are there non-base graphic functions for this? 
+
+Figure 1.7 (page 15) shows the IQ scores of 60 fifth-grade students chosen at random from one school.
+The data first need to be divided into classes or levels of equal width. We can then count the number of 
+individuals in each class/level and use these counts to create a histogram.
 ```{r eg 1-14}
 IQ <- read_csv("https://nhorton.people.amherst.edu/ips9/data/chapter01/EG01-14IQ.csv")
 levels <- c(75, 85, 95, 105, 115, 125, 135, 145, 155)
 labels <- c("75 <= IQ & IQ < 85", "85 <= IQ & IQ < 95", "95 <= IQ & IQ < 105", "105 <= IQ & IQ < 115", "115 <= IQ & IQ < 125", "125 <= IQ & IQ < 135", "135 <= IQ & IQ < 145", "145 <= IQ & IQ < 155")
 IQ_Count <- IQ %>% 
   mutate(Class = cut(IQ, levels, labels = labels)) %>% 
-  pull(Class) %>%
-  tally()
-gf_histogram(IQ_Count)
+  pull(Class) 
+gf_histogram(~ IQ_Count, stat = "count")
 ```
-The cut() function divides the IQ dataset into the defined levels and assigns the values into the appropriate categories.  
+The `cut()` function divides the IQ dataset into the defined levels and assigns the values into the appropriate categories.  
+By setting the `stat` argument in the `gf_histogram()` function to "count", we can create a count histogram.  
+The distribution of scores on IQ tests is roughly "bell-shaped".
+
+Table 1.2 (page 17) displays the lengths of the first 80 calls. To call the first 80 observations in the dataset, we can 
+use the `head()` function and specify the number of observations.
+```{r eg 1-15}
+Customer_Calls <- read_csv("https://nhorton.people.amherst.edu/ips9/data/chapter01/EG01-16CALLS.csv")
+head(Customer_Calls, 80)
+```
+Figure 1.8 displays the histogram of the lengths of all 31,492 calls. To exclude the few lengths that are greater than
+1200 seconds (20 minutes), we can use the `filter()` function.
+```{r eg 1-16}
+Customer_Calls <- read_csv("https://nhorton.people.amherst.edu/ips9/data/chapter01/EG01-16CALLS.csv")
+Customer_Calls %>% 
+  filter(length <= 1200) %>%
+  gf_histogram(~ length, stat = "count") %>%
+  gf_labs(x = "Service time (seconds)", y = "Count of calls")
+```
+From the last visual, we can assess the shape of the distribution of IQ scores. We can also 
+use functions to find the center and spread. 
+```{r eg 1-17}
+summary(Customer_Calls)
+```
+
+```{r eg 1-18}
+```
+
+```{r eg 1-19}
+```
+
+```{r eg 1-20}
+```
+
+```{r eg 1-21}
+```
+
+```{r eg 1-22}
+```
+
 
 ### Section 1.3: Describing Distributions with Numbers
 See .
