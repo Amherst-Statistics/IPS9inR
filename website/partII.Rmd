@@ -1,0 +1,23 @@
+<h2>
+<center>
+"Part II: Probability and Inference"
+</center>
+</h2>
+
+</br>
+<h4><right>Chapters: 01-05</right></h4>
+</br>
+
+
+
+
+Title  | Links to Rmd and PDF files
+------------- | -------------
+Chapter 04 : Probability: The Study of Randomness | <a href='chapters/Chapter01.Rmd'>.Rmd File</a> <a href='chapters/Chapter01.pdf'>(pdf)</a>
+Chapter 05 : Sampling Distributions | <a href='chapters/Chapter02.Rmd'>.Rmd File</a> <a href='chapters/Chapter02.pdf'>(pdf)</a>
+Chapter 06 : Introduction to Inference | <a href='chapters/Chapter03.Rmd'>.Rmd File</a> <a href='chapters/Chapter03.pdf'>(pdf)</a>
+Chapter 07 : Inference for Means | <a href='chapters/Chapter03.Rmd'>.Rmd File</a> <a href='chapters/Chapter03.pdf'>(pdf)</a>
+Chapter 08 : Inference for Proportions | <a href='chapters/Chapter03.Rmd'>.Rmd File</a> <a href='chapters/Chapter03.pdf'>(pdf)</a>
+
+
+
