@@ -60,10 +60,14 @@ Online %>%
   adorn_totals("row") 
 ```
 
+By default, the `read_csv()` function will output the types of columns, as we see above. 
+For future coding, we will suppress the "Parsed with column specification" message by adding
+`message = FALSE` at the top of the code chunks. 
+
 We can represent the data in percentages by dividing the number 
 of students who favor each online resource by the total number of participants
 and multiplying the ratio by 100. The table on page 10 shows the preference percents.
-```{r eg 1-8}
+```{r eg 1-8, message = FALSE}
 Online_Percent <- 
   read_csv("https://nhorton.people.amherst.edu/ips9/data/chapter01/EG01-08ONLINE.csv")
 
@@ -79,7 +83,7 @@ provides an easy way to rename the column from "Count" to "Percent".
 
 Figure 1.2 (page 10) displays the online resource preference data from the above example
 using a bar graph. We can make a bar graph by typing: 
-```{r eg 1-9}
+```{r eg 1-9, message = FALSE}
 gf_col(Percent ~ Source, data = Online_Percent)
 
 Online_Percent %>%
@@ -95,7 +99,7 @@ the sources on a descending order of preference percentages.
 
 Figure 1.3 (page 11) displays the online resource preference data in a pie chart. You can create one using 
 the `ggplot2` package.
-```{r eg 1-10}
+```{r eg 1-10,  message = FALSE}
 library(ggplot2)
 Preferences <- ggplot(Online_Percent, aes(x = "", y = Percent, fill = factor(Source))) +
 geom_bar(width = 1, stat = "identity")
@@ -107,7 +111,7 @@ XX Should I make the stemplots on page 12 and 13? Are there non-base graphic fun
 Figure 1.7 (page 15) shows the IQ scores of 60 fifth-grade students chosen at random from one school.
 The data first need to be divided into classes or levels of equal width. We can then count the number of 
 individuals in each class/level and use these counts to create a histogram.
-```{r eg 1-14}
+```{r eg 1-14, message = FALSE}
 IQ <- read_csv("https://nhorton.people.amherst.edu/ips9/data/chapter01/EG01-14IQ.csv")
 levels <- c(75, 85, 95, 105, 115, 125, 135, 145, 155)
 labels <- c("75 <= IQ & IQ < 85", "85 <= IQ & IQ < 95", "95 <= IQ & IQ < 105", "105 <= IQ & IQ < 115", "115 <= IQ & IQ < 125", "125 <= IQ & IQ < 135", "135 <= IQ & IQ < 145", "145 <= IQ & IQ < 155")
@@ -122,45 +126,184 @@ The distribution of scores on IQ tests is roughly "bell-shaped".
 
 Table 1.2 (page 17) displays the lengths of the first 80 calls. To call the first 80 observations in the dataset, we can 
 use the `head()` function and specify the number of observations.
-```{r eg 1-15}
+```{r eg 1-15, message = FALSE}
 Customer_Calls <- read_csv("https://nhorton.people.amherst.edu/ips9/data/chapter01/EG01-16CALLS.csv")
 head(Customer_Calls, 80)
 ```
 Figure 1.8 displays the histogram of the lengths of all 31,492 calls. To exclude the few lengths that are greater than
 1200 seconds (20 minutes), we can use the `filter()` function.
-```{r eg 1-16}
+```{r eg 1-16, message = FALSE}
 Customer_Calls <- read_csv("https://nhorton.people.amherst.edu/ips9/data/chapter01/EG01-16CALLS.csv")
 Customer_Calls %>% 
   filter(length <= 1200) %>%
-  gf_histogram(~ length, stat = "count") %>%
+  gf_histogram(~ length, binwidth = 5) %>%
   gf_labs(x = "Service time (seconds)", y = "Count of calls")
 ```
+
 From the last visual, we can assess the shape of the distribution of IQ scores. We can also 
-use functions to find the center and spread. 
-```{r eg 1-17}
-summary(Customer_Calls)
+use the `favstats()` function to find the center and spread: 
+```{r eg 1-17, message = FALSE}
+favstats(~ IQ, data = IQ)
+```
+For the exact center, we can see that the median IQ score is 114. As for the measure of spread, we 
+can use the minimum value and the maximum value to say that the spread is from 81 to 145. Both the 
+distribution as well as the summary statistics point to a symmetric, unimodal pattern in the IQ 
+data. 
+
+On the other hand, the distribution of call lengths displayed above is strongly *skewed to the right.*
+We can run the `favstats()` function to find exact values of the center and spread:
+```{r eg 1-18, message = FALSE}
+favstats(~ length, data = Customer_Calls)
+```
+We can say that the length of a typical call is about the median value of the dataset, or 115 seconds. 
+The data spread very widely, spanning from 1 second to 28, 739 seconds. The outliers were omitted from
+the histogram above, but it is still clear thats the shape of the distribution is hardly symmetric.
+
+Next, we will look at the number of undergraduate college students in each of the states. Here, we have 
+loaded in the data and displayed the data in a histogram. See Figure 1.9 (page 20): 
+```{r eg 1-19, message = FALSE}
+College <- read_csv("https://nhorton.people.amherst.edu/ips9/data/chapter01/EG01-19COLLEGE.csv")
+
+gf_dhistogram(~ Undergrads, data = College, binwidth = 30)
+College %>% 
+  filter(Undergrads = max(Undergrads))]
+```
+California is the outlier in this case, by having 2,687,893 undergraduate students.  
+
+The *UGradPerThou* variable in the dataset takes into account the variation in state 
+populations and expresses the number of undergraduate students per 1000 people in each state. 
+Below is a stemplot, which provides essentially the same information as a histogram with the 
+added benefit of being able to easily extract indiviudal data points.
+
+```{r eg 1-20, message = FALSE}
+College %>% 
+  pull(UGradPerThou) %>%
+  stem()
+```
+To interpret this plot alongside the histogram, we can take California for example. California has 60
+undergraduate students per 1000 people, making it one of the higher values, though certainly not the 
+highest. Though the last histogram established California as an outlier for its extremely large number of 
+undergraduate students, the stemplot points out another state as an outlier for having the largest proportion
+of undergraduate students. 
+
+Since we can view individual points in stemplots, we can use the `filter()` function to find the name of the 
+outlier state, which turns out to be Arizona, with a ratio of 77.1 undergraduate students per 1000 people in 
+the state.
+
+```{r, message = FALSE}
+College %>%
+  filter(UGradPerThou > 76)
 ```
 
-```{r eg 1-18}
+Below is the code that we use to create a stemplot of the values of PTH measured on
+a sample of 29 boys and girls aged 12 to 15 years (Figure 1.11 on page 21): 
+```{r eg 1-21, message = FALSE}
+PTH <- read_csv("https://nhorton.people.amherst.edu/ips9/data/chapter01/EG01-21PTH.csv")
+PTH %>% 
+  pull(PTH) %>%
+  stem()
+```
+The 127 PTH value at the base of the stemplot stands out as the outlier.
+
+Following is an example of a plot that displays observations in time order. 
+The serum levels of vitamin have been plotted against time of year for samples of subjects 
+from Switzerland (see Figure 1.12 on page 22).  
+```{r eg 1-22, message = FALSE}
+VITDS <- read_csv("https://nhorton.people.amherst.edu/ips9/data/chapter01/EG01-22VITDS.csv")
+gf_point(VitaminD ~ Months, data = VITDS) %>% 
+  gf_smooth(se = FALSE) %>%
+  gf_labs(x = "Months", y= "Vitamin D(nmol/1)")
 ```
 
-```{r eg 1-19}
-```
-
-```{r eg 1-20}
-```
-
-```{r eg 1-21}
-```
-
-```{r eg 1-22}
-```
-
+By default, the `se` argument in `gf_smooth()` function is set to TRUE, so we set it to FALSE
+to suppress the confidence intervals.
 
 ### Section 1.3: Describing Distributions with Numbers
-See .
-```{r}
 
+Like the previous examples of stemplots, you can type the following to 
+display the data collected on the time, in days, that businesses took to complete
+all of the starting procedures: 
+```{r eg 1-23, message = FALSE}
+TTS24 <- read_csv("https://nhorton.people.amherst.edu/ips9/data/chapter01/EG01-23TTS24.csv")
+TTS24 %>% 
+  pull(Time) %>%
+  stem(scale = 2)
+```
+We can control the length of the stemplot by changing the `scale` argument from 
+1, which is the default setting, to 2. 
+
+Other than using the `favstats()` function to calculate summary statistics, we can also 
+use the `mean()` function to find this specific statistic.
+```{r eg 1-24, message = FALSE}
+TTS24 %>% 
+  pull(Time) %>%
+  mean()
+```
+
+To add Suricane's time, we first 
+```{r eg 1-25, message = FALSE}
+Suricane <- 
+TTS24 %>% 
+  pull(Time) %>%
+  mean() %>%
+  round(5)
+```
+
+```{r eg 1-26, message = FALSE}
+```
+
+```{r eg 1-27, message = FALSE}
+```
+
+```{r eg 1-28, message = FALSE}
+```
+
+```{r eg 1-29, message = FALSE}
+```
+
+```{r eg 1-30, message = FALSE}
+```
+
+```{r eg 1-31, message = FALSE}
+```
+
+```{r eg 1-32, message = FALSE}
+```
+
+```{r eg 1-33, message = FALSE}
+```
+
+```{r eg 1-34, message = FALSE}
+```
+
+```{r eg 1-35, message = FALSE}
+```
+
+```{r eg 1-37, message = FALSE}
+```
+
+```{r eg 1-38, message = FALSE}
+```
+
+```{r eg 1-39, message = FALSE}
+```
+
+```{r eg 1-40, message = FALSE}
+```
+
+```{r eg 1-41, message = FALSE}
+```
+
+```{r eg 1-42, message = FALSE}
+```
+
+```{r eg 1-43, message = FALSE}
+```
+
+```{r eg 1-44, message = FALSE}
+```
+
+```{r eg 1-45, message = FALSE}
 ```
 ### Section 1.4: Density Curves and Normal Distributions
 
