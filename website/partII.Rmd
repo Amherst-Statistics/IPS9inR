@@ -5,7 +5,7 @@
 </h2>
 
 </br>
-<h4><right>Chapters: 01-05</right></h4>
+<h4><right>Chapters: 04-08</right></h4>
 </br>
 
 
@@ -13,11 +13,11 @@
 
 Title  | Links to Rmd and PDF files
 ------------- | -------------
-Chapter 04 : Probability: The Study of Randomness | <a href='chapters/Chapter01.Rmd'>.Rmd File</a> <a href='chapters/Chapter01.pdf'>(pdf)</a>
-Chapter 05 : Sampling Distributions | <a href='chapters/Chapter02.Rmd'>.Rmd File</a> <a href='chapters/Chapter02.pdf'>(pdf)</a>
-Chapter 06 : Introduction to Inference | <a href='chapters/Chapter03.Rmd'>.Rmd File</a> <a href='chapters/Chapter03.pdf'>(pdf)</a>
-Chapter 07 : Inference for Means | <a href='chapters/Chapter03.Rmd'>.Rmd File</a> <a href='chapters/Chapter03.pdf'>(pdf)</a>
-Chapter 08 : Inference for Proportions | <a href='chapters/Chapter03.Rmd'>.Rmd File</a> <a href='chapters/Chapter03.pdf'>(pdf)</a>
+Chapter 04 : Probability: The Study of Randomness | <a href='chapters/Chapter04.Rmd'>.Rmd File</a> <a href='chapters/Chapter04.pdf'>(pdf)</a>
+Chapter 05 : Sampling Distributions | <a href='chapters/Chapter05.Rmd'>.Rmd File</a> <a href='chapters/Chapter05.pdf'>(pdf)</a>
+Chapter 06 : Introduction to Inference | <a href='chapters/Chapter06.Rmd'>.Rmd File</a> <a href='chapters/Chapter06.pdf'>(pdf)</a>
+Chapter 07 : Inference for Means | <a href='chapters/Chapter07.Rmd'>.Rmd File</a> <a href='chapters/Chapter07.pdf'>(pdf)</a>
+Chapter 08 : Inference for Proportions | <a href='chapters/Chapter08.Rmd'>.Rmd File</a> <a href='chapters/Chapter08.pdf'>(pdf)</a>
 
 
 
