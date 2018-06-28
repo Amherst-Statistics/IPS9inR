@@ -1,0 +1,21 @@
+---
+title: "Resources Related to the mosaic Package"
+date: "6/28/2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+- Stats: Data and Models (Horton, Frenett, and McDonald) describes how to undertake analyses in De Veaux, Velleman, and Bock's Stats: Data and Models (4th edition).
+
+- Intro Stats (Horton, Chien) describes how to undertake analyses in De Veaux, Velleman, and Bock's Intro Stats (5th edition)
+
+- [The Statistical Sleuth in R](http://nhorton.people.amherst.edu/sleuth) (NJ Horton) describes how to undertake analyses in R for the examples in the first 13 chapters of the Third Edition of the *Statistical Sleuth: A Course in Methods of Data Analysis* (2013), by Fred Ramsey and Dan Schafer.
+
+- A paper describing the mosaic package *Less Volume, More Creativity* approach is available [here](https://journal.r-project.org/archive/2017/RJ-2017-024) 
+
+- Additional mosaic-related resources and documentation are available [here](https://cran.r-project.org/web/packages/mosaic/vignettes/mosaic-resources.html) 
+
+- Additional mosaic package vignettes can be found at [here](http://cran.r-project.org/web/packages/mosaic).
