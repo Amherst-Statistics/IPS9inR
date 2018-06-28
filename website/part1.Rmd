@@ -1,0 +1,21 @@
+<h2>
+<center>
+"Part I: Looking at Data"
+</center>
+</h2>
+
+</br>
+<h4><right>Chapters: 01-05</right></h4>
+</br>
+
+
+
+
+Title  | Links to Rmd and PDF files
+------------- | -------------
+Chapter 01 : Looking at Data -- Distributions | <a href='chapters/Chapter01.Rmd'>.Rmd File</a> <a href='chapters/Chapter01.pdf'>(pdf)</a>
+Chapter 02 : Looking at Data -- Relationships | <a href='chapters/Chapter02.Rmd'>.Rmd File</a> <a href='chapters/Chapter02.pdf'>(pdf)</a>
+Chapter 03 : Producing Data | <a href='chapters/Chapter03.Rmd'>.Rmd File</a> <a href='chapters/Chapter03.pdf'>(pdf)</a>
+
+
+
