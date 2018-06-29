@@ -8,9 +8,9 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-- Stats: Data and Models (Horton, Frenett, and McDonald) describes how to undertake analyses in De Veaux, Velleman, and Bock's Stats: Data and Models (4th edition).
+- [Stats: Data and Models](http://nhorton.people.amherst.edu/SDM4) (Horton, Frenett, and McDonald) describes how to undertake analyses in De Veaux, Velleman, and Bock's *Stats: Data and Models (4th edition)*.
 
-- Intro Stats (Horton, Chien) describes how to undertake analyses in De Veaux, Velleman, and Bock's Intro Stats (5th edition)
+- [Intro Stats](https://nhorton.people.amherst.edu/is5/) (Horton, Chien) describes how to undertake analyses in De Veaux, Velleman, and Bock's *Intro Stats (5th edition)*
 
 - [The Statistical Sleuth in R](http://nhorton.people.amherst.edu/sleuth) (NJ Horton) describes how to undertake analyses in R for the examples in the first 13 chapters of the Third Edition of the *Statistical Sleuth: A Course in Methods of Data Analysis* (2013), by Fred Ramsey and Dan Schafer.
 

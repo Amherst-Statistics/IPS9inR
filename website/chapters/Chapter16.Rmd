@@ -1,7 +1,7 @@
 ---
-title: "IPS9 in R: Looking at Data -- Distributions (Chapter 1)"
+title: "IPS9 in R: Bootstrap Methods and Permutation Tests (Chapter 16)"
 author: "Bonnie Lin and Nicholas Horton (nhorton@amherst.edu)"
-date: "June 21, 2018"
+date: "June 28, 2018"
 output: 
   pdf_document:
     fig_height: 4
@@ -26,7 +26,8 @@ require(mosaic)
 require(knitr)
 opts_chunk$set(
   tidy = FALSE,     # display code as typed
-  size = "small"    # slightly smaller font for code
+  size = "small",    # slightly smaller font for code
+  message = FALSE
 )
 ```
 
@@ -35,17 +36,40 @@ opts_chunk$set(
 This document is intended to help describe how to undertake analyses introduced 
 as examples in the Ninth Edition of \emph{Introduction to the Practice of Statistics} (2017) by Moore, McCabe, and Craig.
 
-More information about the book can be found at https://macmillanlearning.com/Catalog/product/introductiontothepracticeofstatistics-ninthedition-moore.  This
+More information about the book can be found at https://macmillanlearning.com/Catalog/product/introductiontothepracticeofstatistics-ninthedition-moore. This
 file as well as the associated R Markdown reproducible analysis source file used to create it can be found at https://nhorton.people.amherst.edu/ips9/.
 
 This work leverages initiatives undertaken by Project MOSAIC (http://www.mosaic-web.org), an NSF-funded effort to improve the teaching of statistics, calculus, science and computing in the undergraduate curriculum. In particular, we utilize the `mosaic` package, which was written to simplify the use of R for introductory statistics courses. A short summary of the R needed to teach introductory statistics can be found in the mosaic package vignettes (http://cran.r-project.org/web/packages/mosaic).  A paper describing the mosaic approach was published in the *R Journal*: https://journal.r-project.org/archive/2017/RJ-2017-024.
   
-## Chapter 1: Looking at data -- distributions
+## Chapter 1: Bootstrap methods and permutation tests
 The specific goal of this document is to demonstrate how to replicate the
-analysis described in Chapter 1: Looking at Data (Distributions).
+analysis described in Chapter 1: Bootstrap methods and permutation tests.
 
-### Section 1.1: Data
-### Section 1.2: Displaying distributions with graphs
+### Section 16.1: The bootstrap idea
+```{r load-packages}
+library(boot)
+library(readr)
+library(dplyr)
+library(janitor)
+```
+
+```{r eg 16-2}
+FACE4 <- read_csv("https://nhorton.people.amherst.edu/ips9/data/chapter16/EG16-01FACE4.csv") %>% 
+
+  FACE4 <- FACE4 %>%
+  mutate(Time = as.numeric(Time))
+set.seed(2018)
+numsim <- 3000
+Avg_Viewtime <- do(numsim) * mean(~ Time, data = sample(FACE4, 21))
+
+#Figure 16.3(a)
+gf_histogram()
+#Figure 16.3(b)
+```
+### Section 16.2: First steps in using the bootstrap
+### Section 16.3: How accurate is a bootstrap distribution?
+### Section 16.4: Bootstrap confidence intervals 
+### Section 16.5: Significance testing using permutation tests
 
 The table on page 9 displays the counts of preferences for online resources
 of 552 first-year college students. We begin by reading the data: 
