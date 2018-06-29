@@ -19,6 +19,8 @@ output:
 # Don't delete this chunk if you are using the mosaic package
 # This loads the mosaic and dplyr packages
 require(mosaic)
+library(readr)
+library(janitor)
 ```
 
 ```{r, include = FALSE}
@@ -43,20 +45,20 @@ This work leverages initiatives undertaken by Project MOSAIC (http://www.mosaic-
   
 ## Chapter 1: Bootstrap methods and permutation tests
 The specific goal of this document is to demonstrate how to replicate the
-analysis described in Chapter 1: Bootstrap methods and permutation tests.
+analysis described in Chapter 16: Bootstrap methods and permutation tests, one of 
+the four online companion chapters. The PDF's of which can be found at XX INCLUDE LINK HERE
 
 ### Section 16.1: The bootstrap idea
 ```{r load-packages}
-library(boot)
+library(mosaic)
 library(readr)
-library(dplyr)
 library(janitor)
 ```
 
 ```{r eg 16-2}
-FACE4 <- read_csv("https://nhorton.people.amherst.edu/ips9/data/chapter16/EG16-01FACE4.csv") %>% 
+FACE4 <- read_csv("https://nhorton.people.amherst.edu/ips9/data/chapter16/EG16-01FACE4.csv")
 
-  FACE4 <- FACE4 %>%
+FACE4 <- FACE4 %>%
   mutate(Time = as.numeric(Time))
 set.seed(2018)
 numsim <- 3000

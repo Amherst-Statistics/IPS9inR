@@ -17,3 +17,5 @@ Chapter 14 : Logistic Regression | <a href='chapters/Chapter14.Rmd'>.Rmd File</a
 Chapter 15 : Nonparametric Tests | <a href='chapters/Chapter15.Rmd'>.Rmd File</a> <a href='chapters/Chapter15.pdf'>(pdf)</a>
 Chapter 16 : Bootstrap Methods and Permutation Tests | <a href='chapters/Chapter16.Rmd'>.Rmd File</a> <a href='chapters/Chapter16.pdf'>(pdf)</a>
 Chapter 17 : Statistics for Quality Control and Capability | <a href='chapters/Chapter17.Rmd'>.Rmd File</a> <a href='chapters/Chapter17.pdf'>(pdf)</a>
+
+Chapter 29 : Multiple Regression Wisdom | <a href='chapterfiles/Chapter29.Rmd'>.Rmd File</a> <a href='chapterfiles/Chapter29.pdf'>(pdf)</a> <a href="SDM_04_Ch29.pdf">(online pdf of chapter)</a>
