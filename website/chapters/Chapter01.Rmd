@@ -97,14 +97,14 @@ slight modifications by nesting the `reorder()` function in the `mutate()` funct
 data based on the Percent and then reassign the data. The output now matches the graph on page 10 and graphs
 the sources on a descending order of preference percentages. 
 
-Figure 1.3 (page 11) displays the online resource preference data in a pie chart. You can create one using 
-the `ggplot2` package.
+Figure 1.3 (page 11) displays the online resource preference data in a pie chart. You can create a simple one using 
+the `ggplot2` package. However, it is worth noting that the R documentation does not generally recommend pie charts as 
+their features are somewhat limited.
 ```{r eg 1-10,  message = FALSE}
 library(ggplot2)
 Preferences <- ggplot(Online_Percent, aes(x = "", y = Percent, fill = factor(Source))) +
 geom_bar(width = 1, stat = "identity")
 Preferences + coord_polar(theta="y") + labs(fill = "Source") +  theme_void()
-# XX Still need to include the percentage labels
 ```
 XX Should I make the stemplots on page 12 and 13? Are there non-base graphic functions for this? 
 
@@ -166,7 +166,7 @@ College <- read_csv("https://nhorton.people.amherst.edu/ips9/data/chapter01/EG01
 
 gf_dhistogram(~ Undergrads, data = College, binwidth = 30)
 College %>% 
-  filter(Undergrads = max(Undergrads))]
+  filter(Undergrads == max(Undergrads))
 ```
 California is the outlier in this case, by having 2,687,893 undergraduate students.  
 
