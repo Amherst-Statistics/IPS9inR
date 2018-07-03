@@ -23,7 +23,7 @@ library(readr)
 library(janitor)
 ```
 
-```{r, include = FALSE}
+```{r, include = FALSE, message = FALSE}
 # knitr settings to control how R chunks work.
 require(knitr)
 opts_chunk$set(
@@ -54,12 +54,17 @@ library(mosaic)
 library(readr)
 library(janitor)
 ```
-With the following code, 
+With the following code, we create many resamples by repeatedly 
+sampling with replacement from the sample of 21 profiles. Then, we 
+create the bootstrap distribution by finding the mean for the 3,000 
+resamples. 
 ```{r eg 16-2}
 FACE4 <- read_csv("https://nhorton.people.amherst.edu/ips9/data/chapter16/EG16-01FACE4.csv")
 
 FACE4 <- FACE4 %>%
   mutate(Time = as.numeric(Time))
+## XX class() denotes Time as numeric but the message suggests that column is specified as double
+
 set.seed(2018)
 numsim <- 3000
 Avg_Viewtime <- do(numsim) * mean(~ Time, data = resample(FACE4, 21)) 
@@ -83,7 +88,17 @@ The `do()` function in the `mosaic` package simplifies the iteration and resampl
 processees by allowing us to set the number of repetitions and specify what to repeat. 
 
 ### Section 16.2: First steps in using the bootstrap
-```{r}
+```{r eg 16-4}
+College_GPA <- read_csv("https://nhorton.people.amherst.edu/ips9/data/chapter16/EG16-04GPA.csv")
+
+## Figure 16.8(a)
+gf_dhistogram(~ GPA, data = College_GPA) %>%
+  gf_labs(x = "GPA", y = "Percent") 
+
+## Figure 16.8(b)
+gf_qq(~ mean, data = Avg_Viewtime) %>% 
+  gf_qqline(color = "red", linetype = "solid") %>% 
+  gf_labs(x = "Normal score", y = "Mean time of resamples (in minutes)")
 ```
 ### Section 16.3: How accurate is a bootstrap distribution?
 ### Section 16.4: Bootstrap confidence intervals 
