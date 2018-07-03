@@ -43,10 +43,10 @@ file as well as the associated R Markdown reproducible analysis source file used
 
 This work leverages initiatives undertaken by Project MOSAIC (http://www.mosaic-web.org), an NSF-funded effort to improve the teaching of statistics, calculus, science and computing in the undergraduate curriculum. In particular, we utilize the `mosaic` package, which was written to simplify the use of R for introductory statistics courses. A short summary of the R needed to teach introductory statistics can be found in the mosaic package vignettes (http://cran.r-project.org/web/packages/mosaic).  A paper describing the mosaic approach was published in the *R Journal*: https://journal.r-project.org/archive/2017/RJ-2017-024.
   
-## Chapter 1: Bootstrap methods and permutation tests
+## Chapter 16: Bootstrap methods and permutation tests
 The specific goal of this document is to demonstrate how to replicate the
 analysis described in Chapter 16: Bootstrap methods and permutation tests, one of 
-the four online companion chapters. The PDF's of which can be found at XX INCLUDE LINK HERE
+the four online companion chapters. 
 
 ### Section 16.1: The bootstrap idea
 ```{r load-packages}
@@ -54,7 +54,7 @@ library(mosaic)
 library(readr)
 library(janitor)
 ```
-
+With the following code, 
 ```{r eg 16-2}
 FACE4 <- read_csv("https://nhorton.people.amherst.edu/ips9/data/chapter16/EG16-01FACE4.csv")
 
@@ -62,328 +62,30 @@ FACE4 <- FACE4 %>%
   mutate(Time = as.numeric(Time))
 set.seed(2018)
 numsim <- 3000
-Avg_Viewtime <- do(numsim) * mean(~ Time, data = sample(FACE4, 21))
+Avg_Viewtime <- do(numsim) * mean(~ Time, data = resample(FACE4, 21)) 
 
 #Figure 16.3(a)
-gf_histogram()
+mean_time = FACE4 %>%
+  pull(Time) %>%
+  mean()
+
+gf_histogram(~ mean, data = Avg_Viewtime) %>%
+  gf_labs(x = "Mean time of resamples (in minutes)", y = "Count") %>%
+  gf_vline(x = mean_time) 
+
 #Figure 16.3(b)
+gf_qq(~ mean, data = Avg_Viewtime) %>% 
+  gf_qqline(color = "red", linetype = "solid") %>% 
+  gf_labs(x = "Normal score", y = "Mean time of resamples (in minutes)")
 ```
+The psuedorandom number used to set the seed enables the reproduction of results. 
+The `do()` function in the `mosaic` package simplifies the iteration and resampling  
+processees by allowing us to set the number of repetitions and specify what to repeat. 
+
 ### Section 16.2: First steps in using the bootstrap
+```{r}
+```
 ### Section 16.3: How accurate is a bootstrap distribution?
 ### Section 16.4: Bootstrap confidence intervals 
 ### Section 16.5: Significance testing using permutation tests
 
-The table on page 9 displays the counts of preferences for online resources
-of 552 first-year college students. We begin by reading the data: 
-```{r eg 1-7}
-library(mosaic)
-library(readr)
-library(janitor)
-Online <- 
-  read_csv("https://nhorton.people.amherst.edu/ips9/data/chapter01/EG01-07ONLINE.csv")
-
-Online %>%
-  adorn_totals("row") 
-```
-
-By default, the `read_csv()` function will output the types of columns, as we see above. 
-To improve readability for future coding, we will suppress the "Parsed with column 
-specification" message by adding`message = FALSE` at the top of the code chunks. 
-
-We can represent the data in percentages by dividing the number 
-of students who favor each online resource by the total number of participants
-and multiplying the ratio by 100. The table on page 10 shows the preference percents.
-```{r eg 1-8, message = FALSE}
-Online_Percent <- 
-  read_csv("https://nhorton.people.amherst.edu/ips9/data/chapter01/EG01-08ONLINE.csv")
-
-Online_Percent <- Online %>%
-  mutate(Count = 100 * Count/sum(Count)) %>%
-  rename(Percent = Count) 
-  
-Online_Percent %>%
-  adorn_totals("row") 
-```
-We use the `mutate()` function to compute the counts as percentages, while the `rename()` function 
-provides an easy way to rename the column from "Count" to "Percent".
-
-Figure 1.2 (page 10) displays the online resource preference data from the above example
-using a bar graph. We can make a bar graph by typing: 
-```{r eg 1-9, message = FALSE}
-gf_col(Percent ~ Source, data = Online_Percent)
-
-Online_Percent %>%
-  arrange(-Percent) %>%
-  mutate(Source = reorder(Source, - Percent)) %>%
-  gf_col(Percent ~ Source)
-```
-
-R automatically orders the x-axis alphabetically, placing "Other" before "Wikipedia". However, we can make
-slight modifications by nesting the `reorder()` function in the `mutate()` function, which will first reorder the
-data based on the Percent and then reassign the data. The output now matches the graph on page 10 and graphs
-the sources on a descending order of preference percentages. 
-
-Figure 1.3 (page 11) displays the online resource preference data in a pie chart. You can create one using 
-the `ggplot2` package.
-```{r eg 1-10,  message = FALSE}
-library(ggplot2)
-Preferences <- ggplot(Online_Percent, aes(x = "", y = Percent, fill = factor(Source))) +
-geom_bar(width = 1, stat = "identity")
-Preferences + coord_polar(theta="y") + labs(fill = "Source") +  theme_void()
-# XX Still need to include the percentage labels
-```
-XX Should I make the stemplots on page 12 and 13? Are there non-base graphic functions for this? 
-
-Figure 1.7 (page 15) shows the IQ scores of 60 fifth-grade students chosen at random from one school.
-The data first need to be divided into classes or levels of equal width. We can then count the number of 
-individuals in each class/level and use these counts to create a histogram.
-```{r eg 1-14, message = FALSE}
-IQ <- read_csv("https://nhorton.people.amherst.edu/ips9/data/chapter01/EG01-14IQ.csv")
-levels <- c(75, 85, 95, 105, 115, 125, 135, 145, 155)
-labels <- c("75 <= IQ & IQ < 85", "85 <= IQ & IQ < 95", "95 <= IQ & IQ < 105", "105 <= IQ & IQ < 115", "115 <= IQ & IQ < 125", "125 <= IQ & IQ < 135", "135 <= IQ & IQ < 145", "145 <= IQ & IQ < 155")
-IQ_Count <- IQ %>% 
-  mutate(Class = cut(IQ, levels, labels = labels)) %>% 
-  pull(Class) 
-gf_histogram(~ IQ_Count, stat = "count")
-```
-The `cut()` function divides the IQ dataset into the defined levels and assigns the values into the appropriate categories.  
-By setting the `stat` argument in the `gf_histogram()` function to "count", we can create a count histogram.  
-The distribution of scores on IQ tests is roughly "bell-shaped".
-
-Table 1.2 (page 17) displays the lengths of the first 80 calls. To call the first 80 observations in the dataset, we can 
-use the `head()` function and specify the number of observations.
-```{r eg 1-15, message = FALSE}
-Customer_Calls <- read_csv("https://nhorton.people.amherst.edu/ips9/data/chapter01/EG01-16CALLS.csv")
-head(Customer_Calls, 80)
-```
-Figure 1.8 displays the histogram of the lengths of all 31,492 calls. To exclude the few lengths that are greater than
-1200 seconds (20 minutes), we can use the `filter()` function.
-```{r eg 1-16, message = FALSE}
-Customer_Calls <- read_csv("https://nhorton.people.amherst.edu/ips9/data/chapter01/EG01-16CALLS.csv")
-Customer_Calls %>% 
-  filter(length <= 1200) %>%
-  gf_histogram(~ length, binwidth = 5) %>%
-  gf_labs(x = "Service time (seconds)", y = "Count of calls")
-```
-
-From the last visual, we can assess the shape of the distribution of IQ scores. We can also 
-use the `favstats()` function to find the center and spread: 
-```{r eg 1-17, message = FALSE}
-favstats(~ IQ, data = IQ)
-```
-For the exact center, we can see that the median IQ score is 114. As for the measure of spread, we 
-can use the minimum value and the maximum value to say that the spread is from 81 to 145. Both the 
-distribution as well as the summary statistics point to a symmetric, unimodal pattern in the IQ 
-data. 
-
-On the other hand, the distribution of call lengths displayed above is strongly *skewed to the right.*
-We can run the `favstats()` function to find exact values of the center and spread:
-```{r eg 1-18, message = FALSE}
-favstats(~ length, data = Customer_Calls)
-```
-We can say that the length of a typical call is about the median value of the dataset, or 115 seconds. 
-The data spread very widely, spanning from 1 second to 28, 739 seconds. The outliers were omitted from
-the histogram above, but it is still clear thats the shape of the distribution is hardly symmetric.
-
-Next, we will look at the number of undergraduate college students in each of the states. Here, we have 
-loaded in the data and displayed the data in a histogram. See Figure 1.9 (page 20): 
-```{r eg 1-19, message = FALSE}
-College <- read_csv("https://nhorton.people.amherst.edu/ips9/data/chapter01/EG01-19COLLEGE.csv")
-
-gf_dhistogram(~ Undergrads, data = College, binwidth = 30)
-College %>% 
-  filter(Undergrads = max(Undergrads))]
-```
-California is the outlier in this case, by having 2,687,893 undergraduate students.  
-
-The *UGradPerThou* variable in the dataset takes into account the variation in state 
-populations and expresses the number of undergraduate students per 1000 people in each state. 
-Below is a stemplot, which provides essentially the same information as a histogram with the 
-added benefit of being able to easily extract indiviudal data points.
-
-```{r eg 1-20, message = FALSE}
-College %>% 
-  pull(UGradPerThou) %>%
-  stem()
-```
-To interpret this plot alongside the histogram, we can take California for example. California has 60
-undergraduate students per 1000 people, making it one of the higher values, though certainly not the 
-highest. Though the last histogram established California as an outlier for its extremely large number of 
-undergraduate students, the stemplot points out another state as an outlier for having the largest proportion
-of undergraduate students. 
-
-Since we can view individual points in stemplots, we can use the `filter()` function to find the name of the 
-outlier state, which turns out to be Arizona, with a ratio of 77.1 undergraduate students per 1000 people in 
-the state.
-
-```{r, message = FALSE}
-College %>%
-  filter(UGradPerThou > 76)
-```
-
-Below is the code that we use to create a stemplot of the values of PTH measured on
-a sample of 29 boys and girls aged 12 to 15 years (Figure 1.11 on page 21): 
-```{r eg 1-21, message = FALSE}
-PTH <- read_csv("https://nhorton.people.amherst.edu/ips9/data/chapter01/EG01-21PTH.csv")
-PTH %>% 
-  pull(PTH) %>%
-  stem()
-```
-The 127 PTH value at the base of the stemplot stands out as the outlier.
-
-Following is an example of a plot that displays observations in time order. 
-The serum levels of vitamin have been plotted against time of year for samples of subjects 
-from Switzerland (see Figure 1.12 on page 22).  
-```{r eg 1-22, message = FALSE}
-VITDS <- read_csv("https://nhorton.people.amherst.edu/ips9/data/chapter01/EG01-22VITDS.csv")
-gf_point(VitaminD ~ Months, data = VITDS) %>% 
-  gf_smooth(se = FALSE) %>%
-  gf_labs(x = "Months", y= "Vitamin D(nmol/1)")
-```
-
-By default, the `se` argument in `gf_smooth()` function is set to TRUE, so we set it to FALSE
-to suppress the confidence intervals.
-
-### Section 1.3: Describing Distributions with Numbers
-
-Like the previous examples of stemplots, you can type the following to 
-display the data collected on the time, in days, that businesses took to complete
-all of the starting procedures: 
-```{r eg 1-23, message = FALSE}
-TTS24 <- read_csv("https://nhorton.people.amherst.edu/ips9/data/chapter01/EG01-23TTS24.csv")
-TTS24 %>% 
-  pull(Time) %>%
-  stem(scale = 2)
-```
-We can control the length of the stemplot by changing the `scale` argument from 
-1, which is the default setting, to 2. 
-
-Other than using the `favstats()` function to calculate summary statistics, we can also 
-use the `mean()` function to find this specific statistic.
-```{r eg 1-24, message = FALSE}
-TTS24 %>% 
-  pull(Time) %>%
-  mean()
-```
-
-To add Suricane's time, we first 
-```{r eg 1-25, message = FALSE}
-Suricane <- 
-TTS24 %>% 
-  pull(Time) %>%
-  mean() %>%
-  round(5)
-```
-
-```{r eg 1-26, message = FALSE}
-```
-
-```{r eg 1-27, message = FALSE}
-```
-
-```{r eg 1-28, message = FALSE}
-```
-
-```{r eg 1-29, message = FALSE}
-```
-
-```{r eg 1-30, message = FALSE}
-```
-
-```{r eg 1-31, message = FALSE}
-```
-
-```{r eg 1-32, message = FALSE}
-```
-
-```{r eg 1-33, message = FALSE}
-```
-
-```{r eg 1-34, message = FALSE}
-```
-
-```{r eg 1-35, message = FALSE}
-```
-
-```{r eg 1-37, message = FALSE}
-```
-
-```{r eg 1-38, message = FALSE}
-```
-
-```{r eg 1-39, message = FALSE}
-```
-
-```{r eg 1-40, message = FALSE}
-```
-
-```{r eg 1-41, message = FALSE}
-```
-
-```{r eg 1-42, message = FALSE}
-```
-
-```{r eg 1-43, message = FALSE}
-```
-
-```{r eg 1-44, message = FALSE}
-```
-
-```{r eg 1-45, message = FALSE}
-```
-### Section 1.4: Density Curves and Normal Distributions
-
-See table on page 7.
-
-```{r}
-library(mosaic)
-library(readr)
-options(digits = 3)
-Tour <- 
-  read_csv("http://nhorton.people.amherst.edu/is5/data/Tour_de_France_2016.csv")
-names(Tour)
-glimpse(Tour)
-head(Tour, 3)
-tail(Tour, 8) %>%
-  select(Winner, Year, Country)
-```
-
-#### Let's find who was the winner in 1998
-
-```{r}
-filter(Tour, Year == 1998) %>%
-  select(Winner, Year, Country)
-```
-
-#### How many stages did Alberto Contador win in the years when he won the Tour?
-
-```{r}
-filter(Tour, Winner == "Contador Alberto") %>%
-  select(Winner, Year, Stages)
-```
-
-Note that the following command generates the same output.
-
-```{r}
-Tour %>%
-  filter(Winner == "Contador Alberto") %>%
-  select(Winner, Year, Stages)
-```
-
-The pipe operator (`%>%`) can be used to connect one dataframe or command to 
-another.
-
-#### What was the slowest average speed of any tour?  Fastest?
-
-```{r}
-filter(Tour, Average.Speed == min(Average.Speed)) %>%
-  select(Year, Average.Speed)
-filter(Tour, Average.Speed == max(Average.Speed)) %>%
-  select(Year, Average.Speed)
-```
-
-#### How can we summarize the distribution of Average Speeds?
-
-```{r}
-favstats(~ Average.Speed, data = Tour)
-```
