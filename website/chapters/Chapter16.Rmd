@@ -57,7 +57,8 @@ library(janitor)
 With the following code, we create many resamples by repeatedly 
 sampling with replacement from the sample of 21 profiles. Then, we 
 create the bootstrap distribution by finding the mean for the 3,000 
-resamples. 
+resamples. The histogram and qqplots reproduced below can be found on 
+page XX 
 ```{r eg 16-2}
 FACE4 <- read_csv("https://nhorton.people.amherst.edu/ips9/data/chapter16/EG16-01FACE4.csv")
 
@@ -85,10 +86,12 @@ gf_qq(~ mean, data = Avg_Viewtime) %>%
 ```
 The psuedorandom number used to set the seed enables the reproduction of results. 
 The `do()` function in the `mosaic` package simplifies the iteration and resampling  
-processees by allowing us to set the number of repetitions and specify what to repeat. 
+processes by allowing us to set the number of repetitions and specify what to repeat. 
 
 ### Section 16.2: First steps in using the bootstrap
-```{r eg 16-4}
+The strongly skewed distribution is shown on the histogram and Normal quantile plot for
+the original 150 grade points (page 14): 
+```{r eg 16-4 sample}
 College_GPA <- read_csv("https://nhorton.people.amherst.edu/ips9/data/chapter16/EG16-04GPA.csv")
 
 ## Figure 16.8(a)
@@ -96,11 +99,88 @@ gf_dhistogram(~ GPA, data = College_GPA) %>%
   gf_labs(x = "GPA", y = "Percent") 
 
 ## Figure 16.8(b)
-gf_qq(~ mean, data = Avg_Viewtime) %>% 
-  gf_qqline(color = "red", linetype = "solid") %>% 
-  gf_labs(x = "Normal score", y = "Mean time of resamples (in minutes)")
+gf_qq(~ GPA, data = College_GPA) %>% 
+  gf_lims(y = c(0, 4)) %>%
+  gf_labs(x = "Normal score", y = "GPA")
+```
+
+We will now use the 25% trimmed mean as the parameter and use the sample of 150
+students to find the statistic that estimates this parameter. The process is similar 
+to the bootstrapping done above, except that we now specify the "trim" argument in the 
+`mean()` function: 
+```{r eg 16-4 trimmed}
+mean_GPA <- College_GPA %>%
+  pull(GPA) %>%
+  mean(., trim = 0.25) 
+
+numsim <- 3000
+GPA_sims <- do(numsim) * mean(~ GPA, data = resample(College_GPA, 150), trim = 0.25)
+
+## Figure 16.9(a)
+gf_dhistogram(~ mean, data = GPA_sims, binwidth = 0.05, bins = 12, center = 0.05/2) %>%
+  gf_lims(x = c(2.7, 3.3)) %>% 
+  gf_fitdistr(dist = "dnorm") %>% 
+  gf_labs(x = "Means of resamples") %>% 
+  gf_vline(xintercept = as.numeric(mean_GPA))
+
+## XX Graph doesn't look like the textbook, missing the upstep next to the population trimmed mean 
+
+## Figure 16.9(b)
+gf_qq(~ mean, data = GPA_sims) %>%
+  gf_labs(x = "Normal score", y = "Means of resamples") %>%
+  gf_qqline(linetype = "solid", color = "red")
+
+## XX Graph doesn't look like the textbook one, missing outliers
+```
+Since the seed has been previously set, we do not need to set the seed in this code 
+chunk again. 
+
+To find the 95% confidence interval for the population trimmed mean as the book does
+on page 16, we can type: 
+```{r eg 16.5}
+confint(GPA_sims, level = 0.95)
+
+## XX Is it not exact because of the seed that I set? The textbook reports 2.794, 3.106 and the standard error is 0.078. 
+```
+
+```{r eg 16-6}
+College_GPA <- College_GPA %>% 
+  mutate(sex = dplyr::recode(sex, 
+        "1" = "Male",
+        "2" = "Female"), 
+        sex = as.factor(sex))
+## Figure 16.10(a)
+gf_dens(~ GPA, data = College_GPA, color = ~ sex)
+## XX Reordering of the factors to allow for the exact replication of textbook but the curves this way make more sense? 
+
+## Figure 16.10(b)
+gf_qq(~ GPA, data = College_GPA, color = ~ sex)
+
+Summary_GPA <- cbind(
+  tally(~ sex, data = College_GPA),
+  mean(GPA ~ sex, data = College_GPA) %>%
+    round(digits = 3),
+  sd(GPA ~ sex, data = College_GPA) %>%
+    round(digits = 3)) 
+colnames(Summary_GPA) = c("n", "Mean", "Standard Error")
+Summary_GPA
+
+## Bootstrapping
+numsim <- 3000
+Male <- College_GPA %>% filter(sex == "Male") %>% resample(91) %>% pull(GPA) %>% mean()
+Female <- College_GPA %>% filter(sex == "Female") %>% resample(59) %>% pull(GPA) %>% mean()
+
+# newdata <- College_GPA %>% 
+#   bind_rows(., resample(Male, 91), 
+#             ., resample(Female, 59))
+
+GPA_sex_sims <- do(numsim) * Male-Female
+
+t.test(~ mean | sex, data = GPA_sex_sims)
 ```
 ### Section 16.3: How accurate is a bootstrap distribution?
+
+
 ### Section 16.4: Bootstrap confidence intervals 
 ### Section 16.5: Significance testing using permutation tests
 
