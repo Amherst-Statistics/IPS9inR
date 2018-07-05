@@ -1,8 +1,9 @@
 ---
-title: "Introduction"
+title: "Introduction to the Practice of Statistics"
 ---
 
 These documents are intended to help describe how to undertake analyses introduced 
-as examples in the Intro to the Practice of Statistics (9th edition) by Moore, McCabe, and Craig.
+as examples in the textbook *Intro to the Practice of Statistics* (9th edition) by Moore, McCabe, and Craig using the mosaic package in R.
 
-https://nhorton.people.amherst.edu/ips9/
+![Introduction to Practice of Statistics cover](IPS9_BookCover.jpg)]
+
