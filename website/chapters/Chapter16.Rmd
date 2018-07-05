@@ -179,7 +179,9 @@ GPA_sex_sims <- do(numsim) * Male-Female
 t.test(~ mean | sex, data = GPA_sex_sims)
 ```
 ### Section 16.3: How accurate is a bootstrap distribution?
+```{r}
 
+```
 
 ### Section 16.4: Bootstrap confidence intervals 
 ### Section 16.5: Significance testing using permutation tests

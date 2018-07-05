@@ -13,9 +13,9 @@
 
 Title  | Links to Rmd and PDF files
 ------------- | -------------
-Chapter 01 : Looking at Data -- Distributions | <a href='chapters/Chapter01.Rmd'>.Rmd File</a> <a href='chapters/Chapter01.pdf'>(pdf)</a>
-Chapter 02 : Looking at Data -- Relationships | <a href='chapters/Chapter02.Rmd'>.Rmd File</a> <a href='chapters/Chapter02.pdf'>(pdf)</a>
-Chapter 03 : Producing Data | <a href='chapters/Chapter03.Rmd'>.Rmd File</a> <a href='chapters/Chapter03.pdf'>(pdf)</a>
+Chapter 01 : Looking at Data -- Distributions | <a href='chapters/Chapter01.Rmd'>.Rmd File</a> <a href='Chapter01.pdf'>(pdf)</a>
+Chapter 02 : Looking at Data -- Relationships | <a href='chapters/Chapter02.Rmd'>.Rmd File</a> <a href='Chapter02.pdf'>(pdf)</a>
+Chapter 03 : Producing Data | <a href='chapters/Chapter03.Rmd'>.Rmd File</a> <a href='Chapter03.pdf'>(pdf)</a>
 
 
 
