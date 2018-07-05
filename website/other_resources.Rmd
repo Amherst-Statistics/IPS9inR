@@ -1,6 +1,6 @@
 ---
 title: "Resources Related to the mosaic Package"
-date: "6/28/2018"
+date: "2018-07-05"
 output: html_document
 ---
 
