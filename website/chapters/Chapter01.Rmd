@@ -186,6 +186,10 @@ College <- read_csv("https://nhorton.people.amherst.edu/ips9/data/chapter01/EG01
 gf_dhistogram(~ Undergrads, data = College, binwidth = 30)
 College %>% 
   filter(Undergrads == max(Undergrads))
+
+## XX Comes out not looking so pretty in the PDF and not sure why the density plot looks
+## that way 
+
 ```
 California is the outlier in this case, by having 2,687,893 undergraduate students.  
 
@@ -248,6 +252,8 @@ use the `mean()` function to find this specific statistic.
 mean(~ Time, data = TTS24)
 ```
 
+XX ?? use this options(digits = ) or round()
+
 ```{r UseYourKnowledge, message = FALSE}
 Suricane <- read_csv("https://nhorton.people.amherst.edu/ips9/data/chapter01/EG01-25TTS24.csv")
 mean(~ Time, data = Suricane) %>% round(digits = 2)
@@ -267,7 +273,7 @@ Other functions that operate similarly include:
 - IRQ(): to calculate the quartiles (Q3 - Q1)
 
 You can type either line of code to get the help file for the function to see more information: 
-```{r}
+```{r, eval = FALSE}
 ?favstats 
 favstats()
 ```
@@ -291,17 +297,31 @@ We can convert the homework scores to final grade points by dividing each value 
 vector by 4. Because this is a linear transformamtion, the mean of the summed homework score is
 just four times the mean of the points. 
 
+Figure 1.20(a) (page 52) shows the distribution of the time it takes to start a business, as a 
+density plot overlain a histogram. We can recreate this by typing: 
 ```{r eg1-36, message = FALSE}
-TITANIC <- read_csv("https://nhorton.people.amherst.edu/ips9/data/chapter01/EG01-36TITANIC.csv")
+TTS <- read_csv("https://nhorton.people.amherst.edu/ips9/data/chapter01/EG01-36TITANIC.csv")
+gf_dhistogram(~ Time, data = TTS, binwidth = 20, center = 10) %>%
+  gf_fitdistr()
+
+gf_dhistogram( ~ Time, data = TTS, binwidth = 20, center = 10) %>%
+  gf_fitdistr(dist = "dgamma")
+
+## XX Closest I can get to replicating the textbook is the second graph, but I'm not sure how to overlay 
+## the actual density onto the histogram
 ```
 
 ### Section 1.4: Density Curves and Normal Distributions
 
-options(digits = 3)
-```{r eg 1-46, message = FALSE}
+Figure 1.30 (page 67) is a Normal quantile plot of the 60 fifth-grade IQ scores
+from page 14. We can recreate the plot here: 
+```{r eg1-46, message = FALSE}
 IQ <- read_csv("https://nhorton.people.amherst.edu/ips9/data/chapter01/EG01-46IQ.csv")
+gf_qq(~ IQ, data = IQ) %>%
+  gf_qqline(linetype = "solid", color = "red") %>%
+  gf_labs(x = "Normal Score", y = "IQ")
 ```
-
-```{r eg1-48, message = FALSE}
-STUBHUB <- read_csv("https://nhorton.people.amherst.edu/ips9/data/chapter01/EG01-48STUBHUB.csv")
-```
+Since the points do not deviate far from the straight line drawn on the plot, we can conclude that 
+the distribution of the IQ data is approximately Normal. Here, we use the `gf_qq()` function to 
+plot the points and then add the `gf_qqline()` function, with the correct specifications, to overlay
+the straight diagonal line. 
