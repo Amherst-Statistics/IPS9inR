@@ -318,6 +318,8 @@ gf_dhistogram( ~ Time, data = TTS, binwidth = 20, center = 10) %>%
 ## the actual density onto the histogram
 ```
 
+Note that we are using the data as named and provided by the publishers.
+
 ### Section 1.4: Density Curves and Normal Distributions
 
 Figure 1.30 (page 67) is a Normal quantile plot of the 60 fifth-grade IQ scores
