@@ -1,12 +1,12 @@
 ---
 title: "IPS9 in R: Looking at Data -- Distributions (Chapter 1)"
 author: "Bonnie Lin and Nicholas Horton (nhorton@amherst.edu)"
-date: "July 12, 2018"
+date: "July 13, 2018"
 output: 
-  pdf_document:
+  html_document:
     fig_height: 3
     fig_width: 5
-  html_document:
+  pdf_document:
     fig_height: 3
     fig_width: 5
   word_document:
@@ -31,17 +31,17 @@ knitr::opts_chunk$set(
 
 ## Introduction and background 
 
-This document is intended to help describe how to undertake analyses introduced 
+These documents are intended to help describe how to undertake analyses introduced 
 as examples in the Ninth Edition of \emph{Introduction to the Practice of Statistics} (2017) by Moore, McCabe, and Craig.
 
-More information about the book can be found at https://macmillanlearning.com/Catalog/product/introductiontothepracticeofstatistics-ninthedition-moore.  This
+More information about the book can be found at 
+The data used in these documents can be found under Data Sets in the [Student Site](https://www.macmillanlearning.com/catalog/studentresources/ips9e?_ga=2.29224888.526668012.1531487989-1209447309.1529940008#). This
 file as well as the associated R Markdown reproducible analysis source file used to create it can be found at https://nhorton.people.amherst.edu/ips9/.
 
 This work leverages initiatives undertaken by Project MOSAIC (http://www.mosaic-web.org), an NSF-funded effort to improve the teaching of statistics, calculus, science and computing in the undergraduate curriculum. In particular, we utilize the `mosaic` package, which was written to simplify the use of R for introductory statistics courses. A short summary of the R needed to teach introductory statistics can be found in the mosaic package vignettes (http://cran.r-project.org/web/packages/mosaic).  A paper describing the mosaic approach was published in the *R Journal*: https://journal.r-project.org/archive/2017/RJ-2017-024.
   
 ## Chapter 1: Looking at data -- distributions
-The specific goal of this document is to demonstrate how to replicate the
-analysis described in Chapter 1: Looking at Data (Distributions).
+This file replicates the analyses from Chapter 1: Looking at Data (Distributions).
 
 First, load the packages that will be needed for this document: 
 ```{r load-packages}
@@ -59,8 +59,16 @@ of 552 first-year college students. We begin by reading the data:
 Online <- 
   read_csv("https://nhorton.people.amherst.edu/ips9/data/chapter01/EG01-07ONLINE.csv")
 
+Online
+Total <- sum(~ Count, data = Online)
+rbind(Total, Online)
+
 Online %>%
-  adorn_totals("row") 
+  adorn_totals("row")
+
+# XX NH I don't use tally here because the data are already in tally form,
+# adorn_totals() in the janitor package seems to be the easiest way to display
+# the information and include the `Total`
 ```
 
 By default, the `read_csv()` function will output the types of columns, as we see above. 
@@ -84,18 +92,28 @@ Online_Percent %>%
 We use the `mutate()` function to compute the counts as percentages, while the `rename()` function 
 provides an easy way to rename the column from "Count" to "Percent".
 
+The `%>%` in the code above is known as the piping operator. It comes from the `magrittr` package, 
+which the `mosaic` package calls. It passes the object on its left hand side as the first argument to the function on the right hand side.
+
 Figure 1.2 (page 10) displays the online resource preference data from the above example
 using a bar graph. We can make a bar graph by typing: 
 ```{r eg1-9, message = FALSE}
 gf_col(Percent ~ Source, data = Online_Percent)
 
-Online_Percent %>%
-  arrange(-Percent) %>%
-  mutate(Source = reorder(Source, - Percent)) %>%
-  gf_col(Percent ~ Source)
+# Online_Percent %>%
+#   arrange(-Percent) %>%
+#   mutate(Source = reorder(Source, - Percent)) %>%
+#   gf_col(Percent ~ Source)
+
+## XX NH I had tried arrange(desc()) before but that
+## wasn't working. I have included the code here to show
+
+Online_Percent <- Online_Percent %>%
+  arrange(desc(Percent))  
+gf_col(Percent ~ Source, data = Online_Percent)
 ```
 
-R automatically orders the x-axis alphabetically, placing "Other" before "Wikipedia". However, we can make
+R orders the x-axis alphabetically, placing "Other" before "Wikipedia". However, we can make
 slight modifications by nesting the `reorder()` function in the `mutate()` function, which will first reorder the
 data based on the Percent and then reassign the data. The output now matches the graph on page 10 and graphs
 the sources on a descending order of preference percentages. 
@@ -114,7 +132,7 @@ of calcium in adolescent boys and girls:
 SCF <- read_csv("https://nhorton.people.amherst.edu/ips9/data/chapter01/EG01-11SCF.csv")
 SCF_Treatment <- SCF %>% 
   filter(Treatment == "SCF")
-with(data = SCF_Treatment, expr = stem(Absorption))
+with(data = SCF_Treatment, stem(Absorption))
 ```
 Since the data include absorption percentages of the control participants, we use the `filter()` function to
 isolate the boys and girls who consumed 12 grams per day of SCF from the control group. Once we have defined this 
@@ -126,7 +144,8 @@ Figure 1.7 (page 15) shows the IQ scores of 60 fifth-grade students chosen at ra
 The data first need to be divided into classes or levels of equal width. We can then count the number of 
 individuals in each class/level and use these counts to create a histogram.
 ```{r eg1-14, message = FALSE}
-IQ <- read_csv("https://nhorton.people.amherst.edu/ips9/data/chapter01/EG01-14IQ.csv")
+IQ <- 
+  read_csv("https://nhorton.people.amherst.edu/ips9/data/chapter01/EG01-14IQ.csv")
 levels <- c(75, 85, 95, 105, 115, 125, 135, 145, 155)
 labels <- c("75 <= IQ & IQ < 85", "85 <= IQ & IQ < 95", "95 <= IQ & IQ < 105", "105 <= IQ & IQ < 115", "115 <= IQ & IQ < 125", "125 <= IQ & IQ < 135", "135 <= IQ & IQ < 145", "145 <= IQ & IQ < 155")
 
@@ -164,8 +183,7 @@ use the `favstats()` function to find the center and spread:
 ```{r eg1-17, message = FALSE}
 favstats(~ IQ, data = IQ)
 ```
-For the exact center, we can see that the median IQ score is 114. As for the measure of spread, we 
-can use the minimum value and the maximum value to say that the spread is from 81 to 145. Both the 
+We see that the median IQ score is 114 points and that the data spread from 81 to 145 points. Both the
 distribution as well as the summary statistics point to a symmetric, unimodal pattern in the IQ 
 data. 
 
@@ -183,13 +201,10 @@ loaded in the data and displayed the data in a histogram. See Figure 1.9 (page 2
 ```{r eg1-19, message = FALSE}
 College <- read_csv("https://nhorton.people.amherst.edu/ips9/data/chapter01/EG01-19COLLEGE.csv")
 
-gf_dhistogram(~ Undergrads, data = College, binwidth = 30)
+gf_dhistogram(~ Undergrads, data = College)
+
 College %>% 
   filter(Undergrads == max(Undergrads))
-
-## XX Comes out not looking so pretty in the PDF and not sure why the density plot looks
-## that way 
-
 ```
 California is the outlier in this case, by having 2,687,893 undergraduate students.  
 
@@ -205,15 +220,11 @@ College %>%
 ```
 To interpret this plot alongside the histogram, we can take California for example. California has 60
 undergraduate students per 1000 people, making it one of the higher values, though certainly not the 
-highest. Though the last histogram established California as an outlier for its extremely large number of 
-undergraduate students, the stemplot points out another state as an outlier for having the largest proportion
-of undergraduate students. 
+highest. Though the last histogram established California as an outlier for its extremely large number of undergraduate students, the stemplot points out another state as an outlier for having the largest proportion of undergraduate students. 
 
-Since we can view individual points in stemplots, we can use the `filter()` function to find the name of the 
-outlier state, which turns out to be Arizona, with a ratio of 77.1 undergraduate students per 1000 people in 
-the state.
+Since we can view individual points in stemplots, we can use the `filter()` function to find the name of the outlier state, which turns out to be Arizona, with a ratio of 77.1 undergraduate students per 1000 people in the state.
 
-Below is the code that we use to create a stemplot of the values of PTH measured on
+Below is the code that we use to create a stemplot of the values of parathyroid hormone levels (PTH) measured on
 a sample of 29 boys and girls aged 12 to 15 years (Figure 1.11 on page 21): 
 ```{r eg1-21, message = FALSE}
 PTH <- read_csv("https://nhorton.people.amherst.edu/ips9/data/chapter01/EG01-21PTH.csv")
@@ -252,20 +263,18 @@ use the `mean()` function to find this specific statistic.
 mean(~ Time, data = TTS24)
 ```
 
-XX ?? use this options(digits = ) or round()
-
 ```{r UseYourKnowledge, message = FALSE}
 Suricane <- read_csv("https://nhorton.people.amherst.edu/ips9/data/chapter01/EG01-25TTS24.csv")
-mean(~ Time, data = Suricane) %>% round(digits = 2)
+mean(~ Time, data = Suricane)
 ```
-We have piped the `mean()` output into the `round()` function and specified the number of digits 
+We can pipe the `mean()` output into the `round()` function and specify the number of digits 
 after the decimal to be 2, as the textbook instructs on page 29. 
 
 Similarly, we can use the `median()` function to find this specific statistic:
 ```{r eg1-25, message = FALSE}
 median(~ Time, data = TTS24)
 ```
-You can also use the stemplot generated above to confirm the median value of this variable. 
+You can use the stemplot above to confirm the median value. 
 
 Other functions that operate similarly include: 
 
@@ -301,8 +310,6 @@ Figure 1.20(a) (page 52) shows the distribution of the time it takes to start a 
 density plot overlain a histogram. We can recreate this by typing: 
 ```{r eg1-36, message = FALSE}
 TTS <- read_csv("https://nhorton.people.amherst.edu/ips9/data/chapter01/EG01-36TITANIC.csv")
-gf_dhistogram(~ Time, data = TTS, binwidth = 20, center = 10) %>%
-  gf_fitdistr()
 
 gf_dhistogram( ~ Time, data = TTS, binwidth = 20, center = 10) %>%
   gf_fitdistr(dist = "dgamma")
@@ -321,6 +328,7 @@ gf_qq(~ IQ, data = IQ) %>%
   gf_qqline(linetype = "solid", color = "red") %>%
   gf_labs(x = "Normal Score", y = "IQ")
 ```
+
 Since the points do not deviate far from the straight line drawn on the plot, we can conclude that 
 the distribution of the IQ data is approximately Normal. Here, we use the `gf_qq()` function to 
 plot the points and then add the `gf_qqline()` function, with the correct specifications, to overlay
