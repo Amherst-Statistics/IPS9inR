@@ -47,7 +47,6 @@ First, load the packages that will be needed for this document:
 ```{r load-packages}
 library(mosaic)
 library(readr)
-library(janitor)
 ```
 
 ### Section 1.1: Data
@@ -303,7 +302,7 @@ mean(Score)/mean(Points)
 ```
 We create a vector called `Score` that holds the total score of the 12 homework assignments. 
 We can convert the homework scores to final grade points by dividing each value in the `Score`
-vector by 4. Because this is a linear transformamtion, the mean of the summed homework score is
+vector by 4. Because this is a linear transformation, the mean of the summed homework score is
 just four times the mean of the points. 
 
 Figure 1.20(a) (page 52) shows the distribution of the time it takes to start a business, as a 
@@ -311,11 +310,8 @@ density plot overlain a histogram. We can recreate this by typing:
 ```{r eg1-36, message = FALSE}
 TTS <- read_csv("https://nhorton.people.amherst.edu/ips9/data/chapter01/EG01-36TITANIC.csv")
 
-gf_dhistogram( ~ Time, data = TTS, binwidth = 20, center = 10) %>%
-  gf_fitdistr(dist = "dgamma")
-
-## XX Closest I can get to replicating the textbook is the second graph, but I'm not sure how to overlay 
-## the actual density onto the histogram
+gf_histogram( ~ Time, data = TTS, binwidth = 20, center = 10) %>%
+  gf_dens()
 ```
 
 Note that we are using the data as named and provided by the publishers.
