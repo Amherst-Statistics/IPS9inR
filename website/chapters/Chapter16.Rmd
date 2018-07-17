@@ -1,7 +1,7 @@
 ---
 title: "IPS9 in R: Bootstrap Methods and Permutation Tests (Chapter 16)"
 author: "Bonnie Lin and Nicholas Horton (nhorton@amherst.edu)"
-date: "June 28, 2018"
+date: "July 17, 2018"
 output: 
   pdf_document:
     fig_height: 4
@@ -20,7 +20,6 @@ output:
 # This loads the mosaic and dplyr packages
 require(mosaic)
 library(readr)
-library(janitor)
 ```
 
 ```{r, include = FALSE, message = FALSE}
@@ -35,31 +34,33 @@ opts_chunk$set(
 
 ## Introduction and background 
 
-This document is intended to help describe how to undertake analyses introduced 
+These documents are intended to help describe how to undertake analyses introduced 
 as examples in the Ninth Edition of \emph{Introduction to the Practice of Statistics} (2017) by Moore, McCabe, and Craig.
 
-More information about the book can be found at https://macmillanlearning.com/Catalog/product/introductiontothepracticeofstatistics-ninthedition-moore. This
+More information about the book can be found at 
+The data used in these documents can be found under Data Sets in the [Student Site](https://www.macmillanlearning.com/catalog/studentresources/ips9e?_ga=2.29224888.526668012.1531487989-1209447309.1529940008#). This
 file as well as the associated R Markdown reproducible analysis source file used to create it can be found at https://nhorton.people.amherst.edu/ips9/.
 
 This work leverages initiatives undertaken by Project MOSAIC (http://www.mosaic-web.org), an NSF-funded effort to improve the teaching of statistics, calculus, science and computing in the undergraduate curriculum. In particular, we utilize the `mosaic` package, which was written to simplify the use of R for introductory statistics courses. A short summary of the R needed to teach introductory statistics can be found in the mosaic package vignettes (http://cran.r-project.org/web/packages/mosaic).  A paper describing the mosaic approach was published in the *R Journal*: https://journal.r-project.org/archive/2017/RJ-2017-024.
   
-## Chapter 16: Bootstrap methods and permutation tests
-The specific goal of this document is to demonstrate how to replicate the
-analysis described in Chapter 16: Bootstrap methods and permutation tests, one of 
-the four online companion chapters. 
+## Chapter 1: Looking at data -- distributions
+This file replicates the analyses from Chapter 16: Bootstrap Methods and Permutation
+Tests.
 
-### Section 16.1: The bootstrap idea
+First, load the packages that will be needed for this document: 
 ```{r load-packages}
 library(mosaic)
 library(readr)
-library(janitor)
 ```
+
+### Section 16.1: The bootstrap idea
+
 With the following code, we create many resamples by repeatedly 
-sampling with replacement from the sample of 21 profiles. Then, we 
+sampling with replacement from the sample of 21 Facebook profiles. Then, we 
 create the bootstrap distribution by finding the mean for the 3,000 
 resamples. The histogram and qqplots reproduced below can be found on 
-page XX 
-```{r eg 16-2}
+page 5.
+```{r eg16-2}
 FACE4 <- read_csv("https://nhorton.people.amherst.edu/ips9/data/chapter16/EG16-01FACE4.csv")
 
 FACE4 <- FACE4 %>%
@@ -91,7 +92,7 @@ processes by allowing us to set the number of repetitions and specify what to re
 ### Section 16.2: First steps in using the bootstrap
 The strongly skewed distribution is shown on the histogram and Normal quantile plot for
 the original 150 grade points (page 14): 
-```{r eg 16-4 sample}
+```{r eg16-4-sample}
 College_GPA <- read_csv("https://nhorton.people.amherst.edu/ips9/data/chapter16/EG16-04GPA.csv")
 
 ## Figure 16.8(a)
@@ -108,10 +109,8 @@ We will now use the 25% trimmed mean as the parameter and use the sample of 150
 students to find the statistic that estimates this parameter. The process is similar 
 to the bootstrapping done above, except that we now specify the "trim" argument in the 
 `mean()` function: 
-```{r eg 16-4 trimmed}
-mean_GPA <- College_GPA %>%
-  pull(GPA) %>%
-  mean(., trim = 0.25) 
+```{r eg 16-4-trimmed}
+mean_GPA <- mean(~ GPA, data = College_GPA, trim = 0.25)
 
 numsim <- 3000
 GPA_sims <- do(numsim) * mean(~ GPA, data = resample(College_GPA, 150), trim = 0.25)
@@ -137,13 +136,17 @@ chunk again.
 
 To find the 95% confidence interval for the population trimmed mean as the book does
 on page 16, we can type: 
-```{r eg 16.5}
+```{r eg16-5}
 confint(GPA_sims, level = 0.95)
 
-## XX Is it not exact because of the seed that I set? The textbook reports 2.794, 3.106 and the standard error is 0.078. 
+## XX The textbook reports 2.794, 3.106 and the standard error is 0.078. 
+## Wondering if the GPA_sims is the right data
 ```
 
-```{r eg 16-6}
+Below we have replicated the Density curves and Normal quantile plots of the 
+distributions of GPA for males and females as well as the summary statistics
+and the bootstrap standard error for the difference in sample means (page 17-18):
+```{r eg16-6}
 College_GPA <- College_GPA %>% 
   mutate(sex = dplyr::recode(sex, 
         "1" = "Male",
@@ -178,11 +181,62 @@ GPA_sex_sims <- do(numsim) * Male-Female
 
 t.test(~ mean | sex, data = GPA_sex_sims)
 ```
-### Section 16.3: How accurate is a bootstrap distribution?
-```{r}
+We resample seeparately from the two samples, so that each of our 3000 resamples 
+consists of two group resamples, one of size 91 drawn with replacement from the 
+male data and one of size 59 drawn with replacement from the female data.
 
-```
+XX No data for Example 16.7 (page 20) "Do all daily numbers have an equal payoff"
+
+### Section 16.3: How accurate is a bootstrap distribution?
 
 ### Section 16.4: Bootstrap confidence intervals 
-### Section 16.5: Significance testing using permutation tests
+Up to this point, we have demonstrated theh use of the bootstrap to find confidence
+intervals of the sample mean, trimmed mean, and the difference between two means. 
+Next, we will use it to find the ratio of sample variances.
+```{r}
+```
 
+Now we will bootstrap the confidence intervals for the correlation coefficient, 
+as introduced on page 35. 
+```{r eg16-10}
+LAUND24 <- read_csv("https://nhorton.people.amherst.edu/ips9/data/chapter16/EG16-10LAUND24.csv")
+
+# Figure 16.19
+gf_point(Rating ~ PricePerLoad, data = LAUND24)
+
+# Figure 16.20(a)
+numsim <- 5000
+cor_LAUND24 <- cor(Rating ~ PricePerLoad, data = LAUND24)
+LAUND_sims <- do(numsim) * cor(Rating ~ PricePerLoad, data = resample(LAUND24))
+gf_dhistogram( ~ cor, data = LAUND_sims, binwidth = 0.05, center = 0.025) %>%
+  gf_fitdistr(dist = "dnorm") %>% 
+  gf_labs(x = "Conrrelation coefficient of resamples") %>% 
+  gf_vline(xintercept = cor_LAUND24)
+  
+# Figure 16.20(b)
+gf_qq(~ cor, data = LAUND_sims) %>%
+  gf_labs(x = "Normal score", y = "Correlation coefficient of resamples") %>%
+  gf_qqline(linetype = "solid", color = "red")
+
+# Computing the 95% bootstap percentile interval
+confint(LAUND_sims, method=c("boot", "perc"))
+```
+XX Not sure why the boot method call is not working
+
+### Section 16.5: Significance testing using permutation tests
+Permutation tests use resampling to generate a null distribution for a test 
+statistic, with each step randomly resampling without replacement and recalculating
+the test statistic in each permutation.
+
+In the example provided in the textbook, the permutation test randomimzes the
+assignment of students to either the treament or control group to test for the 
+effect of the treatment, "directed reading activities" in this case (page 43): 
+```{r eg16-12}
+DRP <- read_csv("https://nhorton.people.amherst.edu/ips9/data/chapter16/EG16-11DRP.csv")
+mean_DRP <- mean(~ drp, data = DRP)
+numsim <- 1000
+DRP_sim <- do(numsim) * t.test(drp ~ group, data = sample(DRP))
+## XX Do we prefer the studentized test statistic over the difference of means
+## XX The `t` value remindsd -2.3 over and over again, which makes me think that 
+## I'm not doing this function correctly
+```

@@ -57,59 +57,38 @@ of 552 first-year college students. We begin by reading the data:
 ```{r eg1-7}
 Online <- 
   read_csv("https://nhorton.people.amherst.edu/ips9/data/chapter01/EG01-07ONLINE.csv")
-
 Online
-Total <- sum(~ Count, data = Online)
-rbind(Total, Online)
 
-Online %>%
-  adorn_totals("row")
-
-# XX NH I don't use tally here because the data are already in tally form,
-# adorn_totals() in the janitor package seems to be the easiest way to display
-# the information and include the `Total`
+Online_data <- c(rep("Google", 406), rep("Library", 75), rep("Wikipedia", 52), rep("Other", 19))
+tally(Online_data, margins = TRUE)
 ```
 
 By default, the `read_csv()` function will output the types of columns, as we see above. 
 To improve readability for future coding, we will suppress the "Parsed with column 
 specification" message by adding `message = FALSE` at the top of the code chunks. 
 
-We can represent the data in percentages by dividing the number 
-of students who favor each online resource by the total number of participants
-and multiplying the ratio by 100. The table on page 10 shows the preference percents.
-```{r eg1-8, message = FALSE}
-Online_Percent <- 
-  read_csv("https://nhorton.people.amherst.edu/ips9/data/chapter01/EG01-08ONLINE.csv")
+Since the `Online` data already have the counts for the sources, we could not demonstrate the 
+`tally()` function with them. Thus, we created a dataset called `Online_data` by repeating the
+sources with the `rep()` function. We specified the number of repetitions to match the counts in 
+`Online`. The `tally()` then counts up the number of observations for each source, while the 
+`margins` argument, set to TRUE, includes the Total number of observations for all sources. 
 
-Online_Percent <- Online %>%
-  mutate(Count = 100 * Count/sum(Count)) %>%
-  rename(Percent = Count) 
-  
-Online_Percent %>%
-  adorn_totals("row") 
+The table on page 10 shows the preference percents. We can also represent the data in percentages, 
+by typing the following: 
+```{r eg1-8, message = FALSE}
+options(digits = 2)
+tally(Online_data, format = "percent", margins = TRUE)
 ```
-We use the `mutate()` function to compute the counts as percentages, while the `rename()` function 
-provides an easy way to rename the column from "Count" to "Percent".
+We added the `format` argument to the `tally()` function to show the data in percentages, and, with the 
+`options()` function, we controlled the number of digits after the decimal. 
 
 The `%>%` in the code above is known as the piping operator. It comes from the `magrittr` package, 
 which the `mosaic` package calls. It passes the object on its left hand side as the first argument to the function on the right hand side.
 
 Figure 1.2 (page 10) displays the online resource preference data from the above example
-using a bar graph. We can make a bar graph by typing: 
+using a histogram, which we can make by typing: 
 ```{r eg1-9, message = FALSE}
-gf_col(Percent ~ Source, data = Online_Percent)
-
-# Online_Percent %>%
-#   arrange(-Percent) %>%
-#   mutate(Source = reorder(Source, - Percent)) %>%
-#   gf_col(Percent ~ Source)
-
-## XX NH I had tried arrange(desc()) before but that
-## wasn't working. I have included the code here to show
-
-Online_Percent <- Online_Percent %>%
-  arrange(desc(Percent))  
-gf_col(Percent ~ Source, data = Online_Percent)
+gf_histogram(~ Online_data, Online_data, stat = "count")
 ```
 
 R orders the x-axis alphabetically, placing "Other" before "Wikipedia". However, we can make
