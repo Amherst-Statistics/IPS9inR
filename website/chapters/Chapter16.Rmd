@@ -170,16 +170,28 @@ Summary_GPA
 
 ## Bootstrapping
 numsim <- 3000
-Male <- College_GPA %>% filter(sex == "Male") %>% resample(91) %>% pull(GPA) %>% mean()
-Female <- College_GPA %>% filter(sex == "Female") %>% resample(59) %>% pull(GPA) %>% mean()
+Male <- College_GPA %>%
+  filter(sex == "Male")
+Female <- College_GPA %>% 
+  filter(sex == "Female")
 
-# newdata <- College_GPA %>% 
-#   bind_rows(., resample(Male, 91), 
-#             ., resample(Female, 59))
+diffMeanGPA <- function(Male, Female){
+ Sample_Male <- resample(Male)
+ Sample_Female<- resample(Female)
+ diff(c(mean(~ GPA, data = Sample_Male), mean(~ GPA, data = Sample_Female)))
+}
 
-GPA_sex_sims <- do(numsim) * Male-Female
+GPA_sex_sims <- do(numsim) * diffMeanGPA(Male, Female)
 
-t.test(~ mean | sex, data = GPA_sex_sims)
+# Figure 16.11(a)
+gf_dhistogram(~ diffMeanGPA, data = GPA_sex_sims, binwidth = 0.1, center = 0.05) %>%
+  gf_fitdistr(dist = "norm") %>%
+  gf_labs(x = "Difference in means of resamples")
+
+# Figure 16.11(b)
+gf_qq(~ diffMeanGPA, data = GPA_sex_sims) %>%
+  gf_labs(x = "Normal score", y = "Difference in means of resamples") %>%
+  gf_qqline(linetype = "solid", color = "red")
 ```
 We resample seeparately from the two samples, so that each of our 3000 resamples 
 consists of two group resamples, one of size 91 drawn with replacement from the 

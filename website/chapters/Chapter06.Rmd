@@ -1,5 +1,5 @@
 ---
-title: "IPS9 in R: X chapter name X (Chapter X)"
+title: "IPS9 in R: Introduction to inference (Chapter 6)"
 author: "XX and Nicholas Horton (nhorton@amherst.edu)"
 date: "July 13, 2018"
 output: 
@@ -40,8 +40,8 @@ file as well as the associated R Markdown reproducible analysis source file used
 
 This work leverages initiatives undertaken by Project MOSAIC (http://www.mosaic-web.org), an NSF-funded effort to improve the teaching of statistics, calculus, science and computing in the undergraduate curriculum. In particular, we utilize the `mosaic` package, which was written to simplify the use of R for introductory statistics courses. A short summary of the R needed to teach introductory statistics can be found in the mosaic package vignettes (http://cran.r-project.org/web/packages/mosaic).  A paper describing the mosaic approach was published in the *R Journal*: https://journal.r-project.org/archive/2017/RJ-2017-024.
   
-## Chapter X: X chapter name X
-This file replicates the analyses from Chapter X: X chapter name X.
+## Chapter 6: Introduction to Inference
+This file replicates the analyses from Chapter 6: Introduction to Inference. 
 
 First, load the packages that will be needed for this document: 
 ```{r load-packages}
@@ -49,5 +49,7 @@ library(mosaic)
 library(readr)
 ```
 
-### Section X.1: 
-### Section X.2: 
+### Section 6.1: Estimating with Confidence 
+### Section 6.2: Tests of Significance
+### Section 6.3: Use and abuse of tests
+### Section 6.4: Power and inference as a decision
