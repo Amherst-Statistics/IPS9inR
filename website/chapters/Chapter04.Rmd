@@ -1,7 +1,7 @@
 ---
 title: "IPS9 in R: Probability: The Study of Randomness (Chapter 4)"
 author: "Bonnie Lin and Nicholas Horton (nhorton@amherst.edu)"
-date: "July 13, 2018"
+date: "July 17, 2018"
 output: 
   html_document:
     fig_height: 3
@@ -51,11 +51,9 @@ library(mosaic)
 ### Section 4.1: Randomness
 The results of two trials of a coin toss simulation 5000 times
 are plotted as the proportion of heads, as shown in Figure 3.1 (page 216). 
-We can recreate the plot by typing: 
+We can emulate one trial of such simulation as a plot by typing: 
 ```{r eg4-1}
-## XX should I set seed? and how do I plot the realization of two seeds on same graph? 
-## XX can create a new column, and/or create a new dataset
-tosses <- rbinom(1:5000, 1, 0.5)
+tosses <- rbinom(n = 1:5000, size = 1, prob = 0.5)
 x <- seq(1:5000)
 cy <- cumsum(tosses)
 phead <- (cy / x)
@@ -63,9 +61,14 @@ gf_line(phead ~ x, color = "red") %>%
   gf_labs(x = "Number of tosses", y = "Proportion of heads") %>% 
   gf_hline(., yintercept = 0.5)
 ```
-XX Should I specify the arguments in this function? 
+The parameters in the `rbinom()` function can be explained in the following way: 
+n = 1:5000 specifies the number of observations, while size = 1 specifies the number 
+of trials, with each trial getting a probability of success equal to 0.5. 
+Another way to think about this is: Draw either 0 or 1, given there is a 50% chance of 
+selecting either number, 5000 times.  
 
-The `rbinom()` function will ... 
+Another useful function that is related to this xpbinom(), which can be used to ... 
+XX 
 
 The R function, `runif()`, generates a random number between 0 and 1. 
 We can demonstrate the code below: 
@@ -76,6 +79,8 @@ Since the default arguments in the function define the sample space to be all nu
 between 0 and 1, all we need to specify the number of random numbers we want outputted.
 Run the code above several times. Notice that every iteration gives you a different output. 
 If you do not set a seed, every time you run the code, you will get a random number. 
+
+To demonstrate adjustments that you can make to the `runif()` call: 
 ```{r}
 runif(2) #change the number of random numbers generated from this sample space
 
@@ -85,4 +90,22 @@ runif(1)
 Now that we have selected a pseudorandom seed, anyone who runs this code should expect to see
 the output of `runif(1)` to be 0.34. 
 
-### Section 4.2: 
+### Section 4.2: Probability models
+
+### Section 4.3: Random variables
+We can also display probability histograms that compare the probability model for equally likely random digits with the model given by Benford's law (page 237): 
+```{r use-your-knowledge-4-42}
+# Figure 4.5 (a)
+
+# Figure 4.5 (b)
+```
+
+Below is the code to generate a probability histogram for the distribution of the number of 
+heads in four tosses of a coin Figure 4.7 (page 239): 
+```{r}
+## XX Pick up from here
+```
+
+### Section 4.4: Means and variances of random variables
+
+### Section 4.5: General probability rules
