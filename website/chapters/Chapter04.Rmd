@@ -1,6 +1,6 @@
 ---
-title: "IPS9 in R: X chapter name X (Chapter X)"
-author: "XX and Nicholas Horton (nhorton@amherst.edu)"
+title: "IPS9 in R: Probability: The Study of Randomness (Chapter 4)"
+author: "Bonnie Lin and Nicholas Horton (nhorton@amherst.edu)"
 date: "July 13, 2018"
 output: 
   html_document:
@@ -40,14 +40,49 @@ file as well as the associated R Markdown reproducible analysis source file used
 
 This work leverages initiatives undertaken by Project MOSAIC (http://www.mosaic-web.org), an NSF-funded effort to improve the teaching of statistics, calculus, science and computing in the undergraduate curriculum. In particular, we utilize the `mosaic` package, which was written to simplify the use of R for introductory statistics courses. A short summary of the R needed to teach introductory statistics can be found in the mosaic package vignettes (http://cran.r-project.org/web/packages/mosaic).  A paper describing the mosaic approach was published in the *R Journal*: https://journal.r-project.org/archive/2017/RJ-2017-024.
   
-## Chapter X: X chapter name X
-This file replicates the analyses from Chapter X: X chapter name X.
+## Chapter 4: Probability: The Study of Randomness
+This file replicates the analyses from Chapter 4: Probability: The Study of Randomness.
 
-First, load the packages that will be needed for this document: 
-```{r load-packages}
+First, load the package that will be needed for this document: 
+```{r load-package}
 library(mosaic)
-library(readr)
 ```
 
-### Section X.1: 
-### Section X.2: 
+### Section 4.1: Randomness
+The results of two trials of a coin toss simulation 5000 times
+are plotted as the proportion of heads, as shown in Figure 3.1 (page 216). 
+We can recreate the plot by typing: 
+```{r eg4-1}
+## XX should I set seed? and how do I plot the realization of two seeds on same graph? 
+## XX can create a new column, and/or create a new dataset
+tosses <- rbinom(1:5000, 1, 0.5)
+x <- seq(1:5000)
+cy <- cumsum(tosses)
+phead <- (cy / x)
+gf_line(phead ~ x, color = "red") %>% 
+  gf_labs(x = "Number of tosses", y = "Proportion of heads") %>% 
+  gf_hline(., yintercept = 0.5)
+```
+XX Should I specify the arguments in this function? 
+
+The `rbinom()` function will ... 
+
+The R function, `runif()`, generates a random number between 0 and 1. 
+We can demonstrate the code below: 
+```{r eg4-7}
+runif(1)
+```
+Since the default arguments in the function define the sample space to be all numbers 
+between 0 and 1, all we need to specify the number of random numbers we want outputted.
+Run the code above several times. Notice that every iteration gives you a different output. 
+If you do not set a seed, every time you run the code, you will get a random number. 
+```{r}
+runif(2) #change the number of random numbers generated from this sample space
+
+set.seed(2018) #setting the seed to get reproducible results
+runif(1)
+```
+Now that we have selected a pseudorandom seed, anyone who runs this code should expect to see
+the output of `runif(1)` to be 0.34. 
+
+### Section 4.2: 
