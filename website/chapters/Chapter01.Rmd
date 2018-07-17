@@ -1,7 +1,7 @@
 ---
 title: "IPS9 in R: Looking at Data -- Distributions (Chapter 1)"
 author: "Bonnie Lin and Nicholas Horton (nhorton@amherst.edu)"
-date: "July 13, 2018"
+date: "July 17, 2018"
 output: 
   pdf_document:
     fig_height: 3
@@ -60,7 +60,7 @@ Online <-
 Online
 
 Online_data <- c(rep("Google", 406), rep("Library", 75), rep("Wikipedia", 52), rep("Other", 19))
-tally(Online_data, margins = TRUE)
+tally(~ Online_data, margins = TRUE)
 ```
 
 By default, the `read_csv()` function will output the types of columns, as we see above. 
@@ -77,7 +77,7 @@ The table on page 10 shows the preference percents. We can also represent the da
 by typing the following: 
 ```{r eg1-8, message = FALSE}
 options(digits = 2)
-tally(Online_data, format = "percent", margins = TRUE)
+tally(~ Online_data, format = "percent", margins = TRUE)
 ```
 We added the `format` argument to the `tally()` function to show the data in percentages, and, with the 
 `options()` function, we controlled the number of digits after the decimal. 
@@ -132,15 +132,13 @@ individuals in each class/level and use these counts to create a histogram.
 IQ <- 
   read_csv("https://nhorton.people.amherst.edu/ips9/data/chapter01/EG01-14IQ.csv")
 levels <- c(75, 85, 95, 105, 115, 125, 135, 145, 155)
-labels <- c("75 <= IQ & IQ < 85", "85 <= IQ & IQ < 95", "95 <= IQ & IQ < 105", "105 <= IQ & IQ < 115", "115 <= IQ & IQ < 125", "125 <= IQ & IQ < 135", "135 <= IQ & IQ < 145", "145 <= IQ & IQ < 155")
-
+labels <- c("75 <= IQ & IQ < 85", "85 <= IQ & IQ < 95", 
+  "95 <= IQ & IQ < 105", "105 <= IQ & IQ < 115", "115 <= IQ & IQ < 125", 
+  "125 <= IQ & IQ < 135", "135 <= IQ & IQ < 145", "145 <= IQ & IQ < 155")
 labels <- as.factor(seq(from = 80, to = 150, by = 10))
-
 IQ_Count <- IQ %>% 
   mutate(Class = cut(IQ, levels, labels = labels)) 
 gf_histogram(~ Class, data = IQ_Count, stat = "count")
-
-## XX Thoughts on which one we prefer? 
 ```
 
 The `cut()` function divides the IQ dataset into the defined levels and assigns the values into the appropriate categories.  
