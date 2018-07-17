@@ -245,10 +245,19 @@ assignment of students to either the treament or control group to test for the
 effect of the treatment, "directed reading activities" in this case (page 43): 
 ```{r eg16-12}
 DRP <- read_csv("https://nhorton.people.amherst.edu/ips9/data/chapter16/EG16-11DRP.csv")
-mean_DRP <- mean(~ drp, data = DRP)
+
+Treatment <- DRP %>%
+  filter(group == "Treatment")
+Control <- DRP %>% 
+  filter(group == "Control")
+
+diffMeanDRP <- function(Treatment, Control){
+ Sample_Treatment <- resample(Treatment)
+ Sample_Control<- resample(Control)
+ diff(c(mean(~ drp, data = Sample_Treatment), mean(~ drp, data = Sample_Control)))
+}
 numsim <- 1000
-DRP_sim <- do(numsim) * t.test(drp ~ group, data = sample(DRP))
-## XX Do we prefer the studentized test statistic over the difference of means
-## XX The `t` value repeats -2.3 over and over again, which makes me think that 
-## I'm not doing this function correctly
+DRP_sim <- do(numsim) * diffMeanDRP(sample(Treatment), Control)
+
+## XX Not sure if I'm understanding the permutation test correctly
 ```
