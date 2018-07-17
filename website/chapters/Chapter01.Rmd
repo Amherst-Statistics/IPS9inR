@@ -3,10 +3,10 @@ title: "IPS9 in R: Looking at Data -- Distributions (Chapter 1)"
 author: "Bonnie Lin and Nicholas Horton (nhorton@amherst.edu)"
 date: "July 13, 2018"
 output: 
-  html_document:
+  pdf_document:
     fig_height: 3
     fig_width: 5
-  pdf_document:
+  html_document:
     fig_height: 3
     fig_width: 5
   word_document:
@@ -99,6 +99,13 @@ the sources on a descending order of preference percentages.
 Figure 1.3 (page 11) displays the online resource preference data in a pie chart. You can create a simple one using 
 the `ggplot2` package, which is called with the `mosaic` package. However, it is worth noting that the R documentation does not generally recommend pie charts as their features are somewhat limited.
 ```{r eg1-10, message = FALSE}
+ Online_Percent <- 
+   read_csv("https://nhorton.people.amherst.edu/ips9/data/chapter01/EG01-08ONLINE.csv")
+
+Online_Percent <- Online %>%
+  mutate(Count = 100 * Count/sum(Count)) %>%
+  rename(Percent = Count)
+
 Preferences <- ggplot(Online_Percent, aes(x = "", y = Percent, fill = factor(Source))) +
 geom_bar(width = 1, stat = "identity")
 Preferences + coord_polar(theta="y") + labs(fill = "Source") +  theme_void()
