@@ -1,12 +1,12 @@
 ---
 title: "IPS9 in R: Probability: The Study of Randomness (Chapter 4)"
 author: "Bonnie Lin and Nicholas Horton (nhorton@amherst.edu)"
-date: "July 17, 2018"
+date: "July 18, 2018"
 output: 
-  html_document:
+  pdf_document:
     fig_height: 3
     fig_width: 5
-  pdf_document:
+  html_document:
     fig_height: 3
     fig_width: 5
   word_document:
@@ -67,8 +67,7 @@ of trials, with each trial getting a probability of success equal to 0.5.
 Another way to think about this is: Draw either 0 or 1, given there is a 50% chance of 
 selecting either number, 5000 times.  
 
-Another useful function that is related to this xpbinom(), which can be used to ... 
-XX 
+Another useful function that is related to this xpbinom(), which can be used to plot the proab
 
 The R function, `runif()`, generates a random number between 0 and 1. 
 We can demonstrate the code below: 
@@ -83,7 +82,6 @@ If you do not set a seed, every time you run the code, you will get a random num
 To demonstrate adjustments that you can make to the `runif()` call: 
 ```{r}
 runif(2) #change the number of random numbers generated from this sample space
-
 set.seed(2018) #setting the seed to get reproducible results
 runif(1)
 ```
@@ -96,14 +94,25 @@ the output of `runif(1)` to be 0.34.
 We can also display probability histograms that compare the probability model for equally likely random digits with the model given by Benford's law (page 237): 
 ```{r use-your-knowledge-4-42}
 # Figure 4.5 (a)
-
+eq_likely <- data.frame(Outcomes = rbinom(1000, 1:9, 0.111))
 # Figure 4.5 (b)
+benlaw <- function(d){
+  log10(1 + 1 / d)
+}
+digits <- 1:9
+data <- data.frame(Outcome = benlaw(digits))
+
+gf_bar(. ~ , data = data)
+baseBarplot <- barplot(benlaw(digits), names.arg = digits, xlab = "Outcomes", 
+                       ylim = c(0, .40))
 ```
 
-Below is the code to generate a probability histogram for the distribution of the number of 
-heads in four tosses of a coin Figure 4.7 (page 239): 
+Below is the code to generate a probability histogram for the distribution of 
+the number of heads in 2000 trials of tossing a coin four times as shown in 
+Figure 4.7 (page 239): 
 ```{r}
-## XX Pick up from here
+trials <- data.frame(Heads = rbinom(2000, 4, 0.5))
+gf_histogram(~ Heads, data = trials)
 ```
 
 ### Section 4.4: Means and variances of random variables
