@@ -1,6 +1,6 @@
 ---
-title: "IPS9 in R: Looking at Data -- Relations (Chapter 2"
-author: "XX and Nicholas Horton (nhorton@amherst.edu)"
+title: "IPS9 in R: Looking at Data -- Relations (Chapter 2)"
+author: "Margaret Chien and Nicholas Horton (nhorton@amherst.edu)"
 date: "July 13, 2018"
 output: 
   html_document:
@@ -50,7 +50,113 @@ library(readr)
 ```
 
 ### Section 2.1: Relationships 
+
 ### Section 2.2: Scatterplots
+
+#### Example 2.8: Laundry detergents
+
+```{r}
+Laundry <- read_csv("https://nhorton.people.amherst.edu/ips9/data/chapter02/EG02-008LAUNDRY.csv")
+```
+
+```{r}
+# 2.10: Examine the spreadsheet
+str(Laundry)
+favstats(~ Rating, data = Laundry)
+gf_histogram(~ Rating, data = Laundry, binwidth = 5)
+favstats(~ Price, data = Laundry)
+gf_histogram(~ Price, data = Laundry, binwidth = 5)
+```
+
+#### Example 2.9: Laundry detergents
+
+```{r}
+Laundry <- read_csv("https://nhorton.people.amherst.edu/ips9/data/chapter02/EG02-009LAUNDRY.csv")
+# Figure 2.1, page 86
+gf_point(Rating ~ Price, data = Laundry, xlab = "Price per load (cents)")
+# Figure 2.2
+gf_point(Rating ~ Price, data = Laundry, xlab = "Price per load (cents)") +
+  xlim(0, 35)
+```
+
+```{r}
+# 2.12: Make a scatterplot
+gf_point(jitter(Rating) ~ jitter(Price), data = Laundry, xlab = "Price per load (cents)") +
+  xlim(0, 35)
+```
+
+We can use `jitter()` to add some noise into the plot to show overlapped points.
+
+```{r}
+# 2.13: Change the units
+Laundry2 <- Laundry %>%
+  mutate(Price = Price/100)
+favstats(~ Price, data = Laundry2)
+gf_point(Rating ~ Price, data = Laundry2, xlab = "Price per load (dollars)")
+```
+
+#### Example 2.10: Scatterplot with a straight line
+
+```{r}
+Laundry <- read_csv("https://nhorton.people.amherst.edu/ips9/data/chapter02/EG02-010LAUND.csv")
+gf_point(Rating ~ Price, data = Laundry, xlab = "Price per load (cents)") %>%
+  gf_lm() 
+```
+
+#### Example 2.11: Education spending and population: Benchmarking
+
+```{r}
+EduSpending <- read_csv("https://nhorton.people.amherst.edu/ips9/data/chapter02/EG02-011EDSPEND.csv")
+head(EduSpending)
+# Figure 2.5, page 90
+gf_point(Spending ~ Population, data = EduSpending) %>%
+  gf_lm() %>%
+  gf_labs(x = "Population (millions)", y = "Spending ($ billion)")
+```
+
+#### Example 2.12: Calcium retention
+
+```{r}
+Calcium <- read_csv("https://nhorton.people.amherst.edu/ips9/data/chapter02/EG02-012CALCIUM.csv")
+# Figure 2.6
+gf_point(CaRetention~ CaIntake, data = Calcium) %>%
+  gf_smooth() %>%
+  gf_labs(x = "Calcium intake (mg/d)", y = "Calcium retention (mg/d)")
+```
+
+#### Example 2.13: Calcium retention with logarithms
+
+```{r}
+Calcium <- read_csv("https://nhorton.people.amherst.edu/ips9/data/chapter02/EG02-013CALCIUM.csv")
+# Figure 2.7, page 91
+gf_point(LogRet ~ CaIntake, data = Calcium) %>%
+  gf_lm() %>%
+  gf_labs(x = "Calcium intake (mg/d)", y = "Log calcium retention")
+```
+
+#### Example 2.14: Education spending and population with logarithms
+
+```{r}
+EduSpending <- read_csv("https://nhorton.people.amherst.edu/ips9/data/chapter02/EG02-014EDSPEND.csv")
+# Figure 2.8, page 92
+EduSpending %>%
+  mutate(LogPop = log(Population), LogSpend = log(Spending)) %>%
+  gf_point(LogSpend ~ LogPop) %>%
+  gf_lm() %>%
+  gf_labs(x = "Log population", y = "Log spending")
+```
+
+#### Example 2.15: Rating versus price and type of laundry detergent
+
+```{r}
+Laundry <- read_csv("https://nhorton.people.amherst.edu/ips9/data/chapter02/EG02-015LAUND.csv")
+# Figure 2.9, page 93
+gf_point(Rating ~ Price, color = ~ Type, data = Laundry, xlab = "Price per load (cents)") %>%
+  gf_lm()
+```
+
+#### Example 2.16: Laundry rating versus price with a smooth fit
+
 ### Section 2.3: Correlation
 ### Section 2.4: Least Squares Regression
 ### Section 2.5: Cautions about Correlation and Regression
