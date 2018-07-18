@@ -37,7 +37,7 @@ opts_chunk$set(
 These documents are intended to help describe how to undertake analyses introduced 
 as examples in the Ninth Edition of \emph{Introduction to the Practice of Statistics} (2017) by Moore, McCabe, and Craig.
 
-More information about the book can be found at 
+More information about the book can be found [here](https://macmillanlearning.com/Catalog/product/introductiontothepracticeofstatistics-ninthedition-moore).
 The data used in these documents can be found under Data Sets in the [Student Site](https://www.macmillanlearning.com/catalog/studentresources/ips9e?_ga=2.29224888.526668012.1531487989-1209447309.1529940008#). This
 file as well as the associated R Markdown reproducible analysis source file used to create it can be found at https://nhorton.people.amherst.edu/ips9/.
 
