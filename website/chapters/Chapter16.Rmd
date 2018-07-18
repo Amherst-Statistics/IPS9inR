@@ -1,7 +1,7 @@
 ---
 title: "IPS9 in R: Bootstrap Methods and Permutation Tests (Chapter 16)"
 author: "Bonnie Lin and Nicholas Horton (nhorton@amherst.edu)"
-date: "July 17, 2018"
+date: "July 18, 2018"
 output: 
   pdf_document:
     fig_height: 4
@@ -68,15 +68,9 @@ numsim <- 3000
 Avg_Viewtime <- do(numsim) * mean(~ Time, data = resample(FACE4, 21)) 
 
 #Figure 16.3(a)
-# XX BL please extirpate all uses of pull!
 favstats(~ mean, data = Avg_Viewtime)
-# XX mean_time = FACE4 %>%
-# XX  pull(Time) %>%
-# XX  mean()
-
 gf_histogram(~ mean, data = Avg_Viewtime) %>%
-  gf_labs(x = "Mean time of resamples (in minutes)", y = "Count") %>%
-  gf_vline(x = mean_time) 
+  gf_labs(x = "Mean time of resamples (in minutes)", y = "Count")
 
 #Figure 16.3(b)
 gf_qq(~ mean, data = Avg_Viewtime) %>% 
@@ -107,7 +101,7 @@ We will now use the 25% trimmed mean as the parameter and use the sample of 150
 students to find the statistic that estimates this parameter. The process is similar 
 to the bootstrapping done above, except that we now specify the "trim" argument in the 
 `mean()` function: 
-```{r eg 16-4-trimmed}
+```{r eg 16-4-trimmed, warning=FALSE}
 mean_GPA <- mean(~ GPA, data = College_GPA, trim = 0.25)
 
 numsim <- 3000
@@ -138,7 +132,7 @@ on page 16, we can type:
 confint(GPA_sims, level = 0.95)
 
 ## XX The textbook reports 2.794, 3.106 and the standard error is 0.078. 
-## Wondering if the GPA_sims is the right data
+## Now wondering if the GPA_sims is the right data
 ```
 
 Below we have replicated the Density curves and Normal quantile plots of the 
@@ -148,12 +142,9 @@ and the bootstrap standard error for the difference in sample means (page 17-18)
 College_GPA <- College_GPA %>% 
   mutate(sex = dplyr::recode(sex, 
         "1" = "Male",
-        "2" = "Female"), 
-        sex = as.factor(sex))
-# XX BL is the is.factor call necessary here?
+        "2" = "Female"))
 ## Figure 16.10(a)
 gf_dens(~ GPA, data = College_GPA, color = ~ sex)
-## XX Reordering of the factors to allow for the exact replication of textbook but the curves this way make more sense? 
 
 ## Figure 16.10(b)
 gf_qq(~ GPA, data = College_GPA, color = ~ sex)
@@ -203,9 +194,6 @@ XX No data for Example 16.7 (page 20) "Do all daily numbers have an equal payoff
 ### Section 16.4: Bootstrap confidence intervals 
 Up to this point, we have demonstrated theh use of the bootstrap to find confidence
 intervals of the sample mean, trimmed mean, and the difference between two means. 
-Next, we will use it to find the ratio of sample variances.
-```{r}
-```
 
 Now we will bootstrap the confidence intervals for the correlation coefficient, 
 as introduced on page 35. 
@@ -230,9 +218,8 @@ gf_qq(~ cor, data = LAUND_sims) %>%
   gf_qqline(linetype = "solid", color = "red")
 
 # Computing the 95% bootstap percentile interval
-confint(LAUND_sims, method=c("boot", "perc"))
+confint(LAUND_sims, method=c("se", "perc"))
 ```
-XX BL: Not sure why the boot method call is not working (please check with MC)
 
 ### Section 16.5: Significance testing using permutation tests
 Permutation tests use resampling to generate a null distribution for a test 
@@ -244,21 +231,9 @@ assignment of students to either the treament or control group to test for the
 effect of the treatment, "directed reading activities" in this case (page 43): 
 ```{r eg16-12}
 DRP <- read_csv("https://nhorton.people.amherst.edu/ips9/data/chapter16/EG16-11DRP.csv")
-
-Treatment <- DRP %>%
-  filter(group == "Treatment")
-Control <- DRP %>% 
-  filter(group == "Control")
-
-diffMeanDRP <- function(Treatment, Control){
- Sample_Treatment <- resample(Treatment)
- Sample_Control<- resample(Control)
- diff(c(mean(~ drp, data = Sample_Treatment), mean(~ drp, data = Sample_Control)))
-}
 numsim <- 1000
-DRP_sim <- do(numsim) * diffMeanDRP(sample(Treatment), Control)
-
-## XX Not sure if I'm understanding the permutation test correctly
-# XX BL shouldn't this be something like:
-# do(numsim) * diffmean(Y ~ shuffle(X), data = DRP)?
+DRP_sim <- do(numsim) * diffmean(drp ~ shuffle(group), data = DRP)
+gf_dhistogram(~ diffmean, data = DRP_sim, binwidth = 1, center = 0.35) %>%
+  gf_fitdistr(dist = "norm") %>%
+  gf_labs(x = "Difference between the treatment mean and the control mean")
 ```
