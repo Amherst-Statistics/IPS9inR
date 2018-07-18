@@ -1,7 +1,7 @@
 ---
 title: "IPS9 in R: Looking at Data -- Distributions (Chapter 1)"
 author: "Bonnie Lin and Nicholas Horton (nhorton@amherst.edu)"
-date: "July 17, 2018"
+date: "July 18, 2018"
 output: 
   pdf_document:
     fig_height: 3
@@ -59,8 +59,8 @@ Online <-
   read_csv("https://nhorton.people.amherst.edu/ips9/data/chapter01/EG01-07ONLINE.csv")
 Online
 
-Online_data <- c(rep("Google", 406), rep("Library", 75), rep("Wikipedia", 52), rep("Other", 19)) %>% 
-  as.data.frame()
+Online_data <- data.frame(Source = c(rep("Google", 406), rep("Library", 75), 
+                                     rep("Wikipedia", 52), rep("Other", 19)))
 
 tally(~ Online_data, margins = TRUE) 
 ```
@@ -86,14 +86,21 @@ We added the `format` argument to the `tally()` function to show the data in per
 
 Figure 1.2 (page 10) displays the online resource preference data from the above example
 using a histogram, which we can make by typing: 
-```{r eg1-9, message = FALSE}
-gf_histogram(~ ., data = Online_data) # XX data = df parameter
+```{r eg1-9, warning = FALSE}
+gf_histogram(~ Source, data = Online_data, stat = "count")
+
+gf_histogram(~ forcats::fct_infreq(Source), data = Online_data, stat = "count") %>%
+  gf_labs(x = "Source")
 ```
 
-XX personal note: after working out the histogram, address this
-R orders the x-axis alphabetically, placing "Other" before "Wikipedia". However, we can make
-slight modifications by nesting the `desc()` within the `arrange()` function. The output now matches the graph on page 10 and graphs
-the sources on a descending order of preference percentages. 
+As you can see from the first plot, R orders the x-axis alphabetically, placing "Other" before
+"Wikipedia". 
+
+However, we can make slight modifications by using the `fct_infreq()` function 
+in the `forcats` package. We use the `package::function()` template to call usefful functions
+from specific packages without calling the entire package. This function orders the sources, a
+categorical variable, by frequency. The output now matches the graph on page 10 and graphs
+the sources on a descending order of count. 
 
 Figure 1.3 (page 11) displays the online resource preference data in a pie chart. You can create a simple one using 
 the `ggplot2` package, which is called with the `mosaic` package. However, it is worth noting that the R documentation does not generally recommend pie charts as their features are somewhat limited.
@@ -109,6 +116,7 @@ Preferences <- ggplot(Online_Percent, aes(x = "", y = Percent, fill = factor(Sou
   geom_bar(width = 1, stat = "identity") 
 Preferences + coord_polar(theta="y") + labs(fill = "Source") +  theme_void() 
 ```
+
 The `coord_polar()` function converts stacked bar charts into the polar coordinate system to make pie charts.
 
 Below is the code that generates the stem and leaf plot (page 12) that displays the effect of SCF on the absorption
@@ -144,14 +152,14 @@ variables. The distribution of scores on IQ tests is roughly "bell-shaped".
 
 Table 1.2 (page 17) displays the lengths of the first 80 calls. To call the first 80 observations in the dataset, we can use the `head()` function and specify the number of observations.
 ```{r eg1-15, message = FALSE}
-Customer_Calls <- read_csv("https://nhorton.people.amherst.edu/ips9/data/chapter01/EG01-16CALLS.csv")
+Customer_Calls <- 
+  read_csv("https://nhorton.people.amherst.edu/ips9/data/chapter01/EG01-16CALLS.csv")
 head(Customer_Calls, 80)
 ```
 
 Figure 1.8 displays the histogram of the lengths of all 31,492 calls. To exclude the few lengths that are greater than
 1200 seconds (20 minutes), we can use the `filter()` function.
 ```{r eg1-16, message = FALSE}
-Customer_Calls <- read_csv("https://nhorton.people.amherst.edu/ips9/data/chapter01/EG01-16CALLS.csv")
 Customer_Calls %>% 
   filter(length <= 1200) %>%
   gf_histogram(~ length, binwidth = 5) %>%
@@ -179,10 +187,9 @@ the histogram above, but it is still clear thats the shape of the distribution i
 Next, we will look at the number of undergraduate college students in each of the states. Here, we have 
 loaded in the data and displayed the data in a histogram. See Figure 1.9 (page 20): 
 ```{r eg1-19, message = FALSE}
-College <- read_csv("https://nhorton.people.amherst.edu/ips9/data/chapter01/EG01-19COLLEGE.csv")
-
+College <- 
+  read_csv("https://nhorton.people.amherst.edu/ips9/data/chapter01/EG01-19COLLEGE.csv")
 gf_dhistogram(~ Undergrads, data = College)
-
 College %>% 
   filter(Undergrads == max(Undergrads))
 ```
@@ -216,7 +223,8 @@ Following is an example of a plot that displays observations in time order.
 The serum levels of vitamin have been plotted against time of year for samples of subjects 
 from Switzerland (see Figure 1.12 on page 22).  
 ```{r eg1-22, message = FALSE}
-VITDS <- read_csv("https://nhorton.people.amherst.edu/ips9/data/chapter01/EG01-22VITDS.csv")
+VITDS <- 
+  read_csv("https://nhorton.people.amherst.edu/ips9/data/chapter01/EG01-22VITDS.csv")
 gf_point(VitaminD ~ Months, data = VITDS) %>% 
   gf_smooth(se = FALSE) %>%
   gf_labs(x = "Months", y= "Vitamin D(nmol/1)")
@@ -243,16 +251,7 @@ use the `mean()` function to find this specific statistic.
 mean(~ Time, data = TTS24)
 ```
 
-```{r UseYourKnowledge, message = FALSE}
-Suricane <- read_csv("https://nhorton.people.amherst.edu/ips9/data/chapter01/EG01-25TTS24.csv")
-mean(~ Time, data = Suricane)
-```
-We can pipe the `mean()` output into the `round()` function and specify the number of digits 
-after the decimal to be 2, as the textbook instructs on page 29. 
-
-XX Is there suppose to be an example accompanying the paragraph above about mean and round? 
-
-Similarly, we can use the `median()` function to find this specific statistic:
+Similarly, we can use the `median()` function to find this specific statistic (page 31):
 ```{r eg1-25, message = FALSE}
 median(~ Time, data = TTS24)
 ```
