@@ -34,6 +34,8 @@ knitr::opts_chunk$set(
 These documents are intended to help describe how to undertake analyses introduced 
 as examples in the Ninth Edition of \emph{Introduction to the Practice of Statistics} (2017) by Moore, McCabe, and Craig.
 
+XX There is a missing link in the next sentence
+
 More information about the book can be found at 
 The data used in these documents can be found under Data Sets in the [Student Site](https://www.macmillanlearning.com/catalog/studentresources/ips9e?_ga=2.29224888.526668012.1531487989-1209447309.1529940008#). This
 file as well as the associated R Markdown reproducible analysis source file used to create it can be found at https://nhorton.people.amherst.edu/ips9/.
@@ -73,6 +75,8 @@ sources with the `rep()` function. We specified the number of repetitions to mat
 `Online`. The `tally()` then counts up the number of observations for each source, while the 
 `margins` argument, set to TRUE, includes the Total number of observations for all sources. 
 
+XX In the previous sentence Total should not be capitalized
+
 The table on page 10 shows the preference percents. We can also represent the data in percentages, 
 by typing the following: 
 ```{r eg1-8, message = FALSE}
@@ -82,13 +86,15 @@ tally(~ Online_data, format = "percent", margins = TRUE)
 We added the `format` argument to the `tally()` function to show the data in percentages, and, with the 
 `options()` function, we controlled the number of digits after the decimal. 
 
+XX The pipe operator has not been demonstrated so far (the next sentence says it has)
+
 The `%>%` in the code above is known as the piping operator. It comes from the `magrittr` package, 
 which the `mosaic` package calls. It passes the object on its left hand side as the first argument to the function on the right hand side.
 
 Figure 1.2 (page 10) displays the online resource preference data from the above example
 using a histogram, which we can make by typing: 
 ```{r eg1-9, message = FALSE}
-gf_histogram(~ Online_data, Online_data, stat = "count")
+gf_histogram(~ Online_data, Online_data, stat = "count") # XX Should we be used to specifying the data = df parameter)
 ```
 
 R orders the x-axis alphabetically, placing "Other" before "Wikipedia". However, we can make
@@ -107,8 +113,9 @@ Online_Percent <- Online %>%
   rename(Percent = Count)
 
 Preferences <- ggplot(Online_Percent, aes(x = "", y = Percent, fill = factor(Source))) +
-geom_bar(width = 1, stat = "identity")
-Preferences + coord_polar(theta="y") + labs(fill = "Source") +  theme_void()
+  geom_bar(width = 1, stat = "identity") 
+# XX This statement needs a comment that explains why the object is being modified in two steps
+Preferences + coord_polar(theta="y") + labs(fill = "Source") +  theme_void() 
 ```
 
 Below is the code that generates the stem and leaf plot (page 12) that displays the effect of SCF on the absorption
@@ -138,7 +145,7 @@ labels <- c("75 <= IQ & IQ < 85", "85 <= IQ & IQ < 95",
 labels <- as.factor(seq(from = 80, to = 150, by = 10))
 IQ_Count <- IQ %>% 
   mutate(Class = cut(IQ, levels, labels = labels)) 
-gf_histogram(~ Class, data = IQ_Count, stat = "count")
+gf_histogram(~ Class, data = IQ_Count, stat = "count") # XX Consisder gf_bar?
 ```
 
 The `cut()` function divides the IQ dataset into the defined levels and assigns the values into the appropriate categories.  
@@ -252,6 +259,8 @@ mean(~ Time, data = Suricane)
 ```
 We can pipe the `mean()` output into the `round()` function and specify the number of digits 
 after the decimal to be 2, as the textbook instructs on page 29. 
+
+XX Is there suppose to be an example accompanying the paragraph above about mean and round? 
 
 Similarly, we can use the `median()` function to find this specific statistic:
 ```{r eg1-25, message = FALSE}
