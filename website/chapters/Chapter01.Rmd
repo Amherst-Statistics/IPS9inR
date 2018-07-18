@@ -59,8 +59,10 @@ Online <-
   read_csv("https://nhorton.people.amherst.edu/ips9/data/chapter01/EG01-07ONLINE.csv")
 Online
 
-Online_data <- c(rep("Google", 406), rep("Library", 75), rep("Wikipedia", 52), rep("Other", 19))
-tally(~ Online_data, margins = TRUE)
+Online_data <- c(rep("Google", 406), rep("Library", 75), rep("Wikipedia", 52), rep("Other", 19)) %>% 
+  as.data.frame()
+
+tally(~ Online_data, margins = TRUE) 
 ```
 
 By default, the `read_csv()` function will output the types of columns, as we see above. 
@@ -71,9 +73,7 @@ Since the `Online` data already have the counts for the sources, we could not de
 `tally()` function with them. Thus, we created a dataset called `Online_data` by repeating the
 sources with the `rep()` function. We specified the number of repetitions to match the counts in 
 `Online`. The `tally()` then counts up the number of observations for each source, while the 
-`margins` argument, set to TRUE, includes the Total number of observations for all sources. 
-
-XX In the previous sentence Total should not be capitalized
+`margins` argument, set to TRUE, includes the total number of observations for all sources. 
 
 The table on page 10 shows the preference percents. We can also represent the data in percentages, 
 by typing the following: 
@@ -84,20 +84,15 @@ tally(~ Online_data, format = "percent", margins = TRUE)
 We added the `format` argument to the `tally()` function to show the data in percentages, and, with the 
 `options()` function, we controlled the number of digits after the decimal. 
 
-XX The pipe operator has not been demonstrated so far (the next sentence says it has)
-
-The `%>%` in the code above is known as the piping operator. It comes from the `magrittr` package, 
-which the `mosaic` package calls. It passes the object on its left hand side as the first argument to the function on the right hand side.
-
 Figure 1.2 (page 10) displays the online resource preference data from the above example
 using a histogram, which we can make by typing: 
 ```{r eg1-9, message = FALSE}
-gf_histogram(~ Online_data, Online_data, stat = "count") # XX Should we be used to specifying the data = df parameter)
+gf_histogram(~ ., data = Online_data) # XX data = df parameter
 ```
 
+XX personal note: after working out the histogram, address this
 R orders the x-axis alphabetically, placing "Other" before "Wikipedia". However, we can make
-slight modifications by nesting the `reorder()` function in the `mutate()` function, which will first reorder the
-data based on the Percent and then reassign the data. The output now matches the graph on page 10 and graphs
+slight modifications by nesting the `desc()` within the `arrange()` function. The output now matches the graph on page 10 and graphs
 the sources on a descending order of preference percentages. 
 
 Figure 1.3 (page 11) displays the online resource preference data in a pie chart. You can create a simple one using 
@@ -112,9 +107,9 @@ Online_Percent <- Online %>%
 
 Preferences <- ggplot(Online_Percent, aes(x = "", y = Percent, fill = factor(Source))) +
   geom_bar(width = 1, stat = "identity") 
-# XX This statement needs a comment that explains why the object is being modified in two steps
 Preferences + coord_polar(theta="y") + labs(fill = "Source") +  theme_void() 
 ```
+The `coord_polar()` function converts stacked bar charts into the polar coordinate system to make pie charts.
 
 Below is the code that generates the stem and leaf plot (page 12) that displays the effect of SCF on the absorption
 of calcium in adolescent boys and girls:
@@ -137,13 +132,10 @@ individuals in each class/level and use these counts to create a histogram.
 IQ <- 
   read_csv("https://nhorton.people.amherst.edu/ips9/data/chapter01/EG01-14IQ.csv")
 levels <- c(75, 85, 95, 105, 115, 125, 135, 145, 155)
-labels <- c("75 <= IQ & IQ < 85", "85 <= IQ & IQ < 95", 
-  "95 <= IQ & IQ < 105", "105 <= IQ & IQ < 115", "115 <= IQ & IQ < 125", 
-  "125 <= IQ & IQ < 135", "135 <= IQ & IQ < 145", "145 <= IQ & IQ < 155")
 labels <- as.factor(seq(from = 80, to = 150, by = 10))
 IQ_Count <- IQ %>% 
   mutate(Class = cut(IQ, levels, labels = labels)) 
-gf_histogram(~ Class, data = IQ_Count, stat = "count") # XX Consisder gf_bar?
+gf_bar(~ Class, data = IQ_Count)
 ```
 
 The `cut()` function divides the IQ dataset into the defined levels and assigns the values into the appropriate categories.  
