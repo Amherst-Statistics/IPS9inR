@@ -63,18 +63,16 @@ page 5.
 ```{r eg16-2}
 FACE4 <- read_csv("https://nhorton.people.amherst.edu/ips9/data/chapter16/EG16-01FACE4.csv")
 
-FACE4 <- FACE4 %>%
-  mutate(Time = as.numeric(Time))
-## XX class() denotes Time as numeric but the message suggests that column is specified as double
-
 set.seed(2018)
 numsim <- 3000
 Avg_Viewtime <- do(numsim) * mean(~ Time, data = resample(FACE4, 21)) 
 
 #Figure 16.3(a)
-mean_time = FACE4 %>%
-  pull(Time) %>%
-  mean()
+# XX BL please extirpate all uses of pull!
+favstats(~ mean, data = Avg_Viewtime)
+# XX mean_time = FACE4 %>%
+# XX  pull(Time) %>%
+# XX  mean()
 
 gf_histogram(~ mean, data = Avg_Viewtime) %>%
   gf_labs(x = "Mean time of resamples (in minutes)", y = "Count") %>%
@@ -85,7 +83,7 @@ gf_qq(~ mean, data = Avg_Viewtime) %>%
   gf_qqline(color = "red", linetype = "solid") %>% 
   gf_labs(x = "Normal score", y = "Mean time of resamples (in minutes)")
 ```
-The psuedorandom number used to set the seed enables the reproduction of results. 
+The pseudorandom number used to set the seed enables the reproduction of results. 
 The `do()` function in the `mosaic` package simplifies the iteration and resampling  
 processes by allowing us to set the number of repetitions and specify what to repeat. 
 
@@ -152,6 +150,7 @@ College_GPA <- College_GPA %>%
         "1" = "Male",
         "2" = "Female"), 
         sex = as.factor(sex))
+# XX BL is the is.factor call necessary here?
 ## Figure 16.10(a)
 gf_dens(~ GPA, data = College_GPA, color = ~ sex)
 ## XX Reordering of the factors to allow for the exact replication of textbook but the curves this way make more sense? 
@@ -193,7 +192,7 @@ gf_qq(~ diffMeanGPA, data = GPA_sex_sims) %>%
   gf_labs(x = "Normal score", y = "Difference in means of resamples") %>%
   gf_qqline(linetype = "solid", color = "red")
 ```
-We resample seeparately from the two samples, so that each of our 3000 resamples 
+We resample separately from the two samples, so that each of our 3000 resamples 
 consists of two group resamples, one of size 91 drawn with replacement from the 
 male data and one of size 59 drawn with replacement from the female data.
 
@@ -233,7 +232,7 @@ gf_qq(~ cor, data = LAUND_sims) %>%
 # Computing the 95% bootstap percentile interval
 confint(LAUND_sims, method=c("boot", "perc"))
 ```
-XX Not sure why the boot method call is not working
+XX BL: Not sure why the boot method call is not working (please check with MC)
 
 ### Section 16.5: Significance testing using permutation tests
 Permutation tests use resampling to generate a null distribution for a test 
@@ -260,4 +259,6 @@ numsim <- 1000
 DRP_sim <- do(numsim) * diffMeanDRP(sample(Treatment), Control)
 
 ## XX Not sure if I'm understanding the permutation test correctly
+# XX BL shouldn't this be something like:
+# do(numsim) * diffmean(Y ~ shuffle(X), data = DRP)?
 ```
