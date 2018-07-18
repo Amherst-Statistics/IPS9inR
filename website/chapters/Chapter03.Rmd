@@ -1,12 +1,12 @@
 ---
 title: "IPS9 in R: Producing data (Chapter 3)"
-author: "XX and Nicholas Horton (nhorton@amherst.edu)"
-date: "July 13, 2018"
+author: "Shukry Zablah (szablah20@amherst.edu) and Nicholas Horton (nhorton@amherst.edu)"
+date: "July 18, 2018"
 output: 
-  html_document:
+  pdf_document:
     fig_height: 3
     fig_width: 5
-  pdf_document:
+  html_document:
     fig_height: 3
     fig_width: 5
   word_document:
@@ -49,8 +49,61 @@ library(mosaic)
 library(readr)
 ```
 
-
 ### Section 3.1: Sources of Data 
 ### Section 3.2: Design of experiment
+
+See Example 3.12 on page 178.
+
+We are looking to setup a dataset with randomly assigned a "Control" or "Treatment" group to our dataset.
+
+```{r ex12_1}
+set.seed(1) #guarantees the same random results each time R runs
+Randomized <- data.frame(ID = c(1:10), randNum = runif(10)) 
+Randomized
+```
+
+We created a data frame in which the first column corresponds to unique IDs and the second column holds the random numbers that will determine which group will be assigned to which ID.
+
+Our plan is to order the IDs based on their random number and assign half of the observations to the Control group and the other half to the Treatment group. We start by arranging the observations. 
+
+```{r ex12_2}
+Randomized <- Randomized %>%
+  arrange(randNum)
+Randomized
+```
+
+And finally we assign each observation to a group. 
+
+```{r ex12_3}
+Randomized <- Randomized %>% 
+  mutate(Group = c(rep("Treatment", 5), rep("Control", 5))) 
+Randomized
+```
+
+Now your observations are randomly assigned to a group! Here we chose to assign the first five ID to the Treatment group and the rest to the Control group, but there are other other ways to do it. To finish you can clean up the dataset by selecting only the ID and the Group columns and order it by ID.
+
+```{r ex12_4}
+Randomized %>% 
+  select(ID, Group) %>% 
+  arrange(ID)
+```
+
+You can do this for many Groups and for as many observations as you want. 
+
 ### Section 3.3: Sampling Design
+
+We want to get a simple random sample (SRS) of 25 countries out of 189.
+
+```{r ex3.23_1, message=FALSE}
+Countries <- read_csv("../data/chapter03/EG03-23TTS.csv")
+```
+
+In R you just have to use the `sample()` function.
+
+```{r}
+Sample <- sample(Countries, size = 25)
+Sample
+```
+
+
 ### Section 3.4: Ethics
