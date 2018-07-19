@@ -1,7 +1,7 @@
 ---
 title: "IPS9 in R: Inference for Regression (Chapter 10)"
-author: "XX and Nicholas Horton (nhorton@amherst.edu)"
-date: "July 13, 2018"
+author: "Bonnie Lin and Nicholas Horton (nhorton@amherst.edu)"
+date: "July 19, 2018"
 output: 
   html_document:
     fig_height: 3
@@ -50,4 +50,70 @@ library(readr)
 ```
 
 ### Section 10.1: Simple linear regression
+```{r eg10-01,  message=FALSE}
+PABME <- read_csv("https://nhorton.people.amherst.edu/ips9/data/chapter10/EG10-01PABMI.csv")
+### Figure 10.3, page 559
+gf_point(BMI ~ PA, data = PABME) %>%
+  gf_lm() %>%
+  gf_labs(x = "PA (Thousands of steps)", y = "BMI (kg/m^2)")
+#gf_lm() adds the least-squares line
+
+## Creating the linear model with the lm() function
+lm_PABME <- lm(BMI ~ PA, data = PABME)
+## Displaying the output with the msummary() function
+msummary(lm_PABME)
+```
+
+You would interpret this output by reporting the model as 
+$\hat{BMI} = 29.578 - 0.655 (PA)$, the same way as the textbook does on page 
+563. This equation also defines the straight line that was plotted in Figure 10.3, 
+using the `gf_lm()` function.
+
+Suppose that a female college student averages 8000 steps per day. By making 
+the linear model into a function, we can predict the BMI of the person. 
+```{r eg10-4}
+### Example 10.4, page 564
+PABME_mod <- makeFun(lm_PABME)
+PABME_mod(8) # BMI estimate 
+
+### Figure 10.5, page 566
+gf_point(resid(lm_PABME) ~ PA, data = PABME) %>%
+  gf_smooth() %>%
+  gf_labs(x = "PA (Thousands of steps)", y = "Residual") 
+
+## XX gf_smooth() has an extra bump that is missing from 
+## the textbook? 
+
+### Figure 10.6, page 566
+gf_qq(~ rstandard(lm_PABME)) %>%
+  gf_qqline() %>%
+  gf_labs(x = "Normal score", y = "Residual")
+```
+
+If the student's actual BMI is 25.66, you can easily find the residual by calculating the 
+difference between the actual and the predicted values. In this case, the residual would 
+be 1.317. 
+
+Note that plotting the Normal quantile plot of the residuals requires the `rstandard()` 
+function call. 
+
+```{r eg10-7}
+### Figure 10.7, page 571
+gf_point(BMI ~ PA, data = PABME) %>%
+  gf_smooth(se = TRUE)
+```
+
+The dark gray bands that appear define the 95% confidence limits.  
+
+XX How to draw the upper and lower limits of the prediction intervals,
+which are different from the confidence intervals 
+
+```{r eg10-11, message=FALSE}
+ENTRE <- read_csv("https://nhorton.people.amherst.edu/ips9/data/chapter10/EG10-11ENTRE.csv")
+
+```
+
+```{r eg10-16, message=FALSE}
+GADIA <- read_csv("https://nhorton.people.amherst.edu/ips9/data/chapter10/EG10-16GADIA.csv")
+```
 ### Section 10.2: More details about simple linear regression
