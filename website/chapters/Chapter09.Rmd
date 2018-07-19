@@ -126,14 +126,20 @@ tally(Required ~ Party, data = Vaccine, margins = TRUE, format = "percent")
 ```
 
 ```{r}
+gf_percents(~ Required, data = Vaccine, fill = ~ Party, position = "dodge")
+```
 
+Note that this is not an equivalent bar graph but still provides the same useful information. 
+
+```{r}
+vcd::mosaic(~ Required | Party, data = Vaccine, format = "percent")
 ```
 
 In Example 9.7 we are interested in getting the expected counts of our Vaccine data. In R you can take advantage of the `chisq.test()` function and get the relevant output like this: 
 
 ```{r}
-chiSq <- chisq.test(tally(Required ~ Party, data = Vaccine), correct = FALSE)
-with(chiSq, expected)
+chiSqVaccine <- chisq.test(tally(Required ~ Party, data = Vaccine), correct = FALSE)
+with(chiSqVaccine, expected)
 ```
 
 We specify the `correct = FALSE` option to match the book's table. This option specifies that there should be no continuity correction applied to our test. You can see how the output changes by removing that option. 
@@ -141,12 +147,75 @@ We specify the `correct = FALSE` option to match the book's table. This option s
 Similarly we could get the observed counts we calculated with `tally()` before. We just need to use the same test and get the relevant part of the returned object. 
 
 ```{r}
-with(chiSq, observed)
+with(chiSqVaccine, observed)
 ```
 
 To see the output of the Chi-Square test discussed in Example 9.8. Note that the book has a mistake. While it showed the correct output, it specified the wrong $$\chi^2$$ squared value. 
 
 ```{r}
-chiSq
+chiSqVaccine
 ```
+
+```{r}
+Health <- rbind(
+  do(69) *  data.frame(PhysAct = "Low", FruitConsumption = "Low"),
+  do(206) * data.frame(PhysAct = "Moderate", FruitConsumption = "Low"),
+  do(294) * data.frame(PhysAct = "Vigorous",  FruitConsumption = "Low"), 
+  do(25) *  data.frame(PhysAct = "Low", FruitConsumption = "Medium"),
+  do(126) * data.frame(PhysAct = "Moderate", FruitConsumption = "Medium"),
+  do(170) * data.frame(PhysAct = "Vigorous", FruitConsumption = "Medium"),
+  do(14) *  data.frame(PhysAct = "Low",  FruitConsumption = "High"), 
+  do(111) * data.frame(PhysAct = "Moderate", FruitConsumption = "High"),
+  do(169) * data.frame(PhysAct = "Vigorous", FruitConsumption = "High")
+)  
+```
+
+
+```{r}
+tally(~ PhysAct + FruitConsumption, data = Health, margins = TRUE)
+```
+
+```{r}
+tally(FruitConsumption ~ PhysAct, data = Health, margins = TRUE, format = "percent")
+```
+
+```{r}
+gf_percents(~ FruitConsumption | PhysAct, data = Health)
+```
+
+Note that these are not equivalent bar graphs to the one in the book (XX FIGURE NUMBER) but they still provide the same useful information. 
+
+```{r}
+chiSqHealth <- chisq.test(tally(FruitConsumption ~ PhysAct, data = Health), correct = FALSE)
+with(chiSqHealth, expected)
+```
+
+```{r}
+with(chiSqHealth, observed)
+```
+
+```{r}
+chiSqHealth
+```
+
 ### Section 9.2: Goodness of fit
+
+```{r}
+ACT <- rbind(
+  do(167) * data.frame(State = "AZ", label = 1),
+  do(257) * data.frame(State = "CA", label = 2),
+  do(257) * data.frame(State = "HI", label = 3),
+  do(297) * data.frame(State = "IN", label = 4),
+  do(107) * data.frame(State = "NV", label = 5),
+  do(482) * data.frame(State = "OH", label = 6)
+)
+```
+
+```{r}
+tally(~ State, data = ACT, margins = TRUE)
+```
+
+```{r}
+tally(~ State, data = ACT, margins = TRUE, format = "prop")
+
+```
