@@ -1,7 +1,7 @@
 ---
 title: "IPS9 in R: Looking at Data -- Relations (Chapter 2)"
 author: "Margaret Chien and Nicholas Horton (nhorton@amherst.edu)"
-date: "July 13, 2018"
+date: "July 19, 2018"
 output: 
   html_document:
     fig_height: 3
@@ -157,10 +157,119 @@ gf_point(Rating ~ Price, color = ~ Type, data = Laundry, xlab = "Price per load 
 
 #### Example 2.16: Laundry rating versus price with a smooth fit
 
+```{r}
+Laundry <- read_csv("https://nhorton.people.amherst.edu/ips9/data/chapter02/EG02-016LAUND.csv")
+# Figure 2.10, page 94-95
+gf_point(Rating ~ Price, data = Laundry) %>%
+  gf_smooth(span = .5)
+gf_point(Rating ~ Price, data = Laundry) %>%
+  gf_smooth(span = 5)
+```
+
+#### Example 2.17: A smooth fit for education spending and population with logs
+
+```{r}
+EduSpending <- read_csv("https://nhorton.people.amherst.edu/ips9/data/chapter02/EG02-017EDSPEND.csv")
+# Figure 2.8, page 92
+EduSpending %>%
+  mutate(LogPop = log(Population), LogSpend = log(Spending)) %>%
+  gf_point(LogSpend ~ LogPop) %>%
+  gf_smooth() %>%
+  gf_labs(x = "Log population", y = "Log spending")
+```
+
 ### Section 2.3: Correlation
+
+#### Use Your Knowledge: Laundry detergents
+
+```{r}
+# page 102
+cor(Rating ~ Price, data = Laundry)
+```
+
 ### Section 2.4: Least Squares Regression
+
+#### Example 2.19: Fidgeting and fat gain
+
+```{r}
+Fidgeting <- read_csv("https://nhorton.people.amherst.edu/ips9/data/chapter02/EG02-019FIDGET.csv")
+# Figure 2.16, page 108
+gf_point(Fat ~ NEA, data = Fidgeting) %>%
+  gf_labs(x = "Nonexercise activity (calories)", y = "Fat gain (kilograms)")
+```
+
+#### Example 2.20: Regression line for fat gain
+
+```{r}
+Fidgeting <- read_csv("https://nhorton.people.amherst.edu/ips9/data/chapter02/EG02-020FIDGET.csv")
+# Figure 2.17, page 109
+gf_point(Fat ~ NEA, data = Fidgeting) %>%
+  gf_lm() %>%
+  gf_labs(x = "Nonexercise activity (calories)", y = "Fat gain (kilograms)")
+# Use Your Knowledge 2.61: Plot the line
+gf_point(Fat ~ NEA, data = Fidgeting) %>%
+  gf_abline(slope = -.00344, intercept = 4.505) %>%
+  gf_labs(x = "Nonexercise activity (calories)", y = "Fat gain (kilograms)") +
+  ylim(0, 5)
+```
+
+#### Example 2.21: Prediction for fat gain
+
+```{r}
+fatlm <- lm(Fat ~ NEA, data = Fidgeting)
+fatfun <- makeFun(fatlm)
+fatfun(NEA = 400)
+```
+
+#### Example 2.24: Regression
+
+```{r}
+# page 113
+msummary(fatlm)
+```
+
+#### Example 2.25: Fidgeting and fat gain
+
+```{r}
+# XX NH Issue with plot and ranges
+NEAlm <- lm(NEA ~ Fat, data = Fidgeting) # using fat gain to predict nonexercise activity
+NEAfun <- makeFun(NEAlm)
+NEAfun(Fat = 6) # (-311.5197, 6)
+NEAfun(Fat = 0) # (745.2604, 0)
+# point 1
+# Figure 2.20, page 115
+gf_point(Fat ~ NEA, data = Fidgeting) %>%
+  gf_lm() %>%
+  #gf_fun(NEAlm, color = "red") + 
+  gf_segment(6 + 0 ~ -311.5197 + 745.2604, color = "red") %>%
+  gf_labs(x = "Nonexercise activity (calories)", y = "Fat gain (kilograms)") +
+  ylim(0, 6)
+```
+
 ### Section 2.5: Cautions about Correlation and Regression
-### Section 2.7: Data Analysis fro Two Way Tables
-### Section 2.6: The Questionn of Causation
+
+#### Example 2.26: Residuals for fat gain
+
+```{r}
+fatlm
+fatfun(NEA = 135)
+2.7 - fatfun(NEA = 135)
+# Figure 2.23, page 124
+gf_point(Fat ~ NEA, data = Fidgeting) %>%
+  gf_lm() %>%
+  gf_labs(x = "Nonexercise activity (calories)", y = "Fat gain (kilograms)")
+gf_point(resid(fatlm) ~ NEA, data = Fidgeting) %>%
+  gf_lm() %>%
+  gf_labs(x = "Nonexercise activity (calories)", y = "Residual")
+```
+
+#### Example 2.27: Patterns in birthrate and Internet user residuals
+
+```{r}
+
+```
+
+### Section 2.7: Data Analysis from Two Way Tables
+### Section 2.6: The Question of Causation
 
 
