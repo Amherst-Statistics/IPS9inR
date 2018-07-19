@@ -103,7 +103,7 @@ And we then have the table with the percentages of people who are users over the
 Now take look at Example 9.2 in page 526. To recreate that table of counts we simply have to call the `tally()` function and it will make the 2-way table for us. 
 We call it like this: 
 
-```{r}
+```{r Instag5}
 tally(~ User + Sex, data = Instag, margins = TRUE)  
 ```
 
@@ -111,7 +111,7 @@ The `margins = TRUE` optio makes sure that `tally()` ouputs the convenient Total
 
 Turn your attention to Example 9.3 now. After creating the dataset from the counts, we can use a similar `tally()` call to recreate the table and verify that our method to create the dataset is in fact accurate. 
 
-```{r}
+```{r Vaccine1}
 Vaccine <- rbind(
   do(729) * data.frame(Required = "Yes", Party = "Democratic"),
   do(479) * data.frame(Required = "Yes", Party = "Republican"),
@@ -124,7 +124,7 @@ tally(~ Required + Party, data = Vaccine, margins = TRUE)
 
 Now we continue to explore our 2 way tables. In Example 9.5 we can see the marginal distribution of our Vaccine tables across political party preference. We recreate it with a call to `tally()` but this time we will use a new parameter too. 
 
-```{r}
+```{r Vaccine2}
 tally(Required ~ Party, data = Vaccine, margins = TRUE, format = "percent")
 ```
 
@@ -132,7 +132,7 @@ The `format = "percent"` will nicely output the results in percentage form!
 
 The output from `tally()` is good enough. However, a picture is worth a thousand words. Let's try to create a bar graph out of the Vaccine dataset. 
 
-```{r}
+```{r Vaccine3}
 gf_percents(~ Required, data = Vaccine, fill = ~ Party, position = "dodge")
 ```
 
@@ -142,7 +142,7 @@ Note: This is not an equivalent bar graph but still provides the same useful inf
 
 Another way that we can visualize two categorical variables is to create a mosaic plot. We will use the `vcd` package's `mosaic()` function to plot the mosaic plot. Note the call resembles the same syntax of the `tally()` commands we made earlier. 
 
-```{r}
+```{r Vaccine4}
 vcd::mosaic(Required ~ Party, data = Vaccine)
 ```
 
@@ -150,7 +150,7 @@ Having multiple ways to visualize varibles will help you analyze your data more 
 
 In Example 9.7 we are interested in getting the expected counts of our Vaccine data. In R you can take advantage of the `chisq.test()` function and get the relevant output like this: 
 
-```{r}
+```{r Vaccine5}
 chiSqVaccine <- chisq.test(tally(Required ~ Party, data = Vaccine), correct = FALSE)
 with(chiSqVaccine, expected)
 ```
@@ -161,13 +161,13 @@ Note: We specify the `correct = FALSE` option to match the book's table. This op
 
 In a manner similar to the one above, we can get the observed counts we calculated with `tally()` before. We just retrieve the relevant field from our object with the `with()` function again.
 
-```{r}
+```{r Vaccine6}
 with(chiSqVaccine, observed)
 ```
 
 To see the output of the Chi-Square test discussed in Example 9.8 we just need to print the object we stored in our variable earlier.
 
-```{r}
+```{r Vaccine7}
 chiSqVaccine
 ```
 
@@ -177,7 +177,7 @@ Note: There is an error in the $$\chi^2$$ value in the book. While it showed the
 
 We continue with Example 9.9 in page 537. 
 
-```{r}
+```{r Health1}
 Health <- rbind(
   do(69) *  data.frame(PhysAct = "Low", FruitConsumption = "Low"),
   do(206) * data.frame(PhysAct = "Moderate", FruitConsumption = "Low"),
@@ -195,19 +195,19 @@ You should already know what is happening in the code chunk above. We will store
 
 Now we recreate the table in page 537 as follows: 
 
-```{r}
+```{r Health2}
 tally(~ FruitConsumption + PhysAct, data = Health, margins = TRUE)
 ```
 
 The table above is the 2 way table of counts from the Health data. To get the percentages instead we use the `format` parameter. 
 
-```{r}
+```{r Health3}
 tally(~ FruitConsumption + PhysAct, data = Health, margins = TRUE, format = "percent")
 ```
 
 Again, visualizations will trump tables in all appropriate cases. We will create a faceted bar graph. 
 
-```{r}
+```{r Health4}
 gf_percents(~ FruitConsumption | PhysAct, data = Health)
 ```
 
@@ -215,20 +215,20 @@ Note: These are not equivalent bar graphs to Figure 9.7, but they still provide 
 
 Now, let's get the expected counts for our Health data. 
 
-```{r}
+```{r Health5}
 chiSqHealth <- chisq.test(tally(FruitConsumption ~ PhysAct, data = Health), correct = FALSE)
 with(chiSqHealth, expected)
 ```
 
 And our observed counts...
 
-```{r}
+```{r Health6}
 with(chiSqHealth, observed)
 ```
 
 And finally our $$\chi^2$$ statistic. 
 
-```{r}
+```{r Health7}
 chiSqHealth
 ```
 
@@ -238,7 +238,7 @@ Remember these are all possible thans to the functionality of the `chisq.test()`
 
 We will be using data of the ACT from six different states. We recreate our dataset from the counts. 
 
-```{r}
+```{r ACT1}
 ACT <- rbind(
   do(167) * data.frame(State = "AZ", label = 1),
   do(257) * data.frame(State = "CA", label = 2),
@@ -251,36 +251,36 @@ ACT <- rbind(
 
 To get a sense of the number of participants in the study (pg 546) we can quickly do a `tally()` call on the State column. 
 
-```{r}
+```{r ACT2}
 tally(~ State, data = ACT, margins = TRUE)
 ```
 
 We will now import the population proportions from a csv file. We will use these values to see how close our sample counts are to the population values. 
 
-```{r}
+```{r ACT3}
 ACTPopProp <- read_csv("https://nhorton.people.amherst.edu/ips9/data/chapter09/EG09-13ACT.csv")
 ACTPopProp
 ```
 
 We will use the same `chisq.test()` function from before. It is important to note the new behavior we expect from the function when we provide a vector of the population proportions. The expected counts and the $$\chi^2$$ value will depend on this new parameter. 
 
-```{r}
+```{r ACT4}
 chisqACT <- chisq.test(tally(~ State, data = ACT), p = c(0.105, .172, .164, .188, .07, .301), correct = FALSE)
 ```
 
 Now that we have saved our object, we can access the expected counts and the test statistic just like before. 
 
-```{r}
+```{r ACT5}
 with(chisqACT, expected)
 ```
 
-```{r}
+```{r ACT6}
 chisqACT
 ```
 
 Another example of a field included in the return value of the `chisq.test()` is the `residuals` field. Let's take a look. 
 
-```{r}
+```{r ACT7}
 with(chisqACT, residuals)
 ```
 
