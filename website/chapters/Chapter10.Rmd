@@ -78,11 +78,8 @@ PABME_mod(8) # BMI estimate
 
 ### Figure 10.5, page 566
 gf_point(resid(lm_PABME) ~ PA, data = PABME) %>%
-  gf_smooth() %>%
+  gf_smooth(span = 2) %>%
   gf_labs(x = "PA (Thousands of steps)", y = "Residual") 
-
-## XX gf_smooth() has an extra bump that is missing from 
-## the textbook? 
 
 ### Figure 10.6, page 566
 gf_qq(~ rstandard(lm_PABME)) %>%
@@ -100,20 +97,66 @@ function call.
 ```{r eg10-7}
 ### Figure 10.7, page 571
 gf_point(BMI ~ PA, data = PABME) %>%
-  gf_smooth(se = TRUE)
+  gf_lm(interval = "confidence", fill = "red") %>%
+  gf_lm(interval = "prediction", fill = "navy") %>%
+  gf_labs(x = "PA (thousands of steps)", y = "BMI (kg/m^2)")
+
 ```
 
-The dark gray bands that appear define the 95% confidence limits.  
+The red bands show the 95% confidence limits, while the navy bands show the 
+95% prediction limits. 
 
-XX How to draw the upper and lower limits of the prediction intervals,
-which are different from the confidence intervals 
 
 ```{r eg10-11, message=FALSE}
 ENTRE <- read_csv("https://nhorton.people.amherst.edu/ips9/data/chapter10/EG10-11ENTRE.csv")
+### Figure 10.9, page 575
+gf_point(INC ~ EDUC, data = ENTRE) %>%
+  gf_smooth(span = 2) %>%
+  gf_lm(color = "red") 
 
+### Figure 10.10, page 575
+log_inc_ENTRE <- ENTRE %>% 
+  mutate(log_INC = log(INC))
+gf_point(log_INC ~ EDUC, data = log_inc_ENTRE) %>%
+  gf_smooth(span = 2) %>%
+  gf_lm(color = "red") %>%
+  gf_labs(y = "log(INC)")
 ```
+On this scatterpot of income versus education, we have plotted the smooth function (blue) 
+and the least-squares line (red). 
 
 ```{r eg10-16, message=FALSE}
-GADIA <- read_csv("https://nhorton.people.amherst.edu/ips9/data/chapter10/EG10-16GADIA.csv")
+GADIA <- read_csv("https://nhorton.people.amherst.edu/ips9/data/chapter10/EG10-16GADIA.csv") %>%
+  select(Diameter, GA) %>%
+  na.omit()
+
+### Example 10.17, page 589
+favstats(~ Diameter, data = GADIA)
+favstats(~ GA, data = GADIA)
+cor(GA ~ Diameter, data = GADIA)
+
+### Example 10.18, 10.20, and 10.21 page 589
+lm_GADIA <- lm(GA ~ Diameter, data = GADIA)
+msummary(lm_GADIA) 
+# From the msummary output, you can compute the least-squares
+# regression line, estimate the standard deviation about the line 
+# and test the slope by using the t statistic and P-value 
+# by the 'Diameter' variable
+
+### Example 10.19, page 590 
+gf_point(resid(lm_GADIA) ~ Diameter, data = GADIA) %>%
+  gf_lm() %>%
+  gf_labs(x = "Diameter", y = "Residual")
+
+### Example 10.22, page 592
+confint(lm_GADIA, 'Diameter')
+
+### Example 10.23, page 593
+new.dat <- data.frame(Diameter = 10)
+predict(lm_GADIA, newdata = new.dat, interval = 'confidence')
 ```
+Since there are only two columns in this dataset that are not filled with NA's, I have 
+used the `select()` and `na.omit()` functions to select columns that we will use for 
+further analysis. 
+
 ### Section 10.2: More details about simple linear regression
