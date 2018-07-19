@@ -3,10 +3,10 @@ title: "IPS9 in R: Inference for means (Chapter 7)"
 author: "Bonnie and Nicholas Horton (nhorton@amherst.edu)"
 date: "July 18, 2018"
 output: 
-  html_document:
+  pdf_document:
     fig_height: 3
     fig_width: 5
-  pdf_document:
+  html_document:
     fig_height: 3
     fig_width: 5
   word_document:
@@ -91,13 +91,18 @@ compensated with.
 ```{r eg7-7, message=FALSE}
 GEPARTS <- read_csv("https://nhorton.people.amherst.edu/ips9/data/chapter07/EG07-07GEPARTS.csv") 
 gf_dhistogram(~ Diff, data = GEPARTS, binwidth = 1/3, center = 1/6)
-t.test(GEPARTS$OptionOn, GEPARTS$OptionOff, var.equal = TRUE, conf.level = 0.90)
-## XX t.test results and use of dollar signs are both not ideal
+with(GEPARTS, t.test(OptionOn, OptionOff, var.equal = TRUE, conf.level = 0.90))
 ```
 
 ```{r eg7-11, message=FALSE}
 DRP <- read_csv("https://nhorton.people.amherst.edu/ips9/data/chapter07/EG07-11DRP.csv")
-
+# Figure 7.12, page 438
+gf_qq(~ drp, color = ~ group, data = DRP) %>%
+  gf_qqline(color = "black", linetype = "solid") %>%
+  gf_labs(x = "Normal score", y = "Treatment/Control group DRP scores")
+# Summary statistics, page 439
+favstats(drp ~ group, data = DRP)
+with(DRP, confint(drp, level = 0.95))
 ```
 
 ```{r eg7-16,message=FALSE}
