@@ -3,10 +3,10 @@ title: "IPS9 in R: Inference for means (Chapter 7)"
 author: "Bonnie and Nicholas Horton (nhorton@amherst.edu)"
 date: "July 18, 2018"
 output: 
-  html_document:
+  pdf_document:
     fig_height: 3
     fig_width: 5
-  pdf_document:
+  html_document:
     fig_height: 3
     fig_width: 5
   word_document:
@@ -91,25 +91,80 @@ compensated with.
 ```{r eg7-7, message=FALSE}
 GEPARTS <- read_csv("https://nhorton.people.amherst.edu/ips9/data/chapter07/EG07-07GEPARTS.csv") 
 gf_dhistogram(~ Diff, data = GEPARTS, binwidth = 1/3, center = 1/6)
-t.test(GEPARTS$OptionOn, GEPARTS$OptionOff, var.equal = TRUE, conf.level = 0.90)
-## XX t.test results and use of dollar signs are both not ideal
+with(GEPARTS, t.test(OptionOn, OptionOff, var.equal = TRUE, conf.level = 0.90))
 ```
 
 ```{r eg7-11, message=FALSE}
 DRP <- read_csv("https://nhorton.people.amherst.edu/ips9/data/chapter07/EG07-11DRP.csv")
+# Figure 7.12, page 438
+gf_qq(~ drp, color = ~ group, data = DRP) %>%
+  gf_qqline(color = "black", linetype = "solid") %>%
+  gf_labs(x = "Normal score", y = "Treatment/Control group DRP scores")
+# Summary statistics, page 439
+favstats(drp ~ group, data = DRP)
 
+# 95% confidence interval for difference between treatment and control groups
+t.test(drp ~ group, data = DRP)
 ```
+Note that textbook reports the difference as the mean of treatment minus the mean of the control, 
+while the `t.test()` function here reports the differnece in the opposite order. 
+
+```{r eg7-13}
+t.test(drp ~ group, data = DRP, alternative = "greater")
+```
+Again, note that the negated t value can be attributed to the same reason as above. 
 
 ```{r eg7-16,message=FALSE}
-EATER <- read_csv("https://nhorton.people.amherst.edu/ips9/data/chapter07/EG07-16EATER.csv")
-```
+# Example 7.16, page 444
+EATER <- read_csv("https://nhorton.people.amherst.edu/ips9/data/chapter07/EG07-16EATER.csv") %>% 
+  na.omit()
+favstats(WTLOSS ~ Group, data = EATER)
+diffmean(WTLOSS ~ Group, data = EATER)
+# Note that R calculates the difference of the early-eater mean from the later-eater mean
 
+# 95% confidence intervals, page 476
+t.test(WTLOSS ~ Group, data = EATER, var.equal = TRUE) 
+#Equal variances asssumed
+t.test(WTLOSS ~ Group, data = EATER) 
+#Equal variances not assumed 
+#var.equal is FALSE by default
+```
+Since the last row of the dataset had missing values, we piped the data into the `na.omit()` to 
+remove the N/A's from our analysis. 
+
+Another way to think about the `var.equal` argument in the `t.test()` function above is 
+in terms of pooled variances. If we want to use the pooled  two-sample *t* procedure, we have to 
+specify `var.equal` to be TRUE. We will demonstrate that in the following example: 
 ```{r eg7-18, message=FALSE}
+# Example 7.19, page 451-452
 BP_CA <- read_csv("https://nhorton.people.amherst.edu/ips9/data/chapter07/EG07-18BP_CA.csv")
+## XX possibly wrong datapoint? 
+favstats(dec ~ group, data = BP_CA)
+t.test(dec ~ group, data = BP_CA, var.equal = TRUE, conf.level = 0.90)
 ```
 
 ```{r eg7-25, message=FALSE}
+### Example 7.25, page 470
 SONGS <- read_csv("https://nhorton.people.amherst.edu/ips9/data/chapter07/EG07-25SONGS.csv")
+## Checking the Normality condition
+gf_qq(~ total_secs, data = SONGS) %>% 
+  gf_qqline(linetype = "dashed", color = "red") %>% 
+  gf_labs(x = "Normal score", y = "Time (seconds)")
+## Check the condition after *transforming* the variable
+gf_qq(~ log(total_secs), data = SONGS) %>% 
+  gf_qqline(linetype = "dashed", color = "red") %>% 
+  gf_labs(x = "Normal score", y = "Time (seconds)")
+
+log_total_secs_SONGS <- SONGS %>% mutate(log_total_secs = log(total_secs))
+
+## Comparing the 95% confidence intervals
+### With transformation
+t.test(~ log_total_secs, data = log_total_secs_SONGS)
+### Without transformation
+t.test(~ total_secs, data = SONGS)
 ```
 
+Since the logarithmic transformation made the Normal quantile plot distribution appear 
+approximately Normal, we created a dataset called `log_total_secs` with the 
+transformed variable. 
 ### Section 7.3: Additional topics on inference
