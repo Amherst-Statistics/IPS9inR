@@ -101,7 +101,7 @@ benlaw <- function(d){
 }
 digits <- 1:9
 data <- data.frame(Outcome = benlaw(digits))
-
+#XX ERROR HERE, NOT ABLE TO KNIT
 gf_bar(. ~ , data = data)
 baseBarplot <- barplot(benlaw(digits), names.arg = digits, xlab = "Outcomes", 
                        ylim = c(0, .40))
