@@ -138,6 +138,7 @@ specify `var.equal` to be TRUE. We will demonstrate that in the following exampl
 ```{r eg7-18, message=FALSE}
 # Example 7.19, page 451-452
 BP_CA <- read_csv("https://nhorton.people.amherst.edu/ips9/data/chapter07/EG07-18BP_CA.csv")
+## XX possibly wrong datapoint? 
 favstats(dec ~ group, data = BP_CA)
 t.test(dec ~ group, data = BP_CA, var.equal = TRUE, conf.level = 0.90)
 ```
