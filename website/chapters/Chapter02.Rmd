@@ -266,10 +266,39 @@ gf_point(resid(fatlm) ~ NEA, data = Fidgeting) %>%
 #### Example 2.27: Patterns in birthrate and Internet user residuals
 
 ```{r}
+IntBirth <- read_csv("https://nhorton.people.amherst.edu/ips9/data/chapter02/EG02-027INBIRTH.csv")
+intbirthlm <- lm(BirthRate2011 ~ Users, data = IntBirth)
+# Figure 2.24, page 126
+gf_point(BirthRate2011 ~ Users, data = IntBirth) %>%
+  gf_lm() %>%
+  gf_labs(x = "Internet users per 100 people", y = "Births per 1000 people")
+gf_point(resid(intbirthlm) ~ Users, data = IntBirth) %>%
+  gf_lm() %>%
+  gf_labs(x = "Internet users per 100 people", y = "Residual")
+```
+
+#### Example 2.28: Diabetes and blood sugar
+
+```{r}
+Diabetes <- read_csv("https://nhorton.people.amherst.edu/ips9/data/chapter02/EG02-028HBA1C.csv")
+diabeteslm <- lm(FPG_mg_ml ~ HbA1c_percent, data = Diabetes)
+# Figure 2.25, page 127
+gf_point(FPG_mg_ml ~ HbA1c_percent, data = Diabetes) %>%
+  gf_lm() %>%
+  gf_labs(x = "HbA1c (percent)", y = "Fasting plasma glucose (mg/dl)")
+gf_point(resid(diabeteslm) ~ HbA1c_percent, data = Diabetes) %>%
+  gf_lm() %>%
+  gf_labs(x = "HbA1c (percent)", y = "Residual")
+```
+
+#### Example 2.29: Influential observations
+
+```{r}
 
 ```
 
-### Section 2.7: Data Analysis from Two Way Tables
-### Section 2.6: The Question of Causation
+### Section 2.6: Data Analysis from Two Way Tables
+
+### Section 2.7: The Question of Causation
 
 
