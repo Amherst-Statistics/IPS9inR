@@ -93,11 +93,21 @@ gf_line(x_hat ~ Friends, data = SummaryFriends) %>% gf_point()
 
 These visualizations are a quick way to know what is going on with your data. Just a few lines of codes can save much time in your analysis. 
 
-XX EXample 12.7 There is a table to recreate here. 
+```{r Friends6}
+Friends %>%
+  group_by(Friends) %>%
+  summarize(N = n(),
+            Mean = mean(Score), 
+            Std.Dev = sd(Score), 
+            Minimum = min(Score),
+            Maximum = max(Score))
+```
+
+XX Missing confidence intervals in table? 
 
 The ANOVA analysis can be done in a straightforward manner in R. We will create a linear model out of the Scores given their Friends group and pipe it into the anova function. (Note: the anova function takes an lm object. This is useful to us since we would maybe want to use the lm object for other purposes too.)
 
-```{r Friends6}
+```{r Friends7}
 modFriends <- lm(Score ~ Friends, data = Friends)
 modFriends %>%
   anova()
