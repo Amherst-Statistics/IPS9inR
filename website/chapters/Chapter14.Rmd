@@ -1,6 +1,6 @@
 ---
 title: "IPS9 in R: Logistic Regression (Chapter 14)"
-author: "XX and Nicholas Horton (nhorton@amherst.edu)"
+author: "Margaret Chien and Nicholas Horton (nhorton@amherst.edu)"
 date: "July 13, 2018"
 output: 
   html_document:
@@ -40,7 +40,7 @@ file as well as the associated R Markdown reproducible analysis source file used
 
 This work leverages initiatives undertaken by Project MOSAIC (http://www.mosaic-web.org), an NSF-funded effort to improve the teaching of statistics, calculus, science and computing in the undergraduate curriculum. In particular, we utilize the `mosaic` package, which was written to simplify the use of R for introductory statistics courses. A short summary of the R needed to teach introductory statistics can be found in the mosaic package vignettes (http://cran.r-project.org/web/packages/mosaic).  A paper describing the mosaic approach was published in the *R Journal*: https://journal.r-project.org/archive/2017/RJ-2017-024.
   
-## Chapter 14: Logistic regression
+## Chapter 14: Logistic Regression
 This file replicates the analyses from Chapter 14: Logistic regression.
 
 First, load the packages that will be needed for this document: 
@@ -49,5 +49,16 @@ library(mosaic)
 library(readr)
 ```
 
-### Section 14.1: The logistic regression model
-### Section 14.2: Inference for logistic regression
+### Section 14.1: The Logistic Regression Model
+
+#### Example 14.3: Comparing the proportions of female and make Instagram users
+
+```{r}
+Instagram <- read_csv("https://nhorton.people.amherst.edu/ips9/data/chapter14/EG14-03INSTAGR.csv")
+# For women
+Instagram %>%
+  filter(SexNum == 1) %>%
+  summarise(User/sum(Count))
+```
+
+### Section 14.2: Inference for Logistic Regression
