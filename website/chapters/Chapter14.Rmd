@@ -1,7 +1,7 @@
 ---
 title: "IPS9 in R: Logistic Regression (Chapter 14)"
 author: "Margaret Chien and Nicholas Horton (nhorton@amherst.edu)"
-date: "July 13, 2018"
+date: "July 18, 2018"
 output: 
   html_document:
     fig_height: 3
@@ -55,10 +55,11 @@ library(readr)
 
 ```{r}
 Instagram <- read_csv("https://nhorton.people.amherst.edu/ips9/data/chapter14/EG14-03INSTAGR.csv")
-# For women
-Instagram %>%
-  filter(SexNum == 1) %>%
-  summarise(User/sum(Count))
+# For odds ratio, should I use oddsRatio()?
+```
+
+```{r}
+
 ```
 
 ### Section 14.2: Inference for Logistic Regression
