@@ -3,10 +3,10 @@ title: "IPS9 in R: One-way analysis of variance (Chapter 12)"
 author: "Shukry Zablah (szablah20@amherst.edu) and Nicholas Horton (nhorton@amherst.edu)"
 date: "July 19, 2018"
 output: 
-  html_document:
+  pdf_document:
     fig_height: 3
     fig_width: 5
-  pdf_document:
+  html_document:
     fig_height: 3
     fig_width: 5
   word_document:
@@ -57,8 +57,6 @@ We begin with Example 12.3 in page 648. Let's read in our data
 
 ```{r Friends1, message=FALSE}
 Friends <- read_csv("https://nhorton.people.amherst.edu/ips9/data/chapter12/EG12-03FRIENDS.csv")
-Friends <- Friends %>%
-  mutate(Friends = as.factor(Friends))
 head(Friends)
 ```
 
@@ -81,22 +79,107 @@ To recreate the histogram (note the `|` used to facet based on the number of fri
 gf_histogram(~ Score | Friends, data = Friends) #XX need to make this match the figure
 ```
 
-To recreate the boxplot: 
+To recreate the boxplot (note: we have to convert Friends to a factor for the boxplots to work): 
 
 ```{r Friends4}
-gf_boxplot(Score ~ Friends, data = Friends)
+gf_boxplot(Score ~ as.factor(Friends), data = Friends)
 ```
 
 And to recreate the linegraph (note the piping through gf_point to add the points to the line): 
 
 ```{r Friends5}
-gf_line(x_hat ~ as.numeric(Friends), data = SummaryFriends) %>% gf_point() 
+gf_line(x_hat ~ Friends, data = SummaryFriends) %>% gf_point() 
 ```
 
 These visualizations are a quick way to know what is going on with your data. Just a few lines of codes can save much time in your analysis. 
 
-```{r}
-anova(lm(Score ~ Friends, data = Friends))
+XX EXample 12.7 There is a table to recreate here. 
+
+The ANOVA analysis can be done in a straightforward manner in R. We will create a linear model out of the Scores given their Friends group and pipe it into the anova function. (Note: the anova function takes an lm object. This is useful to us since we would maybe want to use the lm object for other purposes too.)
+
+```{r Friends6}
+modFriends <- lm(Score ~ Friends, data = Friends)
+modFriends %>%
+  anova()
 ```
 
+Let's turn to page 663 and look at Example 12.15. 
+
+```{r Eyes1, message=FALSE}
+Eyes <- read_csv("https://nhorton.people.amherst.edu/ips9/data/chapter12/EG12-15EYES.csv")
+``` 
+
+We will recreate the ouput from the Excel spreadsheet. With the help of the `group_by()` and `summarize()` idiom we can use the aggregating functions to summarize our dataset. To recreate the anova part of the output we use again the `anova()` function that takes an `lm` object.   
+
+```{r Eyes2}
+Eyes %>% 
+  group_by(Group) %>%
+  summarize(n = n(), 
+            Sum = sum(Score), 
+            Average = Sum / n,
+            Variance = sd(Score)^2)
+
+modEyes <- lm(Score ~ Group, data = Eyes)
+modEyes %>% 
+  anova()
+```
+
+XXExample 12.16 recreate table equal variance test
+
 ### Section 12.2: Comparing the means
+
+Anova gives us the answer to the question "are the differences between the means of the groups statistically significant?" However, it gives no information on what these differences are. This section covers those PostHocTests. 
+
+Let's read in the dataset for the times for times people spend on Facebook. 
+
+```{r Facetym1, message=FALSE}
+Facetym <- read_csv("https://nhorton.people.amherst.edu/ips9/data/chapter12/EG12-17FACETYM.csv")
+```
+
+The analysis starts by checking the data. We will check the distribution of our data with a qqplot. 
+
+```{r Facetym2}
+gf_qq(~ Time, data = Facetym) %>% 
+  gf_qqline()
+```
+
+The `gf_qq()` is piped to `gf_qqline()` in order to get the reference line through the middle of the plot. Note the skewdness of the data.
+
+We now visualize the transformed data. 
+
+```{r Facetym3}
+gf_qq(~ SqrtTime, data = Facetym) %>% 
+  gf_qqline()
+```
+
+Much better. Next step in our analysis is to get some descriptive statistics about the data. After that we perform the Anova test with `anova()`. 
+
+```{r Facetym4}
+Facetym %>% 
+  group_by(Grp) %>%
+  summarize(n = n(),
+            Sum = sum(SqrtTime),
+            Average = mean(SqrtTime),
+            SD = sd(SqrtTime), 
+            min = min(SqrtTime), 
+            max = max(SqrtTime)
+            )
+
+modFacetym <- lm(SqrtTime ~ factor(Grp), data = Facetym)
+modFacetym %>% 
+  anova()
+```
+
+Since the result is statistically significant, there is enough evidence to reject the null hypothesis that the mean differences are all 0. However, we now need PostHocTests in order to find out what those differences are. 
+
+We will use a package called `DescTools` which has many multiple comparisons tests for after you reject the null hypothesis based on your `anova()` output. 
+
+To use the `PostHocTest()` function we have to pass it an object returned by the `aov()` function, which does the ANOVA test for a formula (and not an `lm` object). After that we only have to specify the `method` parameter, which is equal to the name of the multiple comparisons test that you want to perform. 
+
+```{r Facetym5}
+library(DescTools)
+PostHocTest(aov(SqrtTime ~ factor(Grp), data = Facetym), method = "bonferroni")
+PostHocTest(aov(SqrtTime ~ factor(Grp), data = Facetym), method = "lsd")
+```
+
+XX Anova power? 
