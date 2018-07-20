@@ -63,6 +63,9 @@ lm_PABME <- lm(BMI ~ PA, data = PABME)
 ## Displaying the output with the msummary() function
 msummary(lm_PABME)
 ```
+By default, the `read_csv()` function will output the types of columns, as we see above. 
+To improve readability for future coding, we will suppress the "Parsed with column 
+specification" message by adding `message = FALSE` at the top of the code chunks.
 
 You would interpret this output by reporting the model as 
 $\hat{BMI} = 29.578 - 0.655 (PA)$, the same way as the textbook does on page 

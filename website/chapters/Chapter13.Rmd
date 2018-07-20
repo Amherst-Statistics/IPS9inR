@@ -1,7 +1,7 @@
 ---
 title: "IPS9 in R: Two-way analysis of variance (Chapter 13)"
-author: "XX and Nicholas Horton (nhorton@amherst.edu)"
-date: "July 13, 2018"
+author: "Bonnie Lin and Nicholas Horton (nhorton@amherst.edu)"
+date: "July 20, 2018"
 output: 
   html_document:
     fig_height: 3
@@ -50,4 +50,12 @@ library(readr)
 ```
 
 ### Section 13.1: The two-way ANOVA model
+```{r}
+HRTRATE <- read_csv("https://nhorton.people.amherst.edu/ips9/data/chapter13/EG13-08HRTRATE.csv") 
+```
+By default, the `read_csv()` function will output the types of columns, as we see above. 
+To improve readability for future coding, we will suppress the "Parsed with column 
+specification" message by adding `message = FALSE` at the top of the code chunks.
+
 ### Section 13.2: Inference for two-way ANOVA
+
