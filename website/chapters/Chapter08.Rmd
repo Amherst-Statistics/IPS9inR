@@ -1,12 +1,12 @@
 ---
 title: "IPS9 in R: Inference for Proportions (Chapter 8)"
-author: "XX and Nicholas Horton (nhorton@amherst.edu)"
+author: "Bonnie Lin and Nicholas Horton (nhorton@amherst.edu)"
 date: "July 13, 2018"
 output: 
-  html_document:
+  pdf_document:
     fig_height: 3
     fig_width: 5
-  pdf_document:
+  html_document:
     fig_height: 3
     fig_width: 5
   word_document:
@@ -50,5 +50,46 @@ library(readr)
 ```
 
 ### Section 8.1: Inference for a single proportion 
-### Section 8.2: Comparing two proportions
+```{r eg8-1, message=FALSE}
+ROBOT <- read_csv("https://nhorton.people.amherst.edu/ips9/data/chapter08/EG08-01ROBOT.csv")
+ROBOT
+### Example 8.2, page 487
+binom.test(910, 910 + 986, 
+           alternative="two.sided",
+           conf.level=0.95)
+```
+By default, the `read_csv()` function will output the types of columns, as we see above. 
+To improve readability for future coding, we will suppress the "Parsed with column 
+specification" message by adding `message = FALSE` at the top of the code chunks.
 
+```{r eg8-5, message=FALSE}
+SUNBL <- read_csv("https://nhorton.people.amherst.edu/ips9/data/chapter08/EG08-05SUNBL.csv")
+### Example 8.5 and 8.6, page 492-493
+binom.test(13, 20, alternative = "two.sided")
+## XX The p value is not 0.1802 as the book reports 
+```
+
+```{r eg8-11, message=FALSE}
+INSTAG <- read_csv("https://nhorton.people.amherst.edu/ips9/data/chapter08/EG08-11INSTAG.csv")
+### Example 8.11, page 507
+INSTAG_prop <- INSTAG %>%
+  group_by(Sex) %>%
+  mutate(Prop_by_Sex = Count/sum(Count)) %>%
+  ungroup() %>%
+  filter(User == "Yes")
+INSTAG_prop
+
+### Example 8.15, page 513
+prop.test(x = c(328, 234), n = c(537, 532), correct = FALSE)
+
+### Example 8.16, page 515
+zstar = qnorm(.975) # for 95% confidence interval
+p = 0.5 # planned proportion estimate
+moe = 0.1 # margin of error
+p*(zstar/moe)^2 
+### Example 8.17, page 516
+## XX unknown power plot
+
+```
+
+### Section 8.2: Comparing two proportions
