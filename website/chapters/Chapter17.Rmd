@@ -3,10 +3,10 @@ title: "IPS9 in R: Statistics for Quality: Control and Capability (Chapter 17)"
 author: "XX and Nicholas Horton (nhorton@amherst.edu)"
 date: "July 13, 2018"
 output: 
-  html_document:
+  pdf_document:
     fig_height: 3
     fig_width: 5
-  pdf_document:
+  html_document:
     fig_height: 3
     fig_width: 5
   word_document:
