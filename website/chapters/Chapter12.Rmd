@@ -73,7 +73,7 @@ In R the combination of `group_by()` and `summary()` is a powerful one. With the
 
 There are some helpful visualizations starting in page 649 that will help us in our analysis of our Friends data. 
 
-To recreate the histogram (note the `|` used to facet based on the number of friends): 
+The `gf_histogram()` function can be used to recreate the histogram (note the `|` used to facet based on the number of friends).
 
 ```{r Friends3}
 gf_histogram(~ Score | Friends, data = Friends) #XX need to make this match the figure
@@ -91,9 +91,14 @@ And to recreate the linegraph (note the piping through gf_point to add the point
 gf_line(x_hat ~ Friends, data = SummaryFriends) %>% gf_point() 
 ```
 
-These visualizations are a quick way to know what is going on with your data. Just a few lines of codes can save much time in your analysis. 
+These visualizations are a quick way to know what is going on with your data. The `favstats()` command can be used to generate summary statistics by group.
 
 ```{r Friends6}
+favstats(Score ~ Friends, data = Friends)
+```
+
+A more general approach uses the `group_by()` and `summarize()` functions as part of the tidyverse/dplyr packages.
+```{r}
 Friends %>%
   group_by(Friends) %>%
   summarize(N = n(),

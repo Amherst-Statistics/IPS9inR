@@ -52,25 +52,38 @@ library(readr)
 ### Section 13.1: The two-way ANOVA model
 ```{r eg13-8, message=FALSE}
 HRTRATE <- read_csv("https://nhorton.people.amherst.edu/ips9/data/chapter13/EG13-08HRTRATE.csv") 
-HRTRATE_tidy <- HRTRATE %>%
-  tidyr::gather(key = Group, value = Heart_Rate, Control, Runners)
-
-## Figure 13.4, age 710
-favstats(Heart_Rate ~ Sex | Group, data = HRTRATE_tidy)
-
-## Figure 13.5, age 711
-glm_HRTRATE <- glm(Heart_Rate ~ Group * Sex, data = HRTRATE_tidy)
-msummary(glm_HRTRATE)
-anova(glm_HRTRATE)
-## XX Help interpreting
-
-### Figure 13.6, page 712
-# gf_
-
+head(HRTRATE)
 ```
+
 By default, the `read_csv()` function will output the types of columns, as we see above. 
 To improve readability for future coding, we will suppress the "Parsed with column 
 specification" message by adding `message = FALSE` at the top of the code chunks.
+
+We need to transform the data from wide to tall format using the `gather()` function.
+
+```{r}
+HRTRATE_tidy <- HRTRATE %>%
+  tidyr::gather(key = Group, value = Heart_Rate, Control, Runners)
+head(HRTRATE_tidy)
+```
+
+```{r}
+## Figure 13.4, age 710
+favstats(Heart_Rate ~ Sex + Group, data = HRTRATE_tidy)
+
+## Figure 13.5, age 711
+lm_HRTRATE <- lm(Heart_Rate ~ Group * Sex, data = HRTRATE_tidy)
+msummary(lm_HRTRATE)
+anova(lm_HRTRATE)
+```
+
+We see that there is a significant interaction (p=0.007): the sex difference between the heart rates differs by groups.  
+
+```{r}
+### Figure 13.6, page 712
+with(HRTRATE_tidy, interaction.plot(Group, Sex, Heart_Rate))
+```
+
 
 ### Section 13.2: Inference for two-way ANOVA
 

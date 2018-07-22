@@ -1,7 +1,7 @@
 ---
 title: "IPS9 in R: Inference for means (Chapter 7)"
-author: "Bonnie and Nicholas Horton (nhorton@amherst.edu)"
-date: "July 18, 2018"
+author: "Bonnie Lin and Nicholas Horton (nhorton@amherst.edu)"
+date: "July 22, 2018"
 output: 
   pdf_document:
     fig_height: 3
