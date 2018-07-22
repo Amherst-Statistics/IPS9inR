@@ -1,7 +1,7 @@
 ---
 title: "IPS9 in R: Nonparametric tests (Chapter 15)"
-author: "XX and Nicholas Horton (nhorton@amherst.edu)"
-date: "July 13, 2018"
+author: "Shukry Zablah (szablah20@amherst.edu) and Nicholas Horton (nhorton@amherst.edu)"
+date: "July 21, 2018"
 output: 
   html_document:
     fig_height: 3
@@ -44,11 +44,108 @@ This work leverages initiatives undertaken by Project MOSAIC (http://www.mosaic-
 This file replicates the analyses from Chapter 15: Nonparametric tests.
 
 First, load the packages that will be needed for this document: 
-```{r load-packages}
+```{r load-packages, message=FALSE}
 library(mosaic)
 library(readr)
 ```
 
+The skills in the this chapter will help analyze data that doesn't follow the Normal distribution and is not fit for the tests we previously looked at. 
+
 ### Section 15.1: The Wilcoxon rank sum test
+
+Let's read in the csv file for the Hits data in Example 15.1. 
+
+```{r Hits1, message=FALSE}
+Hits <- read_csv("https://nhorton.people.amherst.edu/ips9/data/chapter15/EG15-001HITS.csv")
+Hits
+```
+
+To recreate the table shown, just select the two relevant columns for the hits of each group and drop the `NA` values. 
+
+```{r Hits2}
+Hits %>% 
+  select(HitsAmer, HitsNat) %>%
+  tidyr::drop_na()
+```
+
+Dealing with `NA` values inside our observations can take up uneccesary space. Use the `tidyr::drop_na()` function to remove observations containing any `NA` values from your dataset.  
+
+Now let's set up the rank transformation. 
+
+```{r Hits3}
+nrows <- nrow(Hits)
+RanksHits <- Hits %>%
+  select(League, Hits) %>%
+  arrange(Hits) %>%
+  mutate(Rank = 1:nrows)
+RanksHits
+```
+
+Next we sum the ranks for each group. We will take advantage of the `group_by()` and `summary()` idiom.
+
+```{r Hits4}
+RanksHits %>%
+  group_by(League) %>%
+  summarize(`Sum of ranks` = sum(Rank))
+```
+
+The intuition behind the test is that if there was no difference between the leagues both sums would be the same. 
+
+Finally, to perform the Wilcoxon Rank Sums test we use `wilcox.test()`.
+
+```{r Hits5}
+wilcox.test(Hits ~ League, data = Hits)
+```
+
+In Example 15.6 the book discusses how to deal with ties in the dataset (remember we rank the observations).
+
+We have to recreate the dataset and confirm we can get the table of counts. 
+
+```{r Exerg1}
+Exerg <- rbind(
+  do(6) * data.frame(Exergamer = "Yes", TV_time = "None"),
+  do(160) * data.frame(Exergamer= "Yes", TV_time = "<2 hours"),
+  do(115) * data.frame(Exergamer = "Yes", TV_time = ">=2 hours"),
+  do(48) * data.frame(Exergamer = "No", TV_time = "None"),
+  do(616) * data.frame(Exergamer = "No", TV_time = "<2 hours"),
+  do(255) * data.frame(Exergamer = "No", TV_time = ">=2 hours")
+)
+```
+
+```{r Exerg2}
+tally(~ Exergamer + TV_time, data = Exerg)
+tally(~ Exergamer + TV_time, data = Exerg, format = "percent", margins = TRUE)
+```
+
+Sucess! Now let's perform the Wilcox Rank Sum Test. R will take care of the fact that there are "ties" in the dataset. However, we do have to code the variables into numerics in order for the test to run. 
+
+```{r Exerg3}
+Exerg %>% 
+  mutate(Val = recode(TV_time,
+                      `None` = 0,
+                      `<2 hours` = 1,
+                      `>=2 hours` = 2)
+         ) %>% 
+  wilcox.test(Val ~ Exergamer, data = .)
+```
+
+
 ### Section 15.2: The Wilcoxon signed rank test
+
+```{r Story1, message=FALSE}
+Story <- read_csv("https://nhorton.people.amherst.edu/ips9/data/chapter15/EG15-009STORY.csv")
+Story
+```
+
+```{r}
+StoryTable <- Story %>%
+  select(Child, Progress, Story1, Story2) %>%
+  filter(Progress == "Low") %>% 
+  mutate(Difference = Story2 - Story1)
+```
+
+```{r}
+
+```
+
 ### Section 15.3: The Kruskal-Wallis test
