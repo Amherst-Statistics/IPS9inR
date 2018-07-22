@@ -294,10 +294,112 @@ gf_point(resid(diabeteslm) ~ HbA1c_percent, data = Diabetes) %>%
 #### Example 2.29: Influential observations
 
 ```{r}
+without15lm <- lm(FPG_mg_ml ~ HbA1c_percent, data = filter(Diabetes, FPG_mg_ml <= 300)) # model without subject 15
+without18lm <- lm(FPG_mg_ml ~ HbA1c_percent, data = filter(Diabetes, HbA1c_percent <= 18)) # model without subject 18
 
+# Figure 2.26, page 129
+gf_point(FPG_mg_ml ~ HbA1c_percent, data = Diabetes) %>%
+  gf_lm(color = "red") %>%
+  gf_fun(without15lm, linetype = 2, color = "red") %>%
+  gf_fun(without18lm, linetype = 3, color = "red") %>%
+  gf_labs(x = "HbA1c (percent)", y = "Fasting plasma glucose (mg/dl)")
 ```
 
 ### Section 2.6: Data Analysis from Two Way Tables
+
+#### Example 2.33: Is the calcium intake adequate?
+
+```{r}
+Calcium <- read_csv("https://nhorton.people.amherst.edu/ips9/data/chapter02/EG02-033IOM.csv")
+Calcium # I forget how to change the data set so that it looks like the table on page 137
+```
+
+#### Example 2.34: Add the margins to the table
+
+```{r}
+# margin = TRUE
+Calcium %>%
+  group_by(Age) %>%
+  summarise(sum(Count)) # column totals
+Calcium %>%
+  group_by(Met) %>%
+  summarise(sum(Count)) # row totals
+Calcium %>%
+  summarise(sum(Count)) # overall total
+```
+
+#### Example 2.35: The joint distribution
+
+```{r}
+Calcium %>%
+  mutate(proportion = Count/sum(Count)) %>%
+  select(Age, Met, proportion)
+```
+
+#### Example 2.36: The marginal distribution of age
+
+```{r}
+Calcium %>%
+  group_by(Age) %>%
+  summarise(count = sum(Count)) %>%
+  mutate(proportion = count/sum(count)) %>%
+  select(Age, proportion)
+```
+
+#### Example 2.37: The marginal distribution of "met requirement"
+
+```{r}
+Calcium %>%
+  group_by(Met) %>%
+  summarise(count = sum(Count)) %>%
+  mutate(proportion = count/sum(count)) %>%
+  select(Met, proportion)
+```
+
+#### Example 2.39: Conditional distribution of "met requirement" for children aged 5 to 10
+
+```{r}
+# page 141
+Calcium %>%
+  filter(Age == "A05to10") %>%
+  mutate(percent = Count/sum(Count)) %>%
+  select(Met, percent)
+```
+
+```{r}
+# use your knowledge 2.118: a conditional distribution
+Calcium %>%
+  filter(Age == "A11to13") %>%
+  mutate(percent = Count/sum(Count)) %>%
+  select(Met, percent)
+```
+
+#### Example 2.40: Software output
+
+```{r}
+# Use vcd for a mosaicplot?
+```
+
+#### Example 2.41: Which customer service representative is better?
+
+```{r}
+CustomerService <- read_csv("https://nhorton.people.amherst.edu/ips9/data/chapter02/EG02-041CUSTSER.csv")
+CustomerService %>%
+  select(Rep, GoalMet, Count)
+CustomerService %>%
+  select(Rep, GoalMet, Count) %>%
+  group_by(Rep) %>%
+  summarise(total = sum(Count))
+```
+
+#### Example 2.42: Look at the data more carefully
+
+```{r}
+CustomerService %>%
+  select(Rep, GoalMet_1, Count_1, GoalMet_2, Count_2)
+
+# not sure how to deal with the structure of the table
+```
 
 ### Section 2.7: The Question of Causation
 
