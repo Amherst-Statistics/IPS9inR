@@ -1,12 +1,12 @@
 ---
 title: "IPS9 in R: Nonparametric tests (Chapter 15)"
 author: "Shukry Zablah (szablah20@amherst.edu) and Nicholas Horton (nhorton@amherst.edu)"
-date: "July 21, 2018"
+date: "July 22, 2018"
 output: 
-  html_document:
+  pdf_document:
     fig_height: 3
     fig_width: 5
-  pdf_document:
+  html_document:
     fig_height: 3
     fig_width: 5
   word_document:
@@ -142,26 +142,73 @@ Story
 
 Filter the relevant observations by using `filter()`.
 
-```{r}
+```{r Story2}
 StoryTable <- Story %>%
   filter(Progress == "Low") 
 ```
 
 We will prove why our previous tests are not suitable for the scenario. 
 
-```{r}
-gf_qq(~ Difference, data = StoryTable)
-gf_histogram(~ Difference, data = StoryTable, binwidth = 0.2, center = 0.5)
+```{r Story3}
+gf_qq(~ DiffLow, data = StoryTable)
+gf_histogram(~ DiffLow, data = StoryTable, binwidth = 0.2, center = 0.5)
 ```
 
 The plots suggest lack of Normality. This is why we use a rank test. 
 
-In R, the same `wilcox.test()` function will be used. However, we specify `paired = TRUE` in order to perform the signed rank test from the book. The option `alternative = "less"` gets the one sided p-value that we are testing for. 
+Before we do the test we have to format our dataset differently. Specifically, we need a column with the story type that has two levels. To do this we will use the `gather()` function that takes the names for the the two new columns that will be created and then a list of columns in the dataset that will make up the new ones. In this case we combine Story1 and Story2 into one column. Each observation in this column has the type of story attached to it. 
 
-```{r}
-wilcox.test(Values ~ Stories, data = x, paired = TRUE, alternative = "less")
+The same `wilcox.test()` function will be used to perform the test. However, we specify `paired = TRUE` in order to perform the signed rank test from the book. The option `alternative = "less"` gets the one sided p-value that we are testing for. 
+
+```{r Story4}
+StoryTableNarrower <- StoryTable %>%
+  gather(key = "StoryType", value = "Values", Story1, Story2) 
+StoryTableNarrower
+
+wilcox.test(Values ~ StoryType, data = StoryTableNarrower, paired = TRUE, alternative = "less")
 ```
 
 Example 15.12 uses the same function as before. 
 
 ### Section 15.3: The Kruskal-Wallis test
+
+The ANOVA test needs strict conditions to hold. The Kruskal-Wallis test provides an alternative to the one-way ANOVA test.
+
+Let's read in the dataset. 
+
+```{r Weeds1, message=FALSE}
+Weeds <- read_csv("https://nhorton.people.amherst.edu/ips9/data/chapter15/EG15-014WEEDS.csv")
+Weeds
+```
+
+Recreate the summary statistics. 
+
+```{r Weeds2}
+favstats(yield ~ weeds, data = Weeds)
+```
+
+And get the test results! You can use `kruskal.test()` to perform the Kruskal-Wallis Rank Sum test. 
+
+```{r Weeds3}
+kruskal.test(yield ~ weeds, data = Weeds)
+```
+
+These functions can be black boxes unless you understand the underlying process. Be sure to understand both the test procedure and know about the function in R. Type `?kruskal.test()` to find out more about the function. (You can do this for every function).
+
+Let's look at another dataset. 
+
+```{r Organic1, message=FALSE}
+Organic <- read_csv("https://nhorton.people.amherst.edu/ips9/data/chapter15/EG15-016ORGANIC.csv")
+```
+
+```{r Organic2}
+favstats(Score ~ Food, data = Organic)
+```
+
+And perform the same test.
+
+```{r Organic3}
+kruskal.test(Score ~ as.factor(Food), data = Organic)
+```
+
+Note that the function won't work if the variable that has your groups is of type `char`. To fix this wrap the `as.factor()` function around it. 
