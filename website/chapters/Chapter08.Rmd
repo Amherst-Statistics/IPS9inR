@@ -1,7 +1,7 @@
 ---
 title: "IPS9 in R: Inference for Proportions (Chapter 8)"
 author: "Bonnie Lin and Nicholas Horton (nhorton@amherst.edu)"
-date: "July 13, 2018"
+date: "July 22, 2018"
 output: 
   pdf_document:
     fig_height: 3
@@ -41,9 +41,11 @@ file as well as the associated R Markdown reproducible analysis source file used
 This work leverages initiatives undertaken by Project MOSAIC (http://www.mosaic-web.org), an NSF-funded effort to improve the teaching of statistics, calculus, science and computing in the undergraduate curriculum. In particular, we utilize the `mosaic` package, which was written to simplify the use of R for introductory statistics courses. A short summary of the R needed to teach introductory statistics can be found in the mosaic package vignettes (http://cran.r-project.org/web/packages/mosaic).  A paper describing the mosaic approach was published in the *R Journal*: https://journal.r-project.org/archive/2017/RJ-2017-024.
   
 ## Chapter 8: Inference for Proportions
+
 This file replicates the analyses from Chapter 8: Inference for Proportions.
 
 First, load the packages that will be needed for this document: 
+
 ```{r load-packages}
 library(mosaic)
 library(readr)
@@ -54,19 +56,25 @@ library(readr)
 ROBOT <- read_csv("https://nhorton.people.amherst.edu/ips9/data/chapter08/EG08-01ROBOT.csv")
 ROBOT
 ### Example 8.2, page 487
-binom.test(910, 910 + 986, 
+prop.test(910, 910 + 986, 
            alternative="two.sided",
            conf.level=0.95)
 ```
+
 By default, the `read_csv()` function will output the types of columns, as we see above. 
 To improve readability for future coding, we will suppress the "Parsed with column 
 specification" message by adding `message = FALSE` at the top of the code chunks.
 
 ```{r eg8-5, message=FALSE}
-SUNBL <- read_csv("https://nhorton.people.amherst.edu/ips9/data/chapter08/EG08-05SUNBL.csv")
 ### Example 8.5 and 8.6, page 492-493
-binom.test(13, 20, alternative = "two.sided")
-## XX The p value is not 0.1802 as the book reports 
+prop.test(13, 20, correct = FALSE)
+```
+
+Here we can replicate the results in the book using the `prop.test` function with the `correct = FALSE` option to turn off continuity correction.  A more appropriate approach given the small sample size would be to use exact inference and the `binom.test()` function.
+
+
+```{r}
+binom.test(13, 20)
 ```
 
 ```{r eg8-11, message=FALSE}
@@ -78,10 +86,14 @@ INSTAG_prop <- INSTAG %>%
   ungroup() %>%
   filter(User == "Yes")
 INSTAG_prop
+```
 
+```{r}
 ### Example 8.15, page 513
 prop.test(x = c(328, 234), n = c(537, 532), correct = FALSE)
+```
 
+```{r}
 ### Example 8.16, page 515
 zstar = qnorm(.975) # for 95% confidence interval
 p = 0.5 # planned proportion estimate
@@ -89,7 +101,6 @@ moe = 0.1 # margin of error
 p*(zstar/moe)^2 
 ### Example 8.17, page 516
 ## XX unknown power plot
-
 ```
 
 ### Section 8.2: Comparing two proportions
