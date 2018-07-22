@@ -1,7 +1,7 @@
 ---
 title: "IPS9 in R: Looking at Data -- Relations (Chapter 2)"
 author: "Margaret Chien and Nicholas Horton (nhorton@amherst.edu)"
-date: "July 19, 2018"
+date: "July 22, 2018"
 output: 
   pdf_document:
     fig_height: 3
@@ -61,7 +61,6 @@ Laundry <- read_csv("https://nhorton.people.amherst.edu/ips9/data/chapter02/EG02
 
 ```{r}
 # 2.10: Examine the spreadsheet
-str(Laundry)
 favstats(~ Rating, data = Laundry)
 gf_histogram(~ Rating, data = Laundry, binwidth = 5)
 favstats(~ Price, data = Laundry)
@@ -75,13 +74,14 @@ Laundry <- read_csv("https://nhorton.people.amherst.edu/ips9/data/chapter02/EG02
 # Figure 2.1, page 86
 gf_point(Rating ~ Price, data = Laundry, xlab = "Price per load (cents)")
 # Figure 2.2
-gf_point(Rating ~ Price, data = Laundry, xlab = "Price per load (cents)") +
-  xlim(0, 35)
+gf_point(Rating ~ Price, data = Laundry, xlab = "Price per load (cents)") %>%
+  gf_lims(x = c(0, 35))
 ```
 
 ```{r}
 # 2.12: Make a scatterplot
-gf_point(jitter(Rating) ~ jitter(Price), data = Laundry, xlab = "Price per load (cents)") +
+gf_point(jitter(Rating) ~ jitter(Price), data = Laundry, xlab = "Price per load (cents)") %>%
+  gf_lims(x = c(0, 35))
   xlim(0, 35)
 ```
 
