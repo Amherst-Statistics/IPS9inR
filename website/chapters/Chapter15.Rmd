@@ -47,6 +47,7 @@ First, load the packages that will be needed for this document:
 ```{r load-packages, message=FALSE}
 library(mosaic)
 library(readr)
+library(tidyr)
 ```
 
 The skills in the this chapter will help analyze data that doesn't follow the Normal distribution and is not fit for the tests we previously looked at. 
@@ -132,20 +133,35 @@ Exerg %>%
 
 ### Section 15.2: The Wilcoxon signed rank test
 
+Read in the csv file. 
+
 ```{r Story1, message=FALSE}
 Story <- read_csv("https://nhorton.people.amherst.edu/ips9/data/chapter15/EG15-009STORY.csv")
 Story
 ```
 
+Filter the relevant observations by using `filter()`.
+
 ```{r}
 StoryTable <- Story %>%
-  select(Child, Progress, Story1, Story2) %>%
-  filter(Progress == "Low") %>% 
-  mutate(Difference = Story2 - Story1)
+  filter(Progress == "Low") 
 ```
+
+We will prove why our previous tests are not suitable for the scenario. 
 
 ```{r}
-
+gf_qq(~ Difference, data = StoryTable)
+gf_histogram(~ Difference, data = StoryTable, binwidth = 0.2, center = 0.5)
 ```
+
+The plots suggest lack of Normality. This is why we use a rank test. 
+
+In R, the same `wilcox.test()` function will be used. However, we specify `paired = TRUE` in order to perform the signed rank test from the book. The option `alternative = "less"` gets the one sided p-value that we are testing for. 
+
+```{r}
+wilcox.test(Values ~ Stories, data = x, paired = TRUE, alternative = "less")
+```
+
+Example 15.12 uses the same function as before. 
 
 ### Section 15.3: The Kruskal-Wallis test
