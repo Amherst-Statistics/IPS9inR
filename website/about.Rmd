@@ -1,7 +1,5 @@
 ---
 title: "IPS9 in R"
-date: "6/28/2018"
-output: html_document
 ---
 
 ```{r setup, include=FALSE}
