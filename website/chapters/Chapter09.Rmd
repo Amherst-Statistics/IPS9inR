@@ -72,6 +72,7 @@ To create the summary table in  Example 9.1 we will have to compute some interme
 To start, we first get the total counts for each sex. 
 
 ```{r Instag2}
+# XX should we be using tidyverse?
 Combined_Sex <- Instag %>% 
   group_by(Sex) %>%
   summarize(n = n()) 
@@ -90,6 +91,8 @@ YesUsers
 
 And finally, we use a `mutate()` call to create a variable derived from other variables. This will create the $$\hat{p} = X/n$$ column. 
 
+XX formatting is weird, could use single $ for Latex instead
+
 ```{r Instag4}
 Ex8.11Table <- Combined_Sex %>%
   left_join(YesUsers, by = "Sex") %>%
@@ -107,7 +110,7 @@ We call it like this:
 tally(~ User + Sex, data = Instag, margins = TRUE)  
 ```
 
-The `margins = TRUE` optio makes sure that `tally()` ouputs the convenient Total columns just like in page 527!
+The `margins = TRUE` option makes sure that `tally()` ouputs the convenient Total columns just like in page 527!
 
 Turn your attention to Example 9.3 now. After creating the dataset from the counts, we can use a similar `tally()` call to recreate the table and verify that our method to create the dataset is in fact accurate. 
 
@@ -143,12 +146,15 @@ Note: This is not an equivalent bar graph but still provides the same useful inf
 Another way that we can visualize two categorical variables is to create a mosaic plot. We will use the `vcd` package's `mosaic()` function to plot the mosaic plot. Note the call resembles the same syntax of the `tally()` commands we made earlier. 
 
 ```{r Vaccine4}
+# XX shade = TRUE
 vcd::mosaic(Required ~ Party, data = Vaccine)
 ```
 
 Having multiple ways to visualize varibles will help you analyze your data more thoroughly and communicate your findings in a more intuitive way. 
 
 In Example 9.7 we are interested in getting the expected counts of our Vaccine data. In R you can take advantage of the `chisq.test()` function and get the relevant output like this: 
+
+XX page 533
 
 ```{r Vaccine5}
 chiSqVaccine <- chisq.test(tally(Required ~ Party, data = Vaccine), correct = FALSE)
@@ -173,7 +179,7 @@ chiSqVaccine
 
 All this useful features are already built into how R's `chisq.test()` function works. 
 
-Note: There is an error in the $$\chi^2$$ value in the book. While it showed the correct machine output, it specified the wrong $$\chi^2$$ squared value. 
+Note: There is an error in the $$\chi^2$$ value in the book. While it showed the correct machine output, it specified the wrong $$\chi^2$$ squared value. XX formatting is weird with Latex again. Single $?
 
 We continue with Example 9.9 in page 537. 
 
@@ -226,7 +232,7 @@ And our observed counts...
 with(chiSqHealth, observed)
 ```
 
-And finally our $$\chi^2$$ statistic. 
+And finally our $$\chi^2$$ statistic. XX latex formatting
 
 ```{r Health7}
 chiSqHealth
@@ -262,10 +268,11 @@ ACTPopProp <- read_csv("https://nhorton.people.amherst.edu/ips9/data/chapter09/E
 ACTPopProp
 ```
 
-We will use the same `chisq.test()` function from before. It is important to note the new behavior we expect from the function when we provide a vector of the population proportions. The expected counts and the $$\chi^2$$ value will depend on this new parameter. 
+We will use the same `chisq.test()` function from before. It is important to note the new behavior we expect from the function when we provide a vector of the population proportions. The expected counts and the $$\chi^2$$ value will depend on this new parameter. XX latex formatting
 
 ```{r ACT4}
-chisqACT <- chisq.test(tally(~ State, data = ACT), p = c(0.105, .172, .164, .188, .07, .301), correct = FALSE)
+chisqACT <- chisq.test(tally(~ State, data = ACT), p = c(0.105, .172, .164, .188, .07, .301), 
+                       correct = FALSE)
 ```
 
 Now that we have saved our object, we can access the expected counts and the test statistic just like before. 

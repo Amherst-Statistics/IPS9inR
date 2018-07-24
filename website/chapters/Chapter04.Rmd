@@ -61,6 +61,7 @@ gf_line(phead ~ x, color = "red") %>%
   gf_labs(x = "Number of tosses", y = "Proportion of heads") %>% 
   gf_hline(., yintercept = 0.5)
 ```
+
 The parameters in the `rbinom()` function can be explained in the following way: 
 n = 1:5000 specifies the number of observations, while size = 1 specifies the number 
 of trials, with each trial getting a probability of success equal to 0.5. 
@@ -107,7 +108,7 @@ the number of heads in 2000 trials of tossing a coin four times as shown in
 Figure 4.7 (page 239): 
 ```{r}
 trials <- data.frame(Heads = rbinom(2000, 4, 0.5))
-gf_histogram(~ Heads, data = trials)
+gf_histogram(~ Heads, data = trials) # XX is there a way to make this look better?
 ```
 
 ### Section 4.4: Means and variances of random variables
