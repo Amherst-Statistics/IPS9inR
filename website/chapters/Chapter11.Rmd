@@ -1,7 +1,7 @@
 ---
 title: "IPS9 in R: Multiple regression (Chapter 11)"
-author: "XX and Nicholas Horton (nhorton@amherst.edu)"
-date: "July 13, 2018"
+author: "Bonnie Lin and Nicholas Horton (nhorton@amherst.edu)"
+date: "July 20, 2018"
 output: 
   html_document:
     fig_height: 3
@@ -50,4 +50,13 @@ library(readr)
 ```
 
 ### Section 11.1: Inference for multiple regression
+```{r eg11-1, message=FALSE}
+GPA <- read_csv("https://nhorton.people.amherst.edu/ips9/data/chapter11/EG11-01GPA.csv")
+### Figure 11.4, page 621
+options(digits = 2)
+cor(GPA)
+### Figure 11.5
+pairs(~ ., data = GPA,
+      pch=20, main="GPA Scatterplot Matrix")
+```
 ### Section 11.2: A case study
