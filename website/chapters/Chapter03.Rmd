@@ -1,7 +1,7 @@
 ---
 title: "IPS9 in R: Producing data (Chapter 3)"
 author: "Shukry Zablah (szablah20@amherst.edu) and Nicholas Horton (nhorton@amherst.edu)"
-date: "July 18, 2018"
+date: "July 24, 2018"
 output: 
   pdf_document:
     fig_height: 3
@@ -57,6 +57,7 @@ See Example 3.12 on page 178.
 We are looking to setup a dataset with randomly assigned a "Control" or "Treatment" group to our dataset.
 
 ```{r ex12_1}
+#Fig3.4(b)
 set.seed(1) #guarantees the same random results each time R runs
 Randomized <- data.frame(ID = c(1:10), randNum = runif(10)) 
 Randomized
@@ -67,6 +68,7 @@ We created a data frame in which the first column corresponds to unique IDs and 
 Our plan is to order the IDs based on their random number and assign half of the observations to the Control group and the other half to the Treatment group. We start by arranging the observations. 
 
 ```{r ex12_2}
+#Fig3.4(c)
 Randomized <- Randomized %>%
   arrange(randNum)
 Randomized
@@ -83,6 +85,7 @@ Randomized
 Now your observations are randomly assigned to a group! Here we chose to assign the first five ID to the Treatment group and the rest to the Control group, but there are other other ways to do it. To finish you can clean up the dataset by selecting only the ID and the Group columns and order it by ID.
 
 ```{r ex12_4}
+#Fig3.4(d)  
 Randomized %>% 
   select(ID, Group) %>% 
   arrange(ID)
@@ -101,6 +104,7 @@ Countries <- read_csv("https://nhorton.people.amherst.edu/ips9/data/chapter03/EG
 In R you just have to use the `sample()` function.
 
 ```{r}
+#Fig3.7
 Sample <- sample(Countries, size = 25)
 Sample
 ```
