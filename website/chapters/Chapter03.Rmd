@@ -95,6 +95,8 @@ You can do this for many Groups and for as many observations as you want.
 
 ### Section 3.3: Sampling Design
 
+XX page 192
+
 We want to get a simple random sample (SRS) of 25 countries out of 189.
 
 ```{r ex3.23_1, message=FALSE}

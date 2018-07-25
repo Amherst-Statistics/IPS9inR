@@ -1,7 +1,7 @@
 ---
 title: "IPS9 in R: Looking at Data -- Relations (Chapter 2)"
 author: "Margaret Chien and Nicholas Horton (nhorton@amherst.edu)"
-date: "July 22, 2018"
+date: "July 24, 2018"
 output: 
   pdf_document:
     fig_height: 3
@@ -59,9 +59,16 @@ library(readr)
 Laundry <- read_csv("https://nhorton.people.amherst.edu/ips9/data/chapter02/EG02-008LAUNDRY.csv")
 ```
 
+We use `read_csv()` from the `readr` package to import data into R.  
+
 ```{r}
 # 2.10: Examine the spreadsheet
 favstats(~ Rating, data = Laundry)
+```
+
+The `favstats()` function shows properties of variables.  
+
+```{r}
 gf_histogram(~ Rating, data = Laundry, binwidth = 5)
 favstats(~ Price, data = Laundry)
 gf_histogram(~ Price, data = Laundry, binwidth = 5)
@@ -108,6 +115,11 @@ gf_point(Rating ~ Price, data = Laundry, xlab = "Price per load (cents)") %>%
 ```{r}
 EduSpending <- read_csv("https://nhorton.people.amherst.edu/ips9/data/chapter02/EG02-011EDSPEND.csv")
 head(EduSpending)
+```
+
+We can use the `head()` function to look at the first rows of a data set.  
+
+```{r}
 # Figure 2.5, page 90
 gf_point(Spending ~ Population, data = EduSpending) %>%
   gf_lm() %>%
@@ -145,6 +157,8 @@ EduSpending %>%
   gf_lm() %>%
   gf_labs(x = "Log population", y = "Log spending")
 ```
+
+We use `mutate()` to create new variables in a dataset.  
 
 #### Example 2.15: Rating versus price and type of laundry detergent
 
@@ -187,6 +201,8 @@ EduSpending %>%
 cor(Rating ~ Price, data = Laundry)
 ```
 
+The `cor()` function finds the correlation of two variables.  
+
 ### Section 2.4: Least Squares Regression
 
 #### Example 2.19: Fidgeting and fat gain
@@ -221,6 +237,8 @@ fatfun <- makeFun(fatlm)
 fatfun(NEA = 400)
 ```
 
+We use `makeFun()` to create a function. Here, we make a function from our linear model, created from `lm()`, so we can find the output of a certain value of `NEA`.  
+
 #### Example 2.24: Regression
 
 ```{r}
@@ -228,32 +246,38 @@ fatfun(NEA = 400)
 msummary(fatlm)
 ```
 
+The `msummary()` function shows the properties of the function.  
+
 #### Example 2.25: Fidgeting and fat gain
 
 ```{r}
-# XX NH Issue with plot and ranges
-NEAlm <- lm(NEA ~ Fat, data = Fidgeting) # using fat gain to predict nonexercise activity
-NEAfun <- makeFun(NEAlm)
-NEAfun(Fat = 6) # (-311.5197, 6)
-NEAfun(Fat = 0) # (745.2604, 0)
-# point 1
-# Figure 2.20, page 115
+# Figure 2.20, page 115 (split into two plots)
 gf_point(Fat ~ NEA, data = Fidgeting) %>%
   gf_lm() %>%
-  #gf_fun(NEAlm, color = "red") + 
-  gf_segment(6 + 0 ~ -311.5197 + 745.2604, color = "red") %>%
-  gf_labs(x = "Nonexercise activity (calories)", y = "Fat gain (kilograms)") +
-  ylim(0, 6)
+  gf_labs(x = "Nonexercise activity (calories)", y = "Fat gain (kilograms)")
+gf_point(NEA ~ Fat, data = Fidgeting) %>%
+  gf_lm(color = "red") %>%
+  gf_labs(x = "Fat gain (kilograms)", y = "Nonexercise activity")
+
+# Models
+fatlm 
+NEAlm <- lm(NEA ~ Fat, data = Fidgeting)
+NEAlm 
 ```
 
 ### Section 2.5: Cautions about Correlation and Regression
 
 #### Example 2.26: Residuals for fat gain
 
+Here, we find the residual:  
+
 ```{r}
 fatlm
 fatfun(NEA = 135)
 2.7 - fatfun(NEA = 135)
+```
+
+```{r}
 # Figure 2.23, page 124
 gf_point(Fat ~ NEA, data = Fidgeting) %>%
   gf_lm() %>%
@@ -293,6 +317,8 @@ gf_point(resid(diabeteslm) ~ HbA1c_percent, data = Diabetes) %>%
 
 #### Example 2.29: Influential observations
 
+We can use the `filter()` function to remove rows from a data set:  
+
 ```{r}
 without15lm <- lm(FPG_mg_ml ~ HbA1c_percent, data = filter(Diabetes, FPG_mg_ml <= 300)) # model without subject 15
 without18lm <- lm(FPG_mg_ml ~ HbA1c_percent, data = filter(Diabetes, HbA1c_percent <= 18)) # model without subject 18
@@ -311,26 +337,36 @@ gf_point(FPG_mg_ml ~ HbA1c_percent, data = Diabetes) %>%
 
 ```{r}
 Calcium <- read_csv("https://nhorton.people.amherst.edu/ips9/data/chapter02/EG02-033IOM.csv")
-Calcium # I forget how to change the data set so that it looks like the table on page 137
+Calcium 
+```
+
+To create a data set with the structure we want (with each count as an observation), we can use `rbind()`.  
+
+```{r}
+# Creating data set from counts in the data table
+CalciumC <- rbind(
+ do(194) * data.frame(Age = "A05to10", Met = "No"),
+ do(861) * data.frame(Age = "A05to10", Met = "Yes"), 
+ do(557) * data.frame(Age = "A11to13", Met = "No"),
+ do(417) * data.frame(Age = "A11to13", Met = "Yes")
+)
+
+# Table
+tally(Met ~ Age, data = CalciumC)
 ```
 
 #### Example 2.34: Add the margins to the table
 
 ```{r}
-# margin = TRUE
-Calcium %>%
-  group_by(Age) %>%
-  summarise(sum(Count)) # column totals
-Calcium %>%
-  group_by(Met) %>%
-  summarise(sum(Count)) # row totals
-Calcium %>%
-  summarise(sum(Count)) # overall total
+tally(Met ~ Age, data = CalciumC, margins = TRUE)
+tally(Age ~ Met, data = CalciumC, margins = TRUE)
 ```
 
 #### Example 2.35: The joint distribution
 
 ```{r}
+tally(Met ~ Age, data = CalciumC, format = "proportion") 
+# The tally differs from the book because they are by column
 Calcium %>%
   mutate(proportion = Count/sum(Count)) %>%
   select(Age, Met, proportion)
@@ -339,21 +375,13 @@ Calcium %>%
 #### Example 2.36: The marginal distribution of age
 
 ```{r}
-Calcium %>%
-  group_by(Age) %>%
-  summarise(count = sum(Count)) %>%
-  mutate(proportion = count/sum(count)) %>%
-  select(Age, proportion)
+tally(~ Age, data = CalciumC, format = "proportion")
 ```
 
 #### Example 2.37: The marginal distribution of "met requirement"
 
 ```{r}
-Calcium %>%
-  group_by(Met) %>%
-  summarise(count = sum(Count)) %>%
-  mutate(proportion = count/sum(count)) %>%
-  select(Met, proportion)
+tally(~ Met, data = CalciumC, format = "proportion")
 ```
 
 #### Example 2.39: Conditional distribution of "met requirement" for children aged 5 to 10
@@ -376,8 +404,11 @@ Calcium %>%
 
 #### Example 2.40: Software output
 
+We can use the `mosaic()` function from the `vcd` package to create mosaic plots with color.  
+
 ```{r}
-# Use vcd for a mosaicplot?
+# Figure 2.28 mosaic plot (page 143)
+vcd::mosaic(~ Met + Age, data = CalciumC, shade = TRUE)
 ```
 
 #### Example 2.41: Which customer service representative is better?
@@ -386,10 +417,6 @@ Calcium %>%
 CustomerService <- read_csv("https://nhorton.people.amherst.edu/ips9/data/chapter02/EG02-041CUSTSER.csv")
 CustomerService %>%
   select(Rep, GoalMet, Count)
-CustomerService %>%
-  select(Rep, GoalMet, Count) %>%
-  group_by(Rep) %>%
-  summarise(total = sum(Count))
 ```
 
 #### Example 2.42: Look at the data more carefully
@@ -397,8 +424,6 @@ CustomerService %>%
 ```{r}
 CustomerService %>%
   select(Rep, GoalMet_1, Count_1, GoalMet_2, Count_2)
-
-# not sure how to deal with the structure of the table
 ```
 
 ### Section 2.7: The Question of Causation

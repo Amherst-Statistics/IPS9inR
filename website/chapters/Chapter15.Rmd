@@ -50,7 +50,7 @@ library(readr)
 library(tidyr)
 ```
 
-The skills in the this chapter will help analyze data that doesn't follow the Normal distribution and is not fit for the tests we previously looked at. 
+The skills in the this chapter will help analyze data that don't follow the Normal distribution and are not fit for the tests we previously looked at. 
 
 ### Section 15.1: The Wilcoxon rank sum test
 
@@ -66,7 +66,7 @@ To recreate the table shown, just select the two relevant columns for the hits o
 ```{r Hits2}
 Hits %>% 
   select(HitsAmer, HitsNat) %>%
-  tidyr::drop_na()
+  tidyr::drop_na() # XX would it be better to teach the filter(!is.na) method?
 ```
 
 Dealing with `NA` values inside our observations can take up uneccesary space. Use the `tidyr::drop_na()` function to remove observations containing any `NA` values from your dataset.  
@@ -82,12 +82,12 @@ RanksHits <- Hits %>%
 RanksHits
 ```
 
-Next we sum the ranks for each group. We will take advantage of the `group_by()` and `summary()` idiom.
+Next we sum the ranks for each group. We will take advantage of the `group_by()` and `summarize()` idiom.
 
 ```{r Hits4}
 RanksHits %>%
   group_by(League) %>%
-  summarize(`Sum of ranks` = sum(Rank))
+  summarize(`Sum of ranks` = sum(Rank)) # XX not sure about use of tidyverse
 ```
 
 The intuition behind the test is that if there was no difference between the leagues both sums would be the same. 
@@ -99,6 +99,8 @@ wilcox.test(Hits ~ League, data = Hits)
 ```
 
 In Example 15.6 the book discusses how to deal with ties in the dataset (remember we rank the observations).
+
+XX page 10
 
 We have to recreate the dataset and confirm we can get the table of counts. 
 
@@ -118,7 +120,7 @@ tally(~ Exergamer + TV_time, data = Exerg)
 tally(~ Exergamer + TV_time, data = Exerg, format = "percent", margins = TRUE)
 ```
 
-Sucess! Now let's perform the Wilcox Rank Sum Test. R will take care of the fact that there are "ties" in the dataset. However, we do have to code the variables into numerics in order for the test to run. 
+Success! Now let's perform the Wilcox Rank Sum Test. R will take care of the fact that there are "ties" in the dataset. However, we do have to code the variables into numerics in order for the test to run. 
 
 ```{r Exerg3}
 Exerg %>% 
@@ -135,6 +137,8 @@ Exerg %>%
 
 Read in the csv file. 
 
+XX example 15.9 page 17
+
 ```{r Story1, message=FALSE}
 Story <- read_csv("https://nhorton.people.amherst.edu/ips9/data/chapter15/EG15-009STORY.csv")
 Story
@@ -150,7 +154,7 @@ StoryTable <- Story %>%
 We will prove why our previous tests are not suitable for the scenario. 
 
 ```{r Story3}
-gf_qq(~ DiffLow, data = StoryTable)
+gf_qq(~ DiffLow, data = StoryTable) # XX add line
 gf_histogram(~ DiffLow, data = StoryTable, binwidth = 0.2, center = 0.5)
 ```
 
@@ -175,6 +179,8 @@ Example 15.12 uses the same function as before.
 The ANOVA test needs strict conditions to hold. The Kruskal-Wallis test provides an alternative to the one-way ANOVA test.
 
 Let's read in the dataset. 
+
+XX page 26
 
 ```{r Weeds1, message=FALSE}
 Weeds <- read_csv("https://nhorton.people.amherst.edu/ips9/data/chapter15/EG15-014WEEDS.csv")
