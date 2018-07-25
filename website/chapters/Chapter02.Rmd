@@ -1,7 +1,7 @@
 ---
 title: "IPS9 in R: Looking at Data -- Relations (Chapter 2)"
 author: "Margaret Chien and Nicholas Horton (nhorton@amherst.edu)"
-date: "July 22, 2018"
+date: "July 24, 2018"
 output: 
   pdf_document:
     fig_height: 3
@@ -231,19 +231,18 @@ msummary(fatlm)
 #### Example 2.25: Fidgeting and fat gain
 
 ```{r}
-# XX NH Issue with plot and ranges
-NEAlm <- lm(NEA ~ Fat, data = Fidgeting) # using fat gain to predict nonexercise activity
-NEAfun <- makeFun(NEAlm)
-NEAfun(Fat = 6) # (-311.5197, 6)
-NEAfun(Fat = 0) # (745.2604, 0)
-# point 1
-# Figure 2.20, page 115
+# Figure 2.20, page 115 (split into two plots)
 gf_point(Fat ~ NEA, data = Fidgeting) %>%
   gf_lm() %>%
-  #gf_fun(NEAlm, color = "red") + 
-  gf_segment(6 + 0 ~ -311.5197 + 745.2604, color = "red") %>%
-  gf_labs(x = "Nonexercise activity (calories)", y = "Fat gain (kilograms)") +
-  ylim(0, 6)
+  gf_labs(x = "Nonexercise activity (calories)", y = "Fat gain (kilograms)")
+gf_point(NEA ~ Fat, data = Fidgeting) %>%
+  gf_lm(color = "red") %>%
+  gf_labs(x = "Fat gain (kilograms)", y = "Nonexercise activity")
+
+# Models
+fatlm 
+NEAlm <- lm(NEA ~ Fat, data = Fidgeting)
+NEAlm 
 ```
 
 ### Section 2.5: Cautions about Correlation and Regression
@@ -311,26 +310,32 @@ gf_point(FPG_mg_ml ~ HbA1c_percent, data = Diabetes) %>%
 
 ```{r}
 Calcium <- read_csv("https://nhorton.people.amherst.edu/ips9/data/chapter02/EG02-033IOM.csv")
-Calcium # I forget how to change the data set so that it looks like the table on page 137
+Calcium 
+
+# Creating data set from counts in the data table
+CalciumC <- rbind(
+ do(194) * data.frame(Age = "A05to10", Met = "No"),
+ do(861) * data.frame(Age = "A05to10", Met = "Yes"), 
+ do(557) * data.frame(Age = "A11to13", Met = "No"),
+ do(417) * data.frame(Age = "A11to13", Met = "Yes")
+)
+
+# Table
+tally(Met ~ Age, data = CalciumC)
 ```
 
 #### Example 2.34: Add the margins to the table
 
 ```{r}
-# margin = TRUE
-Calcium %>%
-  group_by(Age) %>%
-  summarise(sum(Count)) # column totals
-Calcium %>%
-  group_by(Met) %>%
-  summarise(sum(Count)) # row totals
-Calcium %>%
-  summarise(sum(Count)) # overall total
+tally(Met ~ Age, data = CalciumC, margins = TRUE)
+tally(Age ~ Met, data = CalciumC, margins = TRUE)
 ```
 
 #### Example 2.35: The joint distribution
 
 ```{r}
+tally(Met ~ Age, data = CalciumC, format = "proportion") 
+# The tally differs from the book because they are by column
 Calcium %>%
   mutate(proportion = Count/sum(Count)) %>%
   select(Age, Met, proportion)
@@ -339,21 +344,13 @@ Calcium %>%
 #### Example 2.36: The marginal distribution of age
 
 ```{r}
-Calcium %>%
-  group_by(Age) %>%
-  summarise(count = sum(Count)) %>%
-  mutate(proportion = count/sum(count)) %>%
-  select(Age, proportion)
+tally(~ Age, data = CalciumC, format = "proportion")
 ```
 
 #### Example 2.37: The marginal distribution of "met requirement"
 
 ```{r}
-Calcium %>%
-  group_by(Met) %>%
-  summarise(count = sum(Count)) %>%
-  mutate(proportion = count/sum(count)) %>%
-  select(Met, proportion)
+tally(~ Met, data = CalciumC, format = "proportion")
 ```
 
 #### Example 2.39: Conditional distribution of "met requirement" for children aged 5 to 10
@@ -377,7 +374,8 @@ Calcium %>%
 #### Example 2.40: Software output
 
 ```{r}
-# Use vcd for a mosaicplot?
+# Figure 2.28 mosaic plot (page 143)
+vcd::mosaic(~ Met + Age, data = CalciumC, shade = TRUE)
 ```
 
 #### Example 2.41: Which customer service representative is better?
@@ -386,10 +384,6 @@ Calcium %>%
 CustomerService <- read_csv("https://nhorton.people.amherst.edu/ips9/data/chapter02/EG02-041CUSTSER.csv")
 CustomerService %>%
   select(Rep, GoalMet, Count)
-CustomerService %>%
-  select(Rep, GoalMet, Count) %>%
-  group_by(Rep) %>%
-  summarise(total = sum(Count))
 ```
 
 #### Example 2.42: Look at the data more carefully
@@ -397,8 +391,6 @@ CustomerService %>%
 ```{r}
 CustomerService %>%
   select(Rep, GoalMet_1, Count_1, GoalMet_2, Count_2)
-
-# not sure how to deal with the structure of the table
 ```
 
 ### Section 2.7: The Question of Causation
