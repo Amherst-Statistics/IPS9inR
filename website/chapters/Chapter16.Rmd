@@ -1,11 +1,11 @@
 ---
 title: "IPS9 in R: Bootstrap Methods and Permutation Tests (Chapter 16)"
 author: "Bonnie Lin and Nicholas Horton (nhorton@amherst.edu)"
-date: "July 18, 2018"
+date: "July 22, 2018"
 output: 
   pdf_document:
-    fig_height: 4
-    fig_width: 6
+    fig_height: 3
+    fig_width: 5
   html_document:
     fig_height: 3
     fig_width: 5
@@ -42,9 +42,11 @@ The data used in these documents can be found under Data Sets in the [Student Si
 file as well as the associated R Markdown reproducible analysis source file used to create it can be found at https://nhorton.people.amherst.edu/ips9/.
 
 This work leverages initiatives undertaken by Project MOSAIC (http://www.mosaic-web.org), an NSF-funded effort to improve the teaching of statistics, calculus, science and computing in the undergraduate curriculum. In particular, we utilize the `mosaic` package, which was written to simplify the use of R for introductory statistics courses. A short summary of the R needed to teach introductory statistics can be found in the mosaic package vignettes (http://cran.r-project.org/web/packages/mosaic).  A paper describing the mosaic approach was published in the *R Journal*: https://journal.r-project.org/archive/2017/RJ-2017-024.
+
+For those less familiar with resampling, the mosaic resampling vignette may be a useful additional reference (https://cran.r-project.org/web/packages/mosaic/vignettes/Resampling.pdf).
   
 ## Chapter 1: Looking at data -- distributions
-This file replicates the analyses from Chapter 16: Bootstrap Methods and Permutation
+This file replicates the analyses from the (online-only) Chapter 16: Bootstrap Methods and Permutation
 Tests.
 
 First, load the packages that will be needed for this document: 
@@ -77,12 +79,13 @@ gf_qq(~ mean, data = Avg_Viewtime) %>%
   gf_qqline(color = "red", linetype = "solid") %>% 
   gf_labs(x = "Normal score", y = "Mean time of resamples (in minutes)")
 ```
+
 The pseudorandom number used to set the seed enables the reproduction of results. 
 The `do()` function in the `mosaic` package simplifies the iteration and resampling  
 processes by allowing us to set the number of repetitions and specify what to repeat. 
 
 ### Section 16.2: First steps in using the bootstrap
-The strongly skewed distribution is shown on the histogram and Normal quantile plot for
+The strongly right skewed distribution is shown on the histogram and Normal quantile plot for
 the original 150 grade points (page 14): 
 ```{r eg16-4-sample}
 College_GPA <- read_csv("https://nhorton.people.amherst.edu/ips9/data/chapter16/EG16-04GPA.csv")
@@ -192,7 +195,7 @@ XX No data for Example 16.7 (page 20) "Do all daily numbers have an equal payoff
 ### Section 16.3: How accurate is a bootstrap distribution?
 
 ### Section 16.4: Bootstrap confidence intervals 
-Up to this point, we have demonstrated theh use of the bootstrap to find confidence
+Up to this point, we have demonstrated the use of the bootstrap to find confidence
 intervals of the sample mean, trimmed mean, and the difference between two means. 
 
 Now we will bootstrap the confidence intervals for the correlation coefficient, 
@@ -209,7 +212,7 @@ cor_LAUND24 <- cor(Rating ~ PricePerLoad, data = LAUND24)
 LAUND_sims <- do(numsim) * cor(Rating ~ PricePerLoad, data = resample(LAUND24))
 gf_dhistogram( ~ cor, data = LAUND_sims, binwidth = 0.05, center = 0.025) %>%
   gf_fitdistr(dist = "dnorm") %>% 
-  gf_labs(x = "Conrrelation coefficient of resamples") %>% 
+  gf_labs(x = "Correlation coefficient of resamples") %>% 
   gf_vline(xintercept = cor_LAUND24)
   
 # Figure 16.20(b)
@@ -217,7 +220,7 @@ gf_qq(~ cor, data = LAUND_sims) %>%
   gf_labs(x = "Normal score", y = "Correlation coefficient of resamples") %>%
   gf_qqline(linetype = "solid", color = "red")
 
-# Computing the 95% bootstap percentile interval
+# Computing the 95% bootstrap percentile interval
 confint(LAUND_sims, method=c("se", "perc"))
 ```
 
@@ -226,8 +229,8 @@ Permutation tests use resampling to generate a null distribution for a test
 statistic, with each step randomly resampling without replacement and recalculating
 the test statistic in each permutation.
 
-In the example provided in the textbook, the permutation test randomimzes the
-assignment of students to either the treament or control group to test for the 
+In the example provided in the textbook, the permutation test randomizes the
+assignment of students to either the treatment or control group to test for the 
 effect of the treatment, "directed reading activities" in this case (page 43): 
 ```{r eg16-12}
 DRP <- read_csv("https://nhorton.people.amherst.edu/ips9/data/chapter16/EG16-11DRP.csv")

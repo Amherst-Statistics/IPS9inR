@@ -56,44 +56,53 @@ library(readr)
 We begin with Example 12.3 in page 648. Let's read in our data
 
 ```{r Friends1, message=FALSE}
+#Ex12.3
 Friends <- read_csv("https://nhorton.people.amherst.edu/ips9/data/chapter12/EG12-03FRIENDS.csv")
 head(Friends)
 ```
 
-We want to get a nice summary table like the one in example 12.3. To do this we have to group the dataset by the number of friends. Then we can use some aggregating functions to get the desired table structure. 
+We want to get a nice summary table like the one in example 12.3. To do this we use the `favstats()` function. 
 
 ```{r Friends2}
-SummaryFriends <- Friends %>%
-  group_by(Friends) %>%
-  summarize(n = n(), x_hat = mean(Score), s = sd(Score))
+#Ex12.3
+SummaryFriends <- favstats(Score ~ Friends, data = Friends)
 SummaryFriends
 ```
 
-In R the combination of `group_by()` and `summary()` is a powerful one. With these two data verbs we can create summary outputs like the one above with very little code.
-
 There are some helpful visualizations starting in page 649 that will help us in our analysis of our Friends data. 
 
-To recreate the histogram (note the `|` used to facet based on the number of friends): 
+The `gf_histogram()` function can be used to recreate the histogram (note the `|` used to facet based on the number of friends).
 
 ```{r Friends3}
-gf_histogram(~ Score | Friends, data = Friends) #XX need to make this match the figure
+#Fig12.4
+gf_dhistogram(~ Score | Friends, data = Friends, binwidth = 0.4)
 ```
 
 To recreate the boxplot (note: we have to convert Friends to a factor for the boxplots to work): 
 
 ```{r Friends4}
+#Fig12.4
 gf_boxplot(Score ~ as.factor(Friends), data = Friends)
 ```
 
 And to recreate the linegraph (note the piping through gf_point to add the points to the line): 
 
 ```{r Friends5}
-gf_line(x_hat ~ Friends, data = SummaryFriends) %>% gf_point() 
+#Fig12.4
+gf_line(mean ~ as.factor(Friends), data = SummaryFriends, group = 1) %>% gf_point() 
 ```
 
-These visualizations are a quick way to know what is going on with your data. Just a few lines of codes can save much time in your analysis. 
+These visualizations are a quick way to know what is going on with your data. The `favstats()` command can be used to generate summary statistics by group.
 
 ```{r Friends6}
+#Ex12.7
+favstats(Score ~ Friends, data = Friends)
+```
+
+A more general approach uses the `group_by()` and `summarize()` functions as part of the tidyverse/dplyr packages.
+
+```{r Friends7}
+#Ex12.7
 Friends %>%
   group_by(Friends) %>%
   summarize(N = n(),
@@ -103,11 +112,17 @@ Friends %>%
             Maximum = max(Score))
 ```
 
-XX Missing confidence intervals in table? 
+And we can get the confidence interval for one of the groups. 
+
+```{r Friends8}
+#Ex12.7
+confint(lm(Score ~ 1, data = filter(Friends, Friends == 102)))
+```
 
 The ANOVA analysis can be done in a straightforward manner in R. We will create a linear model out of the Scores given their Friends group and pipe it into the anova function. (Note: the anova function takes an lm object. This is useful to us since we would maybe want to use the lm object for other purposes too.)
 
-```{r Friends7}
+```{r Friends9}
+#Ex12.8
 modFriends <- lm(Score ~ Friends, data = Friends)
 modFriends %>%
   anova()
@@ -116,25 +131,20 @@ modFriends %>%
 Let's turn to page 663 and look at Example 12.15. 
 
 ```{r Eyes1, message=FALSE}
+#Ex12.15
 Eyes <- read_csv("https://nhorton.people.amherst.edu/ips9/data/chapter12/EG12-15EYES.csv")
 ``` 
 
 We will recreate the ouput from the Excel spreadsheet. With the help of the `group_by()` and `summarize()` idiom we can use the aggregating functions to summarize our dataset. To recreate the anova part of the output we use again the `anova()` function that takes an `lm` object.   
 
 ```{r Eyes2}
-Eyes %>% 
-  group_by(Group) %>%
-  summarize(n = n(), 
-            Sum = sum(Score), 
-            Average = Sum / n,
-            Variance = sd(Score)^2)
+#Ex12.15
+favstats(Score ~ Group, data = Eyes)
 
 modEyes <- lm(Score ~ Group, data = Eyes)
 modEyes %>% 
   anova()
 ```
-
-XXExample 12.16 recreate table equal variance test
 
 ### Section 12.2: Comparing the means
 

@@ -3,10 +3,10 @@ title: "IPS9 in R: Inference for Regression (Chapter 10)"
 author: "Bonnie Lin and Nicholas Horton (nhorton@amherst.edu)"
 date: "July 19, 2018"
 output: 
-  html_document:
+  pdf_document:
     fig_height: 3
     fig_width: 5
-  pdf_document:
+  html_document:
     fig_height: 3
     fig_width: 5
   word_document:
@@ -56,7 +56,7 @@ PABME <- read_csv("https://nhorton.people.amherst.edu/ips9/data/chapter10/EG10-0
 gf_point(BMI ~ PA, data = PABME) %>%
   gf_lm() %>%
   gf_labs(x = "PA (Thousands of steps)", y = "BMI (kg/m^2)")
-#gf_lm() adds the least-squares line
+# gf_lm() adds the least-squares line
 
 ## Creating the linear model with the lm() function
 lm_PABME <- lm(BMI ~ PA, data = PABME)
@@ -103,7 +103,7 @@ gf_point(BMI ~ PA, data = PABME) %>%
   gf_lm(interval = "confidence", fill = "red") %>%
   gf_lm(interval = "prediction", fill = "navy") %>%
   gf_labs(x = "PA (thousands of steps)", y = "BMI (kg/m^2)")
-
+# XX also figure 10.8
 ```
 
 The red bands show the 95% confidence limits, while the navy bands show the 
@@ -125,8 +125,11 @@ gf_point(log_INC ~ EDUC, data = log_inc_ENTRE) %>%
   gf_lm(color = "red") %>%
   gf_labs(y = "log(INC)")
 ```
+
 On this scatterpot of income versus education, we have plotted the smooth function (blue) 
 and the least-squares line (red). 
+
+### Section 10.2: More details about simple linear regression
 
 ```{r eg10-16, message=FALSE}
 GADIA <- read_csv("https://nhorton.people.amherst.edu/ips9/data/chapter10/EG10-16GADIA.csv") %>%
@@ -146,6 +149,8 @@ msummary(lm_GADIA)
 # and test the slope by using the t statistic and P-value 
 # by the 'Diameter' variable
 
+# XX the text above might be better as text rather than being in the code chunk
+
 ### Example 10.19, page 590 
 gf_point(resid(lm_GADIA) ~ Diameter, data = GADIA) %>%
   gf_lm() %>%
@@ -161,5 +166,3 @@ predict(lm_GADIA, newdata = new.dat, interval = 'confidence')
 Since there are only two columns in this dataset that are not filled with NA's, I have 
 used the `select()` and `na.omit()` functions to select columns that we will use for 
 further analysis. 
-
-### Section 10.2: More details about simple linear regression

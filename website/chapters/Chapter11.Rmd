@@ -1,12 +1,12 @@
 ---
 title: "IPS9 in R: Multiple regression (Chapter 11)"
-author: "Bonnie Lin and Nicholas Horton (nhorton@amherst.edu)"
-date: "July 20, 2018"
+author: "Margaret Chien and Nicholas Horton (nhorton@amherst.edu)"
+date: "July 24, 2018"
 output: 
-  html_document:
+  pdf_document:
     fig_height: 3
     fig_width: 5
-  pdf_document:
+  html_document:
     fig_height: 3
     fig_width: 5
   word_document:
@@ -40,8 +40,8 @@ file as well as the associated R Markdown reproducible analysis source file used
 
 This work leverages initiatives undertaken by Project MOSAIC (http://www.mosaic-web.org), an NSF-funded effort to improve the teaching of statistics, calculus, science and computing in the undergraduate curriculum. In particular, we utilize the `mosaic` package, which was written to simplify the use of R for introductory statistics courses. A short summary of the R needed to teach introductory statistics can be found in the mosaic package vignettes (http://cran.r-project.org/web/packages/mosaic).  A paper describing the mosaic approach was published in the *R Journal*: https://journal.r-project.org/archive/2017/RJ-2017-024.
   
-## Chapter 11: Multiple regression
-This file replicates the analyses from Chapter 11: Multiple regression.
+## Chapter 11: Multiple Regression
+This file replicates the analyses from Chapter 11: Multiple Regression.
 
 First, load the packages that will be needed for this document: 
 ```{r load-packages}
@@ -60,3 +60,4 @@ pairs(~ ., data = GPA,
       pch=20, main="GPA Scatterplot Matrix")
 ```
 ### Section 11.2: A case study
+

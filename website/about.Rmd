@@ -1,7 +1,5 @@
 ---
 title: "IPS9 in R"
-date: "6/28/2018"
-output: html_document
 ---
 
 ```{r setup, include=FALSE}
@@ -12,7 +10,7 @@ This work leverages initiatives undertaken by [Project MOSAIC](http://www.mosaic
 
 
 These materials are made available under a creative commons remix with attribution license. 
-Materials created by [Nicholas J Horton](https://www.amherst.edu/people/facstaff/nhorton) and Bonnie Lin (last updated July 5, 2018)
+Materials created by [Nicholas J Horton](https://www.amherst.edu/people/facstaff/nhorton) and Bonnie Lin (last updated July 24, 2018)
 
 ![Introduction to Practice of Statistics cover](IPS9_BookCover.jpg)]
 

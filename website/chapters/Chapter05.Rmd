@@ -1,12 +1,12 @@
 ---
 title: "IPS9 in R: Sampling distributions (Chapter 5)"
-author: "XX and Nicholas Horton (nhorton@amherst.edu)"
-date: "July 13, 2018"
+author: "Margaret Chien and Nicholas Horton (nhorton@amherst.edu)"
+date: "July 24, 2018"
 output: 
-  html_document:
+  pdf_document:
     fig_height: 3
     fig_width: 5
-  pdf_document:
+  html_document:
     fig_height: 3
     fig_width: 5
   word_document:
@@ -40,8 +40,8 @@ file as well as the associated R Markdown reproducible analysis source file used
 
 This work leverages initiatives undertaken by Project MOSAIC (http://www.mosaic-web.org), an NSF-funded effort to improve the teaching of statistics, calculus, science and computing in the undergraduate curriculum. In particular, we utilize the `mosaic` package, which was written to simplify the use of R for introductory statistics courses. A short summary of the R needed to teach introductory statistics can be found in the mosaic package vignettes (http://cran.r-project.org/web/packages/mosaic).  A paper describing the mosaic approach was published in the *R Journal*: https://journal.r-project.org/archive/2017/RJ-2017-024.
   
-## Chapter 5: Sampling distributions
-This file replicates the analyses from Chapter 5: Sampling distributions.
+## Chapter 5: Sampling Distributions
+This file replicates the analyses from Chapter 5: Sampling Distributions.
 
 First, load the packages that will be needed for this document: 
 ```{r load-packages}
@@ -49,6 +49,11 @@ library(mosaic)
 library(readr)
 ```
 
-### Section 5.1: Toward statistical inference 
-### Section 5.2: The sampling distribution of a sample mean
-### Section 5.3: Sampling distributions for counts and proportions
+### Section 5.1: Toward Statistical Inference 
+
+### Section 5.2: The Sampling Distribution of a Sample Mean
+
+#### Example 5.5: Sample means are approximately Normal
+
+
+### Section 5.3: Sampling Distributions for Counts and Proportions

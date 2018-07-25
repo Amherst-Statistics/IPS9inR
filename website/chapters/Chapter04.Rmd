@@ -1,7 +1,7 @@
 ---
 title: "IPS9 in R: Probability: The Study of Randomness (Chapter 4)"
 author: "Bonnie Lin and Nicholas Horton (nhorton@amherst.edu)"
-date: "July 18, 2018"
+date: "July 22, 2018"
 output: 
   pdf_document:
     fig_height: 3
@@ -61,6 +61,7 @@ gf_line(phead ~ x, color = "red") %>%
   gf_labs(x = "Number of tosses", y = "Proportion of heads") %>% 
   gf_hline(., yintercept = 0.5)
 ```
+
 The parameters in the `rbinom()` function can be explained in the following way: 
 n = 1:5000 specifies the number of observations, while size = 1 specifies the number 
 of trials, with each trial getting a probability of success equal to 0.5. 
@@ -96,15 +97,10 @@ We can also display probability histograms that compare the probability model fo
 # Figure 4.5 (a)
 eq_likely <- data.frame(Outcomes = rbinom(1000, 1:9, 0.111))
 # Figure 4.5 (b)
-benlaw <- function(d){
-  log10(1 + 1 / d)
-}
+benlaw <- c(0.301, 0.176, 0.125, 0.097, 0.079, 0.067, 0.058, 0.051, 0.046)
 digits <- 1:9
-data <- data.frame(Outcome = benlaw(digits))
-#XX ERROR HERE, NOT ABLE TO KNIT
-gf_bar(. ~ , data = data)
-baseBarplot <- barplot(benlaw(digits), names.arg = digits, xlab = "Outcomes", 
-                       ylim = c(0, .40))
+bendata <- data.frame(prob = benlaw, x = digits)
+gf_point(prob ~ x, data = bendata)
 ```
 
 Below is the code to generate a probability histogram for the distribution of 
@@ -112,7 +108,7 @@ the number of heads in 2000 trials of tossing a coin four times as shown in
 Figure 4.7 (page 239): 
 ```{r}
 trials <- data.frame(Heads = rbinom(2000, 4, 0.5))
-gf_histogram(~ Heads, data = trials)
+gf_histogram(~ Heads, data = trials) # XX is there a way to make this look better?
 ```
 
 ### Section 4.4: Means and variances of random variables

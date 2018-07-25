@@ -1,7 +1,7 @@
 ---
 title: "IPS9 in R: Introduction to Inference (Chapter 6)"
 author: "Shukry Zablah (szablah20@amherst.edu) and Nicholas Horton (nhorton@amherst.edu)"
-date: "July 18, 2018"
+date: "July 22, 2018"
 output: 
   pdf_document:
     fig_height: 3
@@ -52,6 +52,7 @@ library(readr)
 ### Section 6.1: Estimating with Confidence 
 
 ```{r ex6.1, message=FALSE}
+#Fig6.1
 Wade <- read_csv("https://nhorton.people.amherst.edu/ips9/data/chapter06/EG06-01WADE.csv")
 Wade %>% 
   mutate(North_south = ns,
@@ -59,31 +60,31 @@ Wade %>%
   gf_point(North_south ~ East_west, data = Wade)
 ```
 
-XX "One approach to the analysis of these data indicates that a pattern as clustered or more clustered  than this would only happen 4% of the time if the data were at random"
-XX I'm unsure how to replicate this.
-
 ### Section 6.2: Tests of Significance
 
 Look at Ex6.17 in page 375. We will recreate the calculation as a function of the vector of observations, the population mean, and the known standard deviation. We then visualize it and get the probability of getting a z score equal or greater. 
 
 ```{r ex6.17}
-z.test = function(x, mu, sd){
+#pg375
+z.test <- function(x, mu, sd){
    z = (mean(x) - mu) / (sd / sqrt(length(x)))
    return(z)
 }
-
-z <- z.test(c(15.84,15.33,15.58), 15, 0.25)
-
+z <- z.test(x = c(15.84, 15.33, 15.58), mu = 15, sd = 0.25)
 xpnorm(z)
+```
 
-z.confint = function(x, mu, sd) {
-  err = qnorm(0.995)*sd/sqrt(length(x))
-  lower = mean(x) - err
-  upper = mean(x) + err
+```{r}
+#Ex6.18
+z.confint <- function(x, mu, sd) {
+  err <- qnorm(0.995)*sd/sqrt(length(x))
+  lower <- mean(x) - err
+  upper <- mean(x) + err
   return(c(lower, upper))
 }
 
-z.confint(c(15.84,15.33,15.58), 15, 0.25)
+z.confint(x = c(15.84,15.33,15.58), mu = 15, sd = 0.25)
 ```
+
 ### Section 6.3: Use and abuse of tests
 ### Section 6.4: Power and inference as a decision
