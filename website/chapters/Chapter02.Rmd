@@ -59,9 +59,16 @@ library(readr)
 Laundry <- read_csv("https://nhorton.people.amherst.edu/ips9/data/chapter02/EG02-008LAUNDRY.csv")
 ```
 
+We use `read_csv()` from the `readr` package to import data into R.  
+
 ```{r}
 # 2.10: Examine the spreadsheet
 favstats(~ Rating, data = Laundry)
+```
+
+The `favstats()` function shows properties of variables.  
+
+```{r}
 gf_histogram(~ Rating, data = Laundry, binwidth = 5)
 favstats(~ Price, data = Laundry)
 gf_histogram(~ Price, data = Laundry, binwidth = 5)
@@ -108,6 +115,11 @@ gf_point(Rating ~ Price, data = Laundry, xlab = "Price per load (cents)") %>%
 ```{r}
 EduSpending <- read_csv("https://nhorton.people.amherst.edu/ips9/data/chapter02/EG02-011EDSPEND.csv")
 head(EduSpending)
+```
+
+We can use the `head()` function to look at the first rows of a data set.  
+
+```{r}
 # Figure 2.5, page 90
 gf_point(Spending ~ Population, data = EduSpending) %>%
   gf_lm() %>%
@@ -145,6 +157,8 @@ EduSpending %>%
   gf_lm() %>%
   gf_labs(x = "Log population", y = "Log spending")
 ```
+
+We use `mutate()` to create new variables in a dataset.  
 
 #### Example 2.15: Rating versus price and type of laundry detergent
 
@@ -187,6 +201,8 @@ EduSpending %>%
 cor(Rating ~ Price, data = Laundry)
 ```
 
+The `cor()` function finds the correlation of two variables.  
+
 ### Section 2.4: Least Squares Regression
 
 #### Example 2.19: Fidgeting and fat gain
@@ -221,12 +237,16 @@ fatfun <- makeFun(fatlm)
 fatfun(NEA = 400)
 ```
 
+We use `makeFun()` to create a function. Here, we make a function from our linear model, created from `lm()`, so we can find the output of a certain value of `NEA`.  
+
 #### Example 2.24: Regression
 
 ```{r}
 # page 113
 msummary(fatlm)
 ```
+
+The `msummary()` function shows the properties of the function.  
 
 #### Example 2.25: Fidgeting and fat gain
 
@@ -249,10 +269,15 @@ NEAlm
 
 #### Example 2.26: Residuals for fat gain
 
+Here, we find the residual:  
+
 ```{r}
 fatlm
 fatfun(NEA = 135)
 2.7 - fatfun(NEA = 135)
+```
+
+```{r}
 # Figure 2.23, page 124
 gf_point(Fat ~ NEA, data = Fidgeting) %>%
   gf_lm() %>%
@@ -292,6 +317,8 @@ gf_point(resid(diabeteslm) ~ HbA1c_percent, data = Diabetes) %>%
 
 #### Example 2.29: Influential observations
 
+We can use the `filter()` function to remove rows from a data set:  
+
 ```{r}
 without15lm <- lm(FPG_mg_ml ~ HbA1c_percent, data = filter(Diabetes, FPG_mg_ml <= 300)) # model without subject 15
 without18lm <- lm(FPG_mg_ml ~ HbA1c_percent, data = filter(Diabetes, HbA1c_percent <= 18)) # model without subject 18
@@ -311,7 +338,11 @@ gf_point(FPG_mg_ml ~ HbA1c_percent, data = Diabetes) %>%
 ```{r}
 Calcium <- read_csv("https://nhorton.people.amherst.edu/ips9/data/chapter02/EG02-033IOM.csv")
 Calcium 
+```
 
+To create a data set with the structure we want (with each count as an observation), we can use `rbind()`.  
+
+```{r}
 # Creating data set from counts in the data table
 CalciumC <- rbind(
  do(194) * data.frame(Age = "A05to10", Met = "No"),
@@ -372,6 +403,8 @@ Calcium %>%
 ```
 
 #### Example 2.40: Software output
+
+We can use the `mosaic()` function from the `vcd` package to create mosaic plots with color.  
 
 ```{r}
 # Figure 2.28 mosaic plot (page 143)
