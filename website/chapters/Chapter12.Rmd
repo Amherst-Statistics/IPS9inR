@@ -153,12 +153,14 @@ Anova gives us the answer to the question "are the differences between the means
 Let's read in the dataset for the times for times people spend on Facebook. 
 
 ```{r Facetym1, message=FALSE}
+#Ex12.17
 Facetym <- read_csv("https://nhorton.people.amherst.edu/ips9/data/chapter12/EG12-17FACETYM.csv")
 ```
 
 The analysis starts by checking the data. We will check the distribution of our data with a qqplot. 
 
 ```{r Facetym2}
+#Fig12.11
 gf_qq(~ Time, data = Facetym) %>% 
   gf_qqline()
 ```
@@ -168,6 +170,7 @@ The `gf_qq()` is piped to `gf_qqline()` in order to get the reference line throu
 We now visualize the transformed data. 
 
 ```{r Facetym3}
+#Fig12.13
 gf_qq(~ SqrtTime, data = Facetym) %>% 
   gf_qqline()
 ```
@@ -175,15 +178,8 @@ gf_qq(~ SqrtTime, data = Facetym) %>%
 Much better. Next step in our analysis is to get some descriptive statistics about the data. After that we perform the Anova test with `anova()`. 
 
 ```{r Facetym4}
-Facetym %>% 
-  group_by(Grp) %>%
-  summarize(n = n(),
-            Sum = sum(SqrtTime),
-            Average = mean(SqrtTime),
-            SD = sd(SqrtTime), 
-            min = min(SqrtTime), 
-            max = max(SqrtTime)
-            )
+#Fig12.12
+favstats(SqrtTime ~ Grp, data = Facetym)
 
 modFacetym <- lm(SqrtTime ~ factor(Grp), data = Facetym)
 modFacetym %>% 
@@ -196,7 +192,7 @@ We will use a package called `DescTools` which has many multiple comparisons tes
 
 To use the `PostHocTest()` function we have to pass it an object returned by the `aov()` function, which does the ANOVA test for a formula (and not an `lm` object). After that we only have to specify the `method` parameter, which is equal to the name of the multiple comparisons test that you want to perform. 
 
-```{r Facetym5}
+```{r Facetym5, message=FALSE}
 library(DescTools)
 PostHocTest(aov(SqrtTime ~ factor(Grp), data = Facetym), method = "bonferroni")
 PostHocTest(aov(SqrtTime ~ factor(Grp), data = Facetym), method = "lsd")
