@@ -1,7 +1,7 @@
 ---
 title: "IPS9 in R: Inference for Categorical Data (Chapter 9)"
 author: "Shukry Zablah (szablah20@amherst.edu) and Nicholas Horton (nhorton@amherst.edu)"
-date: "July 19, 2018"
+date: "July 25, 2018"
 output: 
   pdf_document:
     fig_height: 3
@@ -68,47 +68,13 @@ head(Instag)
 
 We take a small peek of the dataset with the `head()` function that returns the first few observations from a given dataset. Some useful columns were returned with our dataset. You don't have to worry about them now. 
 
-To create the summary table in  Example 9.1 we will have to compute some intermediate steps. 
-
-To start, we first get the total counts for each sex. 
+We will get some tables that summarize the information displayed in Ex9.1. We can use the `tally()` function for this.
 
 ```{r Instag2}
-
 #Ex9.1
-
-# XX should we be using tidyverse?
-
-Combined_Sex <- Instag %>% 
-  group_by(Sex) %>%
-  summarize(n = n()) 
-Combined_Sex
+tally(User ~ Sex, data = Instag, margin = TRUE)
+tally(User ~ Sex, data = Instag, format = "proportion", margin = TRUE)
 ```
-
-This will be the first column of our table. Then we get a dataframe with only the counts of those who have a value of "Yes" for User. This will be the second column.
-
-```{r Instag3}
-#Ex9.1
-YesUsers <- Instag %>% 
-  group_by(User, Sex) %>%
-  summarize(n = n()) %>%
-  filter(User == "Yes")
-YesUsers
-```
-
-And finally, we use a `mutate()` call to create a variable derived from other variables. This will create the $$\hat{p} = X/n$$ column. 
-
-XX formatting is weird, could use single $ for Latex instead
-
-```{r Instag4}
-#Ex9.1
-Ex8.11Table <- Combined_Sex %>%
-  left_join(YesUsers, by = "Sex") %>%
-  select(Sex, n = n.x, X = n.y) %>%
-  mutate(`p_hat = X/n` = X/n) 
-Ex8.11Table
-```
-
-And we then have the table with the percentages of people who are users over the total number of people of the same sex!
 
 Now take look at Example 9.2 in page 526. To recreate that table of counts we simply have to call the `tally()` function and it will make the 2-way table for us. 
 We call it like this: 
@@ -118,7 +84,7 @@ We call it like this:
 tally(~ User + Sex, data = Instag, margins = TRUE)  
 ```
 
-The `margins = TRUE` option makes sure that `tally()` ouputs the convenient Total columns just like in page 527!
+The `margins = TRUE` option makes sure that `tally()` ouputs the convenient Total columns just like in page 527. To understand the difference between our last two `tally()` calls, look at the Total column of our tables.
 
 Turn your attention to Example 9.3 now. After creating the dataset from the counts, we can use a similar `tally()` call to recreate the table and verify that our method to create the dataset is in fact accurate. 
 
@@ -158,18 +124,15 @@ Another way that we can visualize two categorical variables is to create a mosai
 
 ```{r Vaccine4}
 #Ex9.7
-# XX shade = TRUE
-vcd::mosaic(Required ~ Party, data = Vaccine)
+vcd::mosaic(Required ~ Party, data = Vaccine, shade = TRUE)
 ```
 
 Having multiple ways to visualize varibles will help you analyze your data more thoroughly and communicate your findings in a more intuitive way. 
 
 In Example 9.7 we are interested in getting the expected counts of our Vaccine data. In R you can take advantage of the `xchisq.test()` function and get the relevant output like this: 
 
-XX page 533
-
 ```{r Vaccine5}
-#Ex9.8
+#Ex9.8 pg.533
 chiSqVaccine <- xchisq.test(tally(Required ~ Party, data = Vaccine), correct = FALSE)
 with(chiSqVaccine, expected)
 ```
@@ -194,7 +157,7 @@ chiSqVaccine
 
 All this useful features are already built into how R's `xchisq.test()` function works. 
 
-Note: There is an error in the $$\chi^2$$ value in the book. While it showed the correct machine output, it specified the wrong $$\chi^2$$ squared value. XX formatting is weird with Latex again. Single $?
+Note: There is an error in the $\chi^2$ value in the book. While it showed the correct machine output, it specified the wrong $\chi^2$ squared value.
 
 We continue with Example 9.9 in page 537. 
 
@@ -253,7 +216,7 @@ And our observed counts...
 with(chiSqHealth, observed)
 ```
 
-And finally our $$\chi^2$$ statistic. XX latex formatting
+And finally our $\chi^2$ statistic.
 
 ```{r Health7}
 #Ex9.11
@@ -294,9 +257,7 @@ ACTPopProp
 ```
 
 
-We will use the same `xchisq.test()` function from before. It is important to note the new behavior we expect from the function when we provide a vector of the population proportions. The expected counts and the $$\chi^2$$ value will depend on this new parameter. 
-
- XX latex formatting
+We will use the same `xchisq.test()` function from before. It is important to note the new behavior we expect from the function when we provide a vector of the population proportions. The expected counts and the $\chi^2$ value will depend on this new parameter. 
 
 ```{r ACT4}
 #Ex9.13

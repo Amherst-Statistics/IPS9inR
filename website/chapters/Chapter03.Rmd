@@ -1,7 +1,7 @@
 ---
 title: "IPS9 in R: Producing data (Chapter 3)"
 author: "Shukry Zablah (szablah20@amherst.edu) and Nicholas Horton (nhorton@amherst.edu)"
-date: "July 24, 2018"
+date: "July 25, 2018"
 output: 
   pdf_document:
     fig_height: 3
@@ -95,9 +95,7 @@ You can do this for many Groups and for as many observations as you want.
 
 ### Section 3.3: Sampling Design
 
-XX page 192
-
-We want to get a simple random sample (SRS) of 25 countries out of 189.
+Turn to page 192. We want to get a simple random sample (SRS) of 25 countries out of 189.
 
 ```{r ex3.23_1, message=FALSE}
 Countries <- read_csv("https://nhorton.people.amherst.edu/ips9/data/chapter03/EG03-23TTS.csv")
@@ -107,8 +105,8 @@ In R you just have to use the `sample()` function.
 
 ```{r}
 #Fig3.7
-Sample <- sample(Countries, size = 25)
-Sample
+SampleCountries <- sample(Countries, size = 25)
+SampleCountries
 ```
 
 
