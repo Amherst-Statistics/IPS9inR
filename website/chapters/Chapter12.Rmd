@@ -1,7 +1,7 @@
 ---
 title: "IPS9 in R: One-way analysis of variance (Chapter 12)"
 author: "Shukry Zablah (szablah20@amherst.edu) and Nicholas Horton (nhorton@amherst.edu)"
-date: "July 19, 2018"
+date: "July 25, 2018"
 output: 
   pdf_document:
     fig_height: 3
@@ -19,6 +19,7 @@ output:
 # Don't delete this chunk if you are using the mosaic package
 # This loads the mosaic and dplyr packages
 require(mosaic)
+library(DescTools)
 ```
 
 ```{r, include = FALSE}
@@ -47,6 +48,7 @@ First, load the packages that will be needed for this document:
 ```{r load-packages}
 library(mosaic)
 library(readr)
+library(DescTools)
 ```
 
 > Complicated computations do not guarantee a valid statistical analysis. (648)
@@ -193,7 +195,6 @@ We will use a package called `DescTools` which has many multiple comparisons tes
 To use the `PostHocTest()` function we have to pass it an object returned by the `aov()` function, which does the ANOVA test for a formula (and not an `lm` object). After that we only have to specify the `method` parameter, which is equal to the name of the multiple comparisons test that you want to perform. 
 
 ```{r Facetym5, message=FALSE}
-library(DescTools)
 PostHocTest(aov(SqrtTime ~ factor(Grp), data = Facetym), method = "bonferroni")
 PostHocTest(aov(SqrtTime ~ factor(Grp), data = Facetym), method = "lsd")
 ```
