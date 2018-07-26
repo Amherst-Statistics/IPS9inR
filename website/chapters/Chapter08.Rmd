@@ -100,18 +100,18 @@ zstar = qnorm(.975) # for 95% confidence interval
 p = 0.5 # planned proportion estimate
 moe = 0.1 # margin of error
 p*(zstar/moe)^2 
+
 ### Example 8.17, page 516
 ### Power curve for two proportions
-calculatePower <- function(altmean = x, n, alpha){
+calculatePower <- function(altmean = x, prop1 = 0.4, prop2 = 0.6, n = 97, alpha = 0.05){
   range <- 1-alpha/2
-  se <- sqrt(100/n)
-  bound <- qnorm(range, mean = 0.6, se) #sig lvl in null dist
-  1 - pnorm(bound, altmean, se) + pnorm(-bound, altmean, se) #calc area past sig lvl
+  se <- sqrt((prop1*(1-prop2)/n) + (prop2*(1-prop1)/n))
+  bound1 <- qnorm(range, mean = 0.6, se) #sig lvl in null dist
+  bound2 <- qnorm(alpha/2, mean = 0.6, se)
+  1 - pnorm(bound1, altmean, se) + pnorm(bound2, altmean, se) #calc area past sig lvl
 } 
 
-gf_function(fun = calculatePower, args = list(altmean = x, n = 97, alpha = 0.05), xlim = c(0.3, 0.9))
-## XX NH error message: Computation failed in `stat_function()`: unused argument (x_trans); not sure how to specify the
-## arguments otherwise
+gf_function(fun = calculatePower, xlim = c(0.3, 0.9))
 ```
 
 ### Section 8.2: Comparing two proportions
