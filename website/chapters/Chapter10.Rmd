@@ -98,12 +98,11 @@ Note that plotting the Normal quantile plot of the residuals requires the `rstan
 function call. 
 
 ```{r eg10-7}
-### Figure 10.7, page 571
+### Figure 10.7 and 10.8, page 571
 gf_point(BMI ~ PA, data = PABME) %>%
   gf_lm(interval = "confidence", fill = "red") %>%
   gf_lm(interval = "prediction", fill = "navy") %>%
   gf_labs(x = "PA (thousands of steps)", y = "BMI (kg/m^2)")
-# XX also figure 10.8
 ```
 
 The red bands show the 95% confidence limits, while the navy bands show the 
@@ -144,13 +143,14 @@ cor(GA ~ Diameter, data = GADIA)
 ### Example 10.18, 10.20, and 10.21 page 589
 lm_GADIA <- lm(GA ~ Diameter, data = GADIA)
 msummary(lm_GADIA) 
-# From the msummary output, you can compute the least-squares
-# regression line, estimate the standard deviation about the line 
-# and test the slope by using the t statistic and P-value 
-# by the 'Diameter' variable
+```
 
-# XX the text above might be better as text rather than being in the code chunk
+From the msummary output, you can compute the least-squares
+regression line, estimate the standard deviation about the line 
+and test the slope by using the t statistic and P-value
+by the 'Diameter' variable
 
+```{r eg10-16cont, message = FALSE}
 ### Example 10.19, page 590 
 gf_point(resid(lm_GADIA) ~ Diameter, data = GADIA) %>%
   gf_lm() %>%
