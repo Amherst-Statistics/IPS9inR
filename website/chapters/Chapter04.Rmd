@@ -71,7 +71,7 @@ selecting either number, 5000 times.
 Another useful function that is related to this xpbinom(), which can be used to plot the proab
 
 The R function, `runif()`, generates a random number between 0 and 1. 
-We can demonstrate the code below: 
+We can demonstrate using the code below: 
 ```{r eg4-7}
 runif(1)
 ```
@@ -106,10 +106,10 @@ gf_point(prob ~ x, data = bendata)
 Below is the code to generate a probability histogram for the distribution of 
 the number of heads in 2000 trials of tossing a coin four times as shown in 
 Figure 4.7 (page 239): 
-```{r}
-trials <- data.frame(Heads = rbinom(2000, 4, 0.5))
+```{r heads}
+trials <- data.frame(Heads = rbinom(2000, size = 4, prob = 0.5))
 gf_histogram(~ as.factor(Heads), data = trials, stat = "count") %>% 
-  gf_labs(x = "Number of Heads"
+  gf_labs(x = "Number of Heads")
 ```
 
 ### Section 4.4: Means and variances of random variables
