@@ -71,7 +71,7 @@ selecting either number, 5000 times.
 Another useful function that is related to this xpbinom(), which can be used to plot the proab
 
 The R function, `runif()`, generates a random number between 0 and 1. 
-We can demonstrate the code below: 
+We can demonstrate using the code below: 
 ```{r eg4-7}
 runif(1)
 ```
