@@ -65,10 +65,40 @@ InstaMatrix
 oddsRatio(InstaMatrix, verbose = TRUE)
 ```
 
-#### Example 14.5: Log odds for Instagram use
+#### Example 14.6: Is a movie going to be profitable?
 
 ```{r}
+Movies <- read_csv("https://nhorton.people.amherst.edu/ips9/data/chapter14/EG14-06MOVIES.csv")
 
+# Log odds
+moviemod <- glm(as.factor(Profit) ~ LOpening, data = Movies, family = "binomial")
+moviemod
+
+# Figure 14.3, page 8
+gf_point(Profit ~ LOpening, data = Movies) %>%
+  gf_smooth(span = 2) %>%
+  gf_labs(x = "Log (opening)", title = "Profit vs. log (opening)") # to adjust smoothness
 ```
 
 ### Section 14.2: Inference for Logistic Regression
+
+#### Example 14.7: Software output
+
+```{r}
+Instagram <- read_csv("https://nhorton.people.amherst.edu/ips9/data/chapter14/EG14-07INSTAGR.csv")
+
+# not sure how to do this
+```
+
+#### Example 14.8: An insecticide for aphids
+
+```{r}
+Insecticide <- read_csv("https://nhorton.people.amherst.edu/ips9/data/chapter14/EG14-08INSECTS.csv")
+
+# Figure 14.8, page 12
+insectmod <- glm()
+
+gf_point()
+```
+
+
