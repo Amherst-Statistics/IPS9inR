@@ -55,8 +55,17 @@ library(readr)
 
 ```{r}
 Instagram <- read_csv("https://nhorton.people.amherst.edu/ips9/data/chapter14/EG14-03INSTAGR.csv")
-# For odds ratio, should I use oddsRatio()?
+Instagram
+
+InstaMatrix <- matrix(c(Instagram$Count), nrow = 2)
+rownames(InstaMatrix) <- c("Yes", "No")
+colnames(InstaMatrix) <- c("Women", "Men")
+InstaMatrix
+
+oddsRatio(InstaMatrix, verbose = TRUE)
 ```
+
+#### Example 14.5: Log odds for Instagram use
 
 ```{r}
 
