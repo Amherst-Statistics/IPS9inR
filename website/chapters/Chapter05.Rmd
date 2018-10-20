@@ -41,9 +41,11 @@ file as well as the associated R Markdown reproducible analysis source file used
 This work leverages initiatives undertaken by Project MOSAIC (http://www.mosaic-web.org), an NSF-funded effort to improve the teaching of statistics, calculus, science and computing in the undergraduate curriculum. In particular, we utilize the `mosaic` package, which was written to simplify the use of R for introductory statistics courses. A short summary of the R needed to teach introductory statistics can be found in the mosaic package vignettes (http://cran.r-project.org/web/packages/mosaic).  A paper describing the mosaic approach was published in the *R Journal*: https://journal.r-project.org/archive/2017/RJ-2017-024.
   
 ## Chapter 5: Sampling Distributions
+
 This file replicates the analyses from Chapter 5: Sampling Distributions.
 
 First, load the packages that will be needed for this document: 
+
 ```{r load-packages}
 library(mosaic)
 library(readr)
@@ -54,6 +56,7 @@ library(readr)
 ### Section 5.2: The Sampling Distribution of a Sample Mean
 
 #### Example 5.5: Sample means are approximately Normal
+
 
 
 ### Section 5.3: Sampling Distributions for Counts and Proportions
