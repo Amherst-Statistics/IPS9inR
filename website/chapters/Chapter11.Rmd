@@ -60,7 +60,8 @@ GPA <- read_csv("https://nhorton.people.amherst.edu/ips9/data/chapter11/EG11-01G
 head(GPA)
 ```
 
-### Section 11.2: A case study
+### Section 11.2: A Case Study
+
 ```{r}
 # Figure 11.2, page 619
 favstats(~ GPA, data = GPA)
@@ -73,13 +74,34 @@ favstats(~ SATW, data = GPA)
 ```
 
 ```{r}
+# Figure 11.3, page 620
+gf_histogram(~ HSM, data = GPA) %>%
+  gf_labs(y = "Percent")# Doesn't look great
+gf_histogram(~ HSS, data = GPA) %>%
+  gf_labs(y = "Percent")
+gf_histogram(~ HSE, data = GPA) %>%
+  gf_labs(y = "Percent")
+```
+
+#### Relationships between pairs of variables
+
+```{r}
 # Figure 11.4, page 621
 options(digits = 2)
 cor(GPA)
 ```
 
+#### Example 11.13: Pairwise relationships among variables in the GPA data set
+
 ```{r}
+GPA <- read_csv("https://nhorton.people.amherst.edu/ips9/data/chapter11/EX11-13GPA.csv")
+library(GGally)
 # Figure 11.5
-pairs(~ ., data = GPA,
-      pch=20, main="GPA Scatterplot Matrix")
+GGally::ggpairs(GPA)
+```
+
+#### Regression on high school grades
+
+```{r}
+# Figure 11.6, page 623
 ```
