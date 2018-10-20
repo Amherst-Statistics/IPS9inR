@@ -104,4 +104,42 @@ GGally::ggpairs(GPA)
 
 ```{r}
 # Figure 11.6, page 623
+gpamultlm <- lm(GPA ~ HSM + HSE + HSS, data = GPA)
+summary(gpamultlm)
+```
+
+#### Examining the residuals
+
+```{r}
+# Figure 11.7, page 625
+gf_qq(~ resid(gpamultlm)) %>% 
+  gf_labs( x = "Normal Score", y = "Residual")
+gf_histogram(~ resid(gpamultlm), binwidth = .5) %>%
+  gf_labs(x = "Residual", y = "Percent")
+```
+
+#### Example 11.14: Residual plots for the GPA analysis
+
+#### Refining the model
+
+```{r}
+# Figure 11.8, page 626
+gpamultlm2 <- lm(GPA ~ HSM + HSS, data = GPA)
+summary(gpamultlm2)
+```
+
+#### Regression using all variables
+
+```{r}
+# Figure 11.9
+gpasatlm <- lm(GPA ~ SATM + SATCR + SATW, data = GPA)
+summary(gpasatlm)
+
+# Figure 11.10, page 628
+gpaalllm <- lm(GPA ~ SATM + SATCR + SATW + HSS + HSE + HSM, data = GPA)
+summary(gpaalllm)
+
+# Figure 11.11, page 631
+library(MASS)
+MASS::stepAIC(gpaalllm) # I don't remember if there is a better way to do this
 ```
