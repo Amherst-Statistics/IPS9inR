@@ -57,6 +57,22 @@ library(readr)
 
 #### Example 5.5: Sample means are approximately Normal
 
+```{r}
+Help <- read_csv("https://nhorton.people.amherst.edu/ips9/data/chapter05/EG05-05HELP60.csv")
 
+# Figure 5.6(a), page 294
+gf_dhistogram(~ Length, data = Help, binwidth = 12.5, center = 6.25)  %>%
+  gf_labs(x = "Visit lengths (minutes)", y = "Percent of Visits")
+
+# Figure 5.6(b)
+set.seed(124)
+HelpSamples <- do(500) * mean(~ Length, data = resample(Help, size = 60))
+gf_dhistogram(~ mean, data = HelpSamples, binwidth = 12.5) %>%
+  gf_labs(x = "Mean length of 60 visits (minutes)", y = "Percent of all means")
+
+# Figure 5.7
+gf_qq(~ mean, data = HelpSamples) %>%
+  gf_labs(x = "Normal Score", y = "Sample mean visit length (minutes)")
+```
 
 ### Section 5.3: Sampling Distributions for Counts and Proportions
