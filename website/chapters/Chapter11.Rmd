@@ -1,7 +1,7 @@
 ---
 title: "IPS9 in R: Multiple regression (Chapter 11)"
-author: "Margaret Chien and Nicholas Horton (nhorton@amherst.edu)"
-date: "October 20, 2018"
+author: "Nicholas Horton (nhorton@amherst.edu)"
+date: "January 19, 2019"
 output: 
   pdf_document:
     fig_height: 3
@@ -93,11 +93,14 @@ cor(GPA)
 
 #### Example 11.13: Pairwise relationships among variables in the GPA data set
 
-```{r}
+```{r message = FALSE, fig.width = 7, fig.height = 8}
 GPA <- read_csv("https://nhorton.people.amherst.edu/ips9/data/chapter11/EX11-13GPA.csv")
+GPA <- GPA %>%
+  mutate(SEX = ifelse(SEX == 1, "F", "M"))
 library(GGally)
 # Figure 11.5
-GGally::ggpairs(GPA)
+GPA %>% select(-OBS) %>%
+  GGally::ggpairs()
 ```
 
 #### Regression on high school grades
@@ -105,7 +108,7 @@ GGally::ggpairs(GPA)
 ```{r}
 # Figure 11.6, page 623
 gpamultlm <- lm(GPA ~ HSM + HSE + HSS, data = GPA)
-summary(gpamultlm)
+msummary(gpamultlm)
 ```
 
 #### Examining the residuals
@@ -125,7 +128,7 @@ gf_histogram(~ resid(gpamultlm), binwidth = .5) %>%
 ```{r}
 # Figure 11.8, page 626
 gpamultlm2 <- lm(GPA ~ HSM + HSS, data = GPA)
-summary(gpamultlm2)
+msummary(gpamultlm2)
 ```
 
 #### Regression using all variables
@@ -133,13 +136,12 @@ summary(gpamultlm2)
 ```{r}
 # Figure 11.9
 gpasatlm <- lm(GPA ~ SATM + SATCR + SATW, data = GPA)
-summary(gpasatlm)
+msummary(gpasatlm)
 
 # Figure 11.10, page 628
 gpaalllm <- lm(GPA ~ SATM + SATCR + SATW + HSS + HSE + HSM, data = GPA)
-summary(gpaalllm)
+msummary(gpaalllm)
 
 # Figure 11.11, page 631
-library(MASS)
-MASS::stepAIC(gpaalllm) # I don't remember if there is a better way to do this
+MASS::stepAIC(gpaalllm) 
 ```
