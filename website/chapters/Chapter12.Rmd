@@ -1,7 +1,7 @@
 ---
 title: "IPS9 in R: One-way analysis of variance (Chapter 12)"
 author: "Shukry Zablah (szablah20@amherst.edu) and Nicholas Horton (nhorton@amherst.edu)"
-date: "July 25, 2018"
+date: "January 31, 2019"
 output: 
   pdf_document:
     fig_height: 3
@@ -51,14 +51,14 @@ library(readr)
 library(DescTools)
 ```
 
-> Complicated computations do not guarantee a valid statistical analysis. (648)
+> Complicated computations do not guarantee a valid statistical analysis. (page 648)
 
 ### Section 12.1: Inference for one-way analysis of variance
 
 We begin with Example 12.3 in page 648. Let's read in our data
 
 ```{r Friends1, message=FALSE}
-#Ex12.3
+# Example 12.3
 Friends <- read_csv("https://nhorton.people.amherst.edu/ips9/data/chapter12/EG12-03FRIENDS.csv")
 head(Friends)
 ```
@@ -66,7 +66,7 @@ head(Friends)
 We want to get a nice summary table like the one in example 12.3. To do this we use the `favstats()` function. 
 
 ```{r Friends2}
-#Ex12.3
+# Example 12.3
 SummaryFriends <- favstats(Score ~ Friends, data = Friends)
 SummaryFriends
 ```
@@ -76,35 +76,35 @@ There are some helpful visualizations starting in page 649 that will help us in 
 The `gf_histogram()` function can be used to recreate the histogram (note the `|` used to facet based on the number of friends).
 
 ```{r Friends3}
-#Fig12.4
+# Figure 12.4, page 649
 gf_dhistogram(~ Score | Friends, data = Friends, binwidth = 0.4)
 ```
 
 To recreate the boxplot (note: we have to convert Friends to a factor for the boxplots to work): 
 
 ```{r Friends4}
-#Fig12.4
+# Figure 12.4, page 649
 gf_boxplot(Score ~ as.factor(Friends), data = Friends)
 ```
 
 And to recreate the linegraph (note the piping through gf_point to add the points to the line): 
 
 ```{r Friends5}
-#Fig12.4
+# Figure 12.4, page 650
 gf_line(mean ~ as.factor(Friends), data = SummaryFriends, group = 1) %>% gf_point() 
 ```
 
 These visualizations are a quick way to know what is going on with your data. The `favstats()` command can be used to generate summary statistics by group.
 
 ```{r Friends6}
-#Ex12.7
+# Example 12.7, page 657
 favstats(Score ~ Friends, data = Friends)
 ```
 
 A more general approach uses the `group_by()` and `summarize()` functions as part of the tidyverse/dplyr packages.
 
 ```{r Friends7}
-#Ex12.7
+# Example 12.7
 Friends %>%
   group_by(Friends) %>%
   summarize(N = n(),
@@ -117,14 +117,14 @@ Friends %>%
 And we can get the confidence interval for one of the groups. 
 
 ```{r Friends8}
-#Ex12.7
+# Example 12.7
 confint(lm(Score ~ 1, data = filter(Friends, Friends == 102)))
 ```
 
 The ANOVA analysis can be done in a straightforward manner in R. We will create a linear model out of the Scores given their Friends group and pipe it into the anova function. (Note: the anova function takes an lm object. This is useful to us since we would maybe want to use the lm object for other purposes too.)
 
 ```{r Friends9}
-#Ex12.8
+# Example 12.8
 modFriends <- lm(Score ~ Friends, data = Friends)
 modFriends %>%
   anova()
@@ -133,14 +133,14 @@ modFriends %>%
 Let's turn to page 663 and look at Example 12.15. 
 
 ```{r Eyes1, message=FALSE}
-#Ex12.15
+# Example 12.15
 Eyes <- read_csv("https://nhorton.people.amherst.edu/ips9/data/chapter12/EG12-15EYES.csv")
 ``` 
 
 We will recreate the ouput from the Excel spreadsheet. With the help of the `group_by()` and `summarize()` idiom we can use the aggregating functions to summarize our dataset. To recreate the anova part of the output we use again the `anova()` function that takes an `lm` object.   
 
 ```{r Eyes2}
-#Ex12.15
+# Example 12.15
 favstats(Score ~ Group, data = Eyes)
 
 modEyes <- lm(Score ~ Group, data = Eyes)
@@ -155,14 +155,14 @@ Anova gives us the answer to the question "are the differences between the means
 Let's read in the dataset for the times for times people spend on Facebook. 
 
 ```{r Facetym1, message=FALSE}
-#Ex12.17
+# Example 12.17, page 670
 Facetym <- read_csv("https://nhorton.people.amherst.edu/ips9/data/chapter12/EG12-17FACETYM.csv")
 ```
 
 The analysis starts by checking the data. We will check the distribution of our data with a qqplot. 
 
 ```{r Facetym2}
-#Fig12.11
+# Figure 12.11, page 671
 gf_qq(~ Time, data = Facetym) %>% 
   gf_qqline()
 ```
@@ -172,7 +172,7 @@ The `gf_qq()` is piped to `gf_qqline()` in order to get the reference line throu
 We now visualize the transformed data. 
 
 ```{r Facetym3}
-#Fig12.13
+# Figure 12.13, page 672
 gf_qq(~ SqrtTime, data = Facetym) %>% 
   gf_qqline()
 ```
@@ -180,7 +180,7 @@ gf_qq(~ SqrtTime, data = Facetym) %>%
 Much better. Next step in our analysis is to get some descriptive statistics about the data. After that we perform the Anova test with `anova()`. 
 
 ```{r Facetym4}
-#Fig12.12
+# Figure 12.12, page 671
 favstats(SqrtTime ~ Grp, data = Facetym)
 
 modFacetym <- lm(SqrtTime ~ factor(Grp), data = Facetym)

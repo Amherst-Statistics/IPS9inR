@@ -1,7 +1,7 @@
 ---
 title: "IPS9 in R: Inference for Regression (Chapter 10)"
 author: "Bonnie Lin and Nicholas Horton (nhorton@amherst.edu)"
-date: "July 19, 2018"
+date: "January 29, 2019"
 output: 
   pdf_document:
     fig_height: 3
@@ -98,7 +98,7 @@ Note that plotting the Normal quantile plot of the residuals requires the `rstan
 function call. 
 
 ```{r eg10-7}
-### Figure 10.7 and 10.8, page 571
+### Figure 10.7 and 10.8, page 571 & 573
 gf_point(BMI ~ PA, data = PABME) %>%
   gf_lm(interval = "confidence", fill = "red") %>%
   gf_lm(interval = "prediction", fill = "navy") %>%
@@ -140,7 +140,7 @@ favstats(~ Diameter, data = GADIA)
 favstats(~ GA, data = GADIA)
 cor(GA ~ Diameter, data = GADIA)
 
-### Example 10.18, 10.20, and 10.21 page 589
+### Example 10.18, 10.20, and 10.21 page 589-591
 lm_GADIA <- lm(GA ~ Diameter, data = GADIA)
 msummary(lm_GADIA) 
 ```

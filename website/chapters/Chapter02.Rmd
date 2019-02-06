@@ -1,7 +1,7 @@
 ---
 title: "IPS9 in R: Looking at Data -- Relationships (Chapter 2)"
 author: "Margaret Chien and Nicholas Horton (nhorton@amherst.edu)"
-date: "July 26, 2018"
+date: "January 29, 2019"
 output: 
   pdf_document:
     fig_height: 3
@@ -187,7 +187,7 @@ gf_point(Rating ~ Price, data = Laundry) %>%
 #### Example 2.17: A smooth fit for education spending and population with logs
 
 ```{r}
-# Figure 2.8, page 92
+# Figure 2.11, page 95
 gf_point(LogSpend ~ LogPop, data = EduSpending) %>%
   gf_smooth() %>%
   gf_labs(x = "Log population", y = "Log spending")

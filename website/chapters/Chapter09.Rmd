@@ -1,7 +1,7 @@
 ---
 title: "IPS9 in R: Inference for Categorical Data (Chapter 9)"
 author: "Shukry Zablah (szablah20@amherst.edu) and Nicholas Horton (nhorton@amherst.edu)"
-date: "January 19, 2019"
+date: "January 29, 2019"
 output: 
   pdf_document:
     fig_height: 3
@@ -56,7 +56,7 @@ To recreate the dataset that was used in Example 9.1, we will use a combination 
 We recreate it like this. 
 
 ```{r Instag1}
-#Ex9.1
+#Example 9.1 (page 526)
 Instag <- rbind(
   do(298) * data.frame(Sex = "Men",  User = "No"),
   do(209) * data.frame(Sex = "Women", User = "No"),
@@ -68,7 +68,7 @@ head(Instag)
 
 We take a small peek of the dataset with the `head()` function that returns the first few observations from a given dataset. Some useful columns were returned with our dataset. You don't have to worry about them now. 
 
-We will get some tables that summarize the information displayed in Ex9.1. We can use the `tally()` function for this.
+We will get some tables that summarize the information displayed in Example 9.1. We can use the `tally()` function for this.
 
 ```{r Instag2}
 #Ex9.1
@@ -76,7 +76,7 @@ tally(User ~ Sex, data = Instag, margin = TRUE)
 tally(User ~ Sex, data = Instag, format = "proportion", margin = TRUE)
 ```
 
-Now take look at Example 9.2 in page 526. To recreate that table of counts we simply have to call the `tally()` function and it will make the 2-way table for us. 
+Now take look at Example 9.2 on page 526. To recreate that table of counts we simply have to call the `tally()` function and it will make the 2-way table for us. 
 We call it like this: 
 
 ```{r Instag5}
@@ -103,7 +103,7 @@ tally(~ Required + Party, data = Vaccine, margins = TRUE)
 Now we continue to explore our 2 way tables. In Example 9.5 we can see the marginal distribution of our Vaccine tables across political party preference. We recreate it with a call to `tally()` but this time we will use a new parameter too. 
 
 ```{r Vaccine2}
-#Ex9.5
+#Example 9.5 (page 529)
 tally(Required ~ Party, data = Vaccine, margins = TRUE, format = "percent")
 ```
 
@@ -112,7 +112,7 @@ The `format = "percent"` will nicely output the results in percentage form!
 The output from `tally()` is good enough. However, a picture is worth a thousand words. Let's try to create a bar graph out of the Vaccine dataset. 
 
 ```{r Vaccine3}
-#Ex9.6
+#Example 9.6 (page 530)
 gf_percents(~ Required, data = Vaccine, fill = ~ Party, position = "dodge")
 ```
 
@@ -123,7 +123,7 @@ Note: This is not an equivalent bar graph but still provides the same useful inf
 Another way that we can visualize two categorical variables is to create a mosaic plot. We will use the `vcd` package's `mosaic()` function to plot the mosaic plot. Note the call resembles the same syntax of the `tally()` commands we made earlier. 
 
 ```{r Vaccine4}
-#Ex9.7
+#Example 9.7 (page 531)
 vcd::mosaic(Required ~ Party, data = Vaccine, shade = TRUE)
 ```
 
@@ -132,7 +132,7 @@ Having multiple ways to visualize varibles will help you analyze your data more 
 In Example 9.7 we are interested in getting the expected counts of our Vaccine data. In R you can take advantage of the `xchisq.test()` function and get the relevant output like this: 
 
 ```{r Vaccine5}
-#Ex9.8 pg.533
+#Example 9.8 (pg.536)
 chiSqVaccine <- xchisq.test(tally(Required ~ Party, data = Vaccine), correct = FALSE)
 with(chiSqVaccine, expected)
 ```
@@ -144,14 +144,14 @@ Note: We specify the `correct = FALSE` option to match the book's table. This op
 In a manner similar to the one above, we can get the observed counts we calculated with `tally()` before. We just retrieve the relevant field from our object with the `with()` function again.
 
 ```{r Vaccine6}
-#Ex9.8
+#Example 9.8
 with(chiSqVaccine, observed)
 ```
 
 To see the output of the Chi-Square test discussed in Example 9.8 we just need to print the object we stored in our variable earlier.
 
 ```{r Vaccine7}
-#Ex9.8
+#Example 9.8
 chiSqVaccine
 ```
 
@@ -159,7 +159,7 @@ All this useful features are already built into how R's `xchisq.test()` function
 
 Note: There is an error in the $\chi^2$ value in the book. While it showed the correct machine output, it specified the wrong $\chi^2$ squared value.
 
-We continue with Example 9.9 in page 537. 
+We continue with Example 9.9 on page 537. 
 
 ```{r Health1}
 #Ex9.9
@@ -181,21 +181,21 @@ You should already know what is happening in the code chunk above. We will store
 Now we recreate the table in page 537 as follows: 
 
 ```{r Health2}
-#Ex9.9
+#Example 9.9
 tally(~ FruitConsumption + PhysAct, data = Health, margins = TRUE)
 ```
 
 The table above is the 2 way table of counts from the Health data. To get the percentages instead we use the `format` parameter. 
 
 ```{r Health3}
-#Ex9.10
+#Example 9.10
 tally(~ FruitConsumption + PhysAct, data = Health, margins = TRUE, format = "percent")
 ```
 
 Again, visualizations will trump tables in all appropriate cases. We will create a faceted bar graph. 
 
 ```{r Health4}
-#Fig9.7
+#Figure 9.7
 gf_percents(~ FruitConsumption | PhysAct, data = Health)
 ```
 
@@ -204,7 +204,7 @@ Note: These are not equivalent bar graphs to Figure 9.7, but they still provide 
 Now, let's get the expected counts for our Health data. 
 
 ```{r Health5}
-#Ex9.11
+#Example 9.11 (page 539)
 chiSqHealth <- xchisq.test(tally(FruitConsumption ~ PhysAct, data = Health), correct = FALSE)
 with(chiSqHealth, expected)
 ```
@@ -212,14 +212,14 @@ with(chiSqHealth, expected)
 And our observed counts...
 
 ```{r Health6}
-#Ex9.11
+#Example 9.11
 with(chiSqHealth, observed)
 ```
 
 And finally our $\chi^2$ statistic.
 
 ```{r Health7}
-#Ex9.11
+#Example 9.11
 chiSqHealth
 ```
 
@@ -230,7 +230,7 @@ Remember these are all possible thans to the functionality of the `xchisq.test()
 We will be using data of the ACT from six different states. We recreate our dataset from the counts. 
 
 ```{r ACT1}
-#Ex9.13
+#Example 9.13 (page 545)
 ACT <- rbind(
   do(167) * data.frame(State = "AZ", label = 1),
   do(257) * data.frame(State = "CA", label = 2),
@@ -244,14 +244,14 @@ ACT <- rbind(
 To get a sense of the number of participants in the study (pg 546) we can quickly do a `tally()` call on the State column. 
 
 ```{r ACT2}
-#Ex9.13
+#Example 9.13 (page 546)
 tally(~ State, data = ACT, margins = TRUE)
 ```
 
 We will now import the population proportions from a csv file. We will use these values to see how close our sample counts are to the population values. 
 
 ```{r ACT3, message=FALSE}
-#Ex9.13
+#Example 9.13
 ACTPopProp <- read_csv("https://nhorton.people.amherst.edu/ips9/data/chapter09/EG09-13ACT.csv")
 ACTPopProp
 ```
@@ -260,26 +260,26 @@ ACTPopProp
 We will use the same `xchisq.test()` function from before. It is important to note the new behavior we expect from the function when we provide a vector of the population proportions. The expected counts and the $\chi^2$ value will depend on this new parameter. 
 
 ```{r ACT4}
-#Ex9.13
+#Example 9.13
 chisqACT <- xchisq.test(tally(~ State, data = ACT), p = c(0.105, .172, .164, .188, .07, .301), correct = FALSE)
 ```
 
 Now that we have saved our object, we can access the expected counts and the test statistic just like before. 
 
 ```{r ACT5}
-#Ex9.13
+#Example 9.13
 with(chisqACT, expected)
 ```
 
 ```{r ACT6}
-#Ex9.14
+#Example 9.14 (page 547)
 chisqACT
 ```
 
 Another example of a field included in the return value of the `xchisq.test()` is the `residuals` field. Let's take a look. 
 
 ```{r ACT7}
-#Ex9.15
+#Example 9.15 (page 548)
 with(chisqACT, residuals)
 ```
 

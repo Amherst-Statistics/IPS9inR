@@ -1,7 +1,7 @@
 ---
 title: "IPS9 in R: Two-way analysis of variance (Chapter 13)"
 author: "Bonnie Lin and Nicholas Horton (nhorton@amherst.edu)"
-date: "July 20, 2018"
+date: "January 31, 2019"
 output: 
   pdf_document:
     fig_height: 3
@@ -68,10 +68,10 @@ head(HRTRATE_tidy)
 ```
 
 ```{r}
-## Figure 13.4, age 710
+## Figure 13.4, page 710
 favstats(Heart_Rate ~ Sex + Group, data = HRTRATE_tidy)
 
-## Figure 13.5, age 711
+## Figure 13.5, page 711
 lm_HRTRATE <- lm(Heart_Rate ~ Group * Sex, data = HRTRATE_tidy)
 msummary(lm_HRTRATE)
 anova(lm_HRTRATE)

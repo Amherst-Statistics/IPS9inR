@@ -1,7 +1,7 @@
 ---
 title: "IPS9 in R: Inference for Proportions (Chapter 8)"
 author: "Bonnie Lin and Nicholas Horton (nhorton@amherst.edu)"
-date: "January 19, 2019"
+date: "January 29, 2019"
 
 output: 
   pdf_document:
@@ -56,7 +56,7 @@ library(readr)
 ```{r eg8-1, message=FALSE}
 ROBOT <- read_csv("https://nhorton.people.amherst.edu/ips9/data/chapter08/EG08-01ROBOT.csv")
 ROBOT
-### Example 8.2, page 487
+### Example 8.3, page 487
 prop.test(910, 910 + 986, 
            alternative="two.sided",
            conf.level=0.95)
@@ -67,7 +67,7 @@ To improve readability for future coding, we will suppress the "Parsed with colu
 specification" message by adding `message = FALSE` at the top of the code chunks.
 
 ```{r eg8-5, message=FALSE}
-### Example 8.5 and 8.6, page 492-493
+### Example 8.5 and 8.6, page 491-493
 prop.test(13, 20, correct = FALSE)
 ```
 

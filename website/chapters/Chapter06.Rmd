@@ -1,7 +1,7 @@
 ---
 title: "IPS9 in R: Introduction to Inference (Chapter 6)"
 author: "Shukry Zablah (szablah20@amherst.edu) and Nicholas Horton (nhorton@amherst.edu)"
-date: "July 25, 2018"
+date: "January 29, 2019"
 output: 
   pdf_document:
     fig_height: 3
@@ -52,7 +52,7 @@ library(readr)
 ### Section 6.1: Estimating with Confidence 
 
 ```{r ex6.1, message=FALSE}
-#Fig6.1
+#Fig6.1 (page 324)
 Wade <- read_csv("https://nhorton.people.amherst.edu/ips9/data/chapter06/EG06-01WADE.csv")
 Wade %>% 
   mutate(North_south = ns,
@@ -62,7 +62,7 @@ Wade %>%
 
 ### Section 6.2: Tests of Significance
 
-Look at Ex6.17 in page 375. We will recreate the calculation as a function of the vector of observations, the population mean, and the known standard deviation. We then visualize it and get the probability of getting a z score equal or greater. 
+Look at Example 6.17 on page 375. We will recreate the calculation as a function of the vector of observations, the population mean, and the known standard deviation. We then visualize it and get the probability of getting a z score equal or greater. 
 
 ```{r ex6.17}
 #pg375

@@ -1,7 +1,7 @@
 ---
 title: "IPS9 in R: Multiple regression (Chapter 11)"
 author: "Nicholas Horton (nhorton@amherst.edu)"
-date: "January 19, 2019"
+date: "January 31, 2019"
 output: 
   pdf_document:
     fig_height: 3
@@ -98,7 +98,7 @@ GPA <- read_csv("https://nhorton.people.amherst.edu/ips9/data/chapter11/EX11-13G
 GPA <- GPA %>%
   mutate(SEX = ifelse(SEX == 1, "F", "M"))
 library(GGally)
-# Figure 11.5
+# Figure 11.5, page 622
 GPA %>% select(-OBS) %>%
   GGally::ggpairs()
 ```
@@ -134,7 +134,7 @@ msummary(gpamultlm2)
 #### Regression using all variables
 
 ```{r}
-# Figure 11.9
+# Figure 11.9, page 627
 gpasatlm <- lm(GPA ~ SATM + SATCR + SATW, data = GPA)
 msummary(gpasatlm)
 

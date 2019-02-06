@@ -1,7 +1,7 @@
 ---
 title: "IPS9 in R: Sampling distributions (Chapter 5)"
 author: "Margaret Chien and Nicholas Horton (nhorton@amherst.edu)"
-date: "November 10, 2018"
+date: "January 31, 2019"
 output: 
   pdf_document:
     fig_height: 3
@@ -60,11 +60,11 @@ library(readr)
 ```{r}
 Help <- read_csv("https://nhorton.people.amherst.edu/ips9/data/chapter05/EG05-05HELP60.csv")
 
-# Figure 5.6(a), page 294
+# Figure 5.6 (a), page 294
 gf_dhistogram(~ Length, data = Help, binwidth = 12.5, center = 6.25)  %>%
   gf_labs(x = "Visit lengths (minutes)", y = "Percent of Visits")
 
-# Figure 5.6(b)
+# Figure 5.6 (b)
 set.seed(124)
 HelpSamples <- do(500) * mean(~ Length, data = resample(Help, size = 60))
 gf_dhistogram(~ mean, data = HelpSamples, binwidth = 12.5) %>%
