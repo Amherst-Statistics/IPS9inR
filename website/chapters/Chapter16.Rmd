@@ -1,7 +1,7 @@
 ---
 title: "IPS9 in R: Bootstrap Methods and Permutation Tests (Chapter 16)"
 author: "Bonnie Lin and Nicholas Horton (nhorton@amherst.edu)"
-date: "July 22, 2018"
+date: "February 9, 2019"
 output: 
   pdf_document:
     fig_height: 3
@@ -69,12 +69,12 @@ set.seed(2018)
 numsim <- 3000
 Avg_Viewtime <- do(numsim) * mean(~ Time, data = resample(FACE4, 21)) 
 
-#Figure 16.3(a)
+# Figure 16.3(a)
 favstats(~ mean, data = Avg_Viewtime)
 gf_histogram(~ mean, data = Avg_Viewtime) %>%
   gf_labs(x = "Mean time of resamples (in minutes)", y = "Count")
 
-#Figure 16.3(b)
+# Figure 16.3(b)
 gf_qq(~ mean, data = Avg_Viewtime) %>% 
   gf_qqline(color = "red", linetype = "solid") %>% 
   gf_labs(x = "Normal score", y = "Mean time of resamples (in minutes)")
@@ -225,6 +225,7 @@ confint(LAUND_sims, method=c("se", "perc"))
 ```
 
 ### Section 16.5: Significance testing using permutation tests
+
 Permutation tests use resampling to generate a null distribution for a test 
 statistic, with each step randomly resampling without replacement and recalculating
 the test statistic in each permutation.

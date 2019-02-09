@@ -1,7 +1,7 @@
 ---
 title: "IPS9 in R: Nonparametric tests (Chapter 15)"
 author: "Shukry Zablah (szablah20@amherst.edu) and Nicholas Horton (nhorton@amherst.edu)"
-date: "July 22, 2018"
+date: "February 9, 2019"
 output: 
   pdf_document:
     fig_height: 3
@@ -64,7 +64,7 @@ Hits
 To recreate the table shown, just select the two relevant columns for the hits of each group and drop the `NA` values. 
 
 ```{r Hits2}
-#Ex15.1
+# Example 15.1
 Hits %>% 
   select(HitsAmer, HitsNat) %>%
   filter(!is.na(HitsAmer))
@@ -86,7 +86,7 @@ RanksHits
 Next we sum the ranks for each group. We will take advantage of the `sum()` function.
 
 ```{r Hits4}
-#Pg15.5
+# Example 15.5
 sum(Rank ~ League, data = RanksHits)
 ```
 
@@ -95,7 +95,7 @@ The intuition behind the test is that if there was no difference between the lea
 Finally, to perform the Wilcoxon Rank Sums test we use `wilcox.test()`.
 
 ```{r Hits5}
-#Fig15.3
+# Figure 15.3
 wilcox.test(Hits ~ League, data = Hits)
 ```
 
@@ -104,7 +104,7 @@ In page 10, Example 15.6 the book discusses how to deal with ties in the dataset
 For Example 15.7, we have to recreate the dataset and confirm we can get the table of counts. 
 
 ```{r Exerg1}
-#Ex15.7
+# Example 15.7
 Exerg <- rbind(
   do(6) * data.frame(Exergamer = "Yes", TV_time = "None"),
   do(160) * data.frame(Exergamer= "Yes", TV_time = "<2 hours"),
@@ -116,7 +116,7 @@ Exerg <- rbind(
 ```
 
 ```{r Exerg2}
-#Ex15.7
+# Example 15.7
 tally(~ Exergamer + TV_time, data = Exerg)
 tally(~ Exergamer + TV_time, data = Exerg, format = "percent", margins = TRUE)
 ```
@@ -124,7 +124,7 @@ tally(~ Exergamer + TV_time, data = Exerg, format = "percent", margins = TRUE)
 Success! Now let's perform the Wilcox Rank Sum Test. R will take care of the fact that there are "ties" in the dataset. However, we do have to code the variables into numerics in order for the test to run. 
 
 ```{r Exerg3}
-#Ex.15.8
+# Example 15.8
 Exerg %>% 
   mutate(Val = recode(TV_time,
                       `None` = 0,
@@ -140,7 +140,7 @@ Exerg %>%
 Read in the csv file. 
 
 ```{r Story1, message=FALSE}
-#Ex15.9
+# Example 15.9
 Story <- read_csv("https://nhorton.people.amherst.edu/ips9/data/chapter15/EG15-009STORY.csv")
 Story
 ```
@@ -148,7 +148,7 @@ Story
 Filter the relevant observations by using `filter()`.
 
 ```{r Story2}
-#Ex15.9
+# Example 15.9
 StoryTable <- Story %>%
   filter(Progress == "Low") 
 ```
@@ -156,7 +156,7 @@ StoryTable <- Story %>%
 We will prove why our previous tests are not suitable for the scenario. 
 
 ```{r Story3}
-#Ex15.9
+# Example 15.9
 gf_qq(~ DiffLow, data = StoryTable) # XX add line
 gf_histogram(~ DiffLow, data = StoryTable, binwidth = 0.2, center = 0.5)
 ```
@@ -168,7 +168,7 @@ Before we do the test we have to format our dataset differently. Specifically, w
 The same `wilcox.test()` function will be used to perform the test. However, we specify `paired = TRUE` in order to perform the signed rank test from the book. The option `alternative = "less"` gets the one sided p-value that we are testing for. 
 
 ```{r Story4}
-#Fig15.7
+# Figure 15.7
 StoryTableNarrower <- StoryTable %>%
   gather(key = "StoryType", value = "Values", Story1, Story2) 
 StoryTableNarrower
@@ -185,7 +185,7 @@ The ANOVA test needs strict conditions to hold. The Kruskal-Wallis test provides
 Let's read in the dataset. 
 
 ```{r Weeds1, message=FALSE}
-#Ex15.14
+# Example 15.14
 Weeds <- read_csv("https://nhorton.people.amherst.edu/ips9/data/chapter15/EG15-014WEEDS.csv")
 Weeds
 ```
@@ -193,14 +193,14 @@ Weeds
 Recreate the summary statistics. 
 
 ```{r Weeds2}
-#Ex15.14
+# Example 15.14
 favstats(yield ~ weeds, data = Weeds)
 ```
 
 And get the test results! You can use `kruskal.test()` to perform the Kruskal-Wallis Rank Sum test. 
 
 ```{r Weeds3}
-#Ex15.15
+# Example 15.15
 kruskal.test(yield ~ weeds, data = Weeds)
 ```
 
@@ -209,19 +209,19 @@ These functions can be black boxes unless you understand the underlying process.
 Let's look at another dataset. 
 
 ```{r Organic1, message=FALSE}
-#Ex15.16
+# Example 15.16
 Organic <- read_csv("https://nhorton.people.amherst.edu/ips9/data/chapter15/EG15-016ORGANIC.csv")
 ```
 
 ```{r Organic2}
-#Ex15.16
+# Example 15.16
 favstats(Score ~ Food, data = Organic)
 ```
 
 And perform the same test.
 
 ```{r Organic3}
-#Ex15.16
+# Example 15.16
 kruskal.test(Score ~ as.factor(Food), data = Organic)
 ```
 
